@@ -1,0 +1,10 @@
+{
+  "id": "sample.file-system-provider",
+  "name": "File System Provider Sample",
+  "description": "An in-memory file system backed by a JavaScript map",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onFileSystem:memfs"]
+}

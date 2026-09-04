@@ -1,0 +1,15 @@
+{
+  "id": "sample.source-control-provider",
+  "name": "Source Control Provider Sample",
+  "description": "A small source control provider with staged and unstaged groups",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onSourceControl:file"],
+  "sourceControlProviders": [
+    {
+      "id": "sampleSourceControl"
+    }
+  ]
+}
