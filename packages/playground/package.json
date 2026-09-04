@@ -1,0 +1,9 @@
+{
+  "name": "@lvce-editor/extension-samples-playground",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "esbuild-wasm": "^0.28.2"
+  }
+}

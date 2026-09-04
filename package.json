@@ -1,0 +1,33 @@
+{
+  "name": "@lvce-editor/extension-samples-monorepo",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "node packages/build/src/build.ts",
+    "build:static": "node packages/build/src/build.ts",
+    "dev": "node packages/build/src/dev.ts",
+    "e2e": "npm run e2e --workspace=packages/e2e",
+    "e2e:headless": "npm run e2e:headless --workspace=packages/e2e",
+    "format": "prettier --write .",
+    "lint": "eslint . && prettier --check .",
+    "test": "node --test \"packages/**/test/**/*.test.ts\"",
+    "type-check": "tsc -b"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 150
+  },
+  "devDependencies": {
+    "@lvce-editor/eslint-config": "^18.9.0",
+    "@types/node": "^26.4.1",
+    "eslint": "^10.9.1",
+    "prettier": "^3.9.6",
+    "typescript": "^6.0.3"
+  }
+}

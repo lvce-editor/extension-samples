@@ -1,0 +1,13 @@
+{
+  "name": "@lvce-editor/extension-samples-e2e",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test --headed",
+    "e2e:headless": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}
