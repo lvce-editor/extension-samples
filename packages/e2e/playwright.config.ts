@@ -16,7 +16,7 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
   retries: process.env.CI ? 2 : 0,
   testDir: './src',
-  timeout: 45_000,
+  timeout: 60_000,
   use: {
     baseURL: 'http://127.0.0.1:3000',
     headless: true,

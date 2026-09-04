@@ -1,9 +1,10 @@
 import { activate as activateExtensionApi, registerSourceControlProvider, type SourceControlProvider } from '@lvce-editor/api'
 
 const providerId = 'sampleSourceControl'
+const workspaceRoot = '/extension-samples/source-control-provider'
 const changedFiles = [
-  { file: '/workspace/README.md', status: 1 },
-  { file: '/workspace/src/main.ts', status: 2 },
+  { file: `${workspaceRoot}/README.md`, status: 1 },
+  { file: `${workspaceRoot}/src/main.ts`, status: 2 },
 ]
 
 const provider: SourceControlProvider = {
@@ -45,14 +46,14 @@ const provider: SourceControlProvider = {
     return [
       {
         id: 'changes',
-        items: changedFiles.map((item) => ({ ...item, file: `${cwd}${item.file.slice('/workspace'.length)}` })),
+        items: changedFiles.map((item) => ({ ...item, file: `${cwd}${item.file.slice(workspaceRoot.length)}` })),
         label: 'Changes',
       },
     ]
   },
   id: providerId,
-  isActive(scheme, root) {
-    return scheme === 'file' && root === '/workspace'
+  isActive(_scheme, _root) {
+    return true
   },
 }
 
