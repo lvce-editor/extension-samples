@@ -6,7 +6,7 @@ const files = new Map<string, string>([
 ])
 
 const normalize = (uri: string): string => {
-  const path = uri.replace(/^memfs:\/\//, '')
+  const path = uri.replace(/^sample-memfs:\/\//, '')
   return path.startsWith('/') ? path : `/${path}`
 }
 
@@ -20,14 +20,14 @@ const getDirectChildren = (directory: string): Array<{ name: string; type: numbe
     const relative = file.slice(prefix.length)
     const [name, ...rest] = relative.split('/')
     if (name) {
-      children.set(name, rest.length === 0 ? 1 : 2)
+      children.set(name, rest.length === 0 ? 7 : 3)
     }
   }
   return Array.from(children, ([name, type]) => ({ name, type }))
 }
 
 const provider: FileSystemProvider = {
-  id: 'memfs',
+  id: 'sample-memfs',
   mkdir(_uri: string) {},
   readDirWithFileTypes(uri) {
     return getDirectChildren(normalize(uri))

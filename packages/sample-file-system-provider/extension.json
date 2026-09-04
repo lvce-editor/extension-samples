@@ -6,5 +6,5 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onFileSystem:memfs"]
+  "activation": ["onFileSystem:sample-memfs"]
 }

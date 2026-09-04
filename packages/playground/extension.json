@@ -1,0 +1,26 @@
+{
+  "id": "builtin.extension-samples-playground",
+  "name": "Extension Samples Playground",
+  "description": "Live-editable LVCE Editor extension API samples",
+  "version": "0.0.0",
+  "browser": "dist/extensionMain.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "connect-src 'self'", "script-src 'self' 'unsafe-eval'"],
+  "activation": ["onCommand:extensionSamples.openPlayground", "onFileSystem:sample-memfs"],
+  "fileSystemProviders": [
+    {
+      "id": "sample-memfs"
+    }
+  ],
+  "sourceControlProviders": [
+    {
+      "id": "sampleSourceControl"
+    }
+  ],
+  "commands": [
+    {
+      "id": "extensionSamples.openPlayground",
+      "label": "Extension Samples: Open Playground"
+    }
+  ]
+}

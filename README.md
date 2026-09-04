@@ -2,7 +2,7 @@
 
 Interactive examples for the [Lvce Editor](https://github.com/lvce-editor/lvce-editor) extension API.
 
-Each extension lives in `packages/sample-<id>`. The static playground loads its TypeScript source, bundles it in the browser with esbuild-wasm, and runs it in a sandboxed preview. Saving with `Ctrl+S` or the Save button rebuilds the extension and refreshes the preview.
+Each extension lives in `packages/sample-<id>`. The static playground opens its TypeScript source in a real LVCE Editor, transpiles it in the browser with esbuild-wasm, and activates it in an isolated extension host. Saving with `Ctrl+S` rebuilds the extension and refreshes the live LVCE preview.
 
 ## Samples
 
@@ -22,4 +22,6 @@ Use `npm run build:static` to create the GitHub Pages artifact in `.tmp/static` 
 
 ## Playground architecture
 
-The browser compiler maps `@lvce-editor/api` to a small preview adapter. This keeps the playground fully static and makes extension code immediately runnable without a server. The sample source and manifests use the real Lvce Editor API package and can also be packaged as regular extensions. A future embeddable Lvce workbench can replace the adapter without changing the sample packages.
+The build exports a focused LVCE workbench for each sample and installs the released `builtin.eslint` web extension. The source workspace uses LVCE's built-in in-memory file system so syntax highlighting, diagnostics, editing, and saving follow the normal editor paths. The file-system sample's right editor uses the provider registered by the code on the left; the source-control sample opens LVCE's real source-control view.
+
+The playground extension maps `@lvce-editor/api` to the active extension-host API, transpiles the single-file TypeScript sample with esbuild-wasm, and persists successful saves in browser storage. The generated site remains a static GitHub Pages artifact and does not require a development server at runtime.

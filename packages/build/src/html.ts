@@ -6,7 +6,6 @@ const escapeAttribute = (value: string): string => {
 
 export const createHtml = (sample: Sample, nested: boolean): string => {
   const prefix = nested ? '..' : '.'
-  const sourceUrl = `${prefix}/samples/${sample.id}/src/main.ts`
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -16,50 +15,25 @@ export const createHtml = (sample: Sample, nested: boolean): string => {
     <title>${escapeAttribute(sample.title)} · Lvce Editor Extension Samples</title>
     <link rel="stylesheet" href="${prefix}/assets/app.css">
   </head>
-  <body
-    data-sample-id="${escapeAttribute(sample.id)}"
-    data-source-url="${escapeAttribute(sourceUrl)}"
-    data-wasm-url="${prefix}/assets/esbuild.wasm"
-    data-route-prefix="${prefix}"
-  >
-    <main class="Workbench" aria-label="Lvce Editor extension playground">
-      <aside class="CollapsedSideBar" aria-label="Collapsed sidebar">
+  <body data-sample-id="${escapeAttribute(sample.id)}" data-route-prefix="${prefix}">
+    <main class="Playground" aria-label="LVCE Editor extension playground">
+      <header class="Toolbar">
         <a class="Brand" href="${prefix}/" aria-label="Extension samples home">LV</a>
-        <button class="SideBarIcon SideBarIconActive" type="button" title="Explorer collapsed" aria-label="Explorer collapsed">▱</button>
-        <button class="SideBarIcon" type="button" title="Extensions" aria-label="Extensions">◇</button>
-      </aside>
-      <section class="CodePane" aria-label="Extension source">
-        <div class="Toolbar">
-          <label class="SamplePickerLabel" for="sample-picker">Sample</label>
-          <select id="sample-picker" class="SamplePicker" aria-label="Extension sample"></select>
-          <span class="ToolbarSpacer"></span>
-          <button id="reset-button" class="Button ButtonSecondary" type="button">Reset</button>
-          <button id="save-button" class="Button ButtonPrimary" type="button">Save &amp; run</button>
-        </div>
-        <div class="EditorTab" aria-label="Open editor tab">
-          <span class="TypeScriptIcon">TS</span>
-          <span>main.ts</span>
-          <span id="dirty-indicator" class="DirtyIndicator" aria-label="Unsaved changes"></span>
-        </div>
-        <div class="EditorSurface">
-          <div id="line-numbers" class="LineNumbers" aria-hidden="true"></div>
-          <textarea id="source-editor" class="SourceEditor" aria-label="TypeScript extension source" spellcheck="false"></textarea>
-        </div>
-        <div id="build-status" class="BuildStatus" role="status" aria-live="polite">Loading source…</div>
-      </section>
-      <section class="PreviewPane" aria-label="Live extension preview">
-        <div class="PreviewHeader">
-          <div>
-            <div class="Eyebrow">Live preview</div>
-            <h1>${escapeAttribute(sample.title)}</h1>
-          </div>
-          <span class="PreviewBadge">Sandboxed</span>
-        </div>
-        <p class="PreviewDescription">${escapeAttribute(sample.description)}</p>
-        <iframe id="preview-frame" class="PreviewFrame" title="Extension preview" sandbox="allow-scripts"></iframe>
-      </section>
+        <label class="SamplePickerLabel" for="sample-picker">Sample</label>
+        <select id="sample-picker" class="SamplePicker" aria-label="Extension sample"></select>
+        <span class="SaveHint">Edit on the left · Ctrl+S rebuilds the extension and refreshes the preview</span>
+        <span class="ToolbarSpacer"></span>
+        <button id="reset-button" class="ResetButton" type="button">Reset sample</button>
+      </header>
+      <iframe
+        id="workbench-frame"
+        class="WorkbenchFrame"
+        title="LVCE Editor workbench"
+        src="${prefix}/workbench/${escapeAttribute(sample.id)}/?sample=${escapeAttribute(sample.id)}"
+        allow="clipboard-read; clipboard-write"
+      ></iframe>
     </main>
-    <script type="module" src="${prefix}/assets/app.js"></script>
+    <script type="module" src="${prefix}/assets/site.js"></script>
   </body>
 </html>
 `
