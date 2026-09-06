@@ -1,7 +1,7 @@
 {
   "id": "sample.source-control-provider",
   "name": "Source Control Provider Sample",
-  "description": "A small source control provider with staged and unstaged groups",
+  "description": "A mock source control provider with a changes group and SVG decorations",
   "version": "0.0.0",
   "browser": "dist/main.js",
   "isolated": true,

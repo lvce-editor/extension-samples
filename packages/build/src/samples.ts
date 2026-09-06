@@ -15,7 +15,7 @@ export const samples: readonly Sample[] = [
     title: 'File System Provider',
   },
   {
-    description: 'Expose changed files, decorations, staging, and commit actions.',
+    description: 'Expose mock changed files, SVG decorations, and example commit actions.',
     id: 'source-control-provider',
     packageName: 'sample-source-control-provider',
     route: 'source-control-provider',

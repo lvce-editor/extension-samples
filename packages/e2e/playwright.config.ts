@@ -21,13 +21,13 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${process.env.PORT || '3000'}`,
     headless: true,
     trace: 'retain-on-failure',
-    viewport: { width: 1600, height: 900 },
+    viewport: { height: 900, width: 1600 },
   },
-  workers: process.env.CI ? 2 : undefined,
   webServer: {
     command: 'npm run dev --prefix ../..',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     url: `http://127.0.0.1:${process.env.PORT || '3000'}/extension-samples/file-system-provider/`,
   },
+  workers: process.env.CI ? 2 : '50%',
 })

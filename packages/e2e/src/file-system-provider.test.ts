@@ -74,7 +74,7 @@ test('rebuilds an imported file repeatedly without replacing the source IDE or s
     for (const worker of sharedWorkers) expect(page.workers()).toContain(worker)
     const ids = await page.locator('[id]').evaluateAll((elements) => elements.map((element) => element.id))
     expect(new Set(ids).size).toBe(ids.length)
-    const uids = await page.locator('.Viewlet[data-uid]').evaluateAll((elements) => elements.map((element) => element.getAttribute('data-uid')))
+    const uids = await page.locator('.Viewlet[data-uid]').evaluateAll((elements) => elements.map((element) => element.dataset.uid))
     expect(new Set(uids).size).toBe(uids.length)
     timings.push(Number(await page.locator('body').getAttribute('data-preview-build-ms')))
   }
@@ -107,7 +107,7 @@ test('editing the provider workspace does not save or rebuild the source applica
   await page.keyboard.insertText('Written through the sample filesystem provider')
   await page.keyboard.press('Control+s')
   await expect(preview.locator('.Editor')).toContainText('Written through the sample filesystem provider')
-  await expect(preview.getByRole('tab', { name: 'README.md Close', exact: true })).toBeVisible()
+  await expect(preview.getByRole('tab', { exact: true, name: 'README.md Close' })).toBeVisible()
   await preview.getByRole('treeitem', { exact: true, name: 'src' }).click()
   await preview.getByRole('treeitem', { exact: true, name: 'example.ts' }).click()
   await expect(preview.locator('.Editor')).toContainText('Hello from an extension file system')
