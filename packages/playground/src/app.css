@@ -27,6 +27,41 @@ select {
   height: 100vh;
 }
 
+.IdePair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+}
+
+.IdePane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid #292f38;
+}
+
+.IdePane > header {
+  padding: 5px 12px;
+  min-height: 30px;
+  max-height: 100px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+#preview-status {
+  color: #84909c;
+  margin-left: 16px;
+}
+
+.IdeRoot {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
 .Toolbar {
   align-items: center;
   background: #15181d;
@@ -92,13 +127,6 @@ select {
 
 .ResetButton:hover {
   background: #242a32;
-}
-
-.WorkbenchFrame {
-  background: #111318;
-  border: 0;
-  height: 100%;
-  width: 100%;
 }
 
 @media (max-width: 620px) {

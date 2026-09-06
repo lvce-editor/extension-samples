@@ -18,7 +18,9 @@ const contentTypes: Readonly<Record<string, string>> = {
   '.wasm': 'application/wasm',
 }
 
-await buildStatic()
+if (process.env.SKIP_STATIC_BUILD !== '1') {
+  await buildStatic()
+}
 
 createServer(async (request, response) => {
   try {

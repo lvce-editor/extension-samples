@@ -51,6 +51,13 @@ jobs:
       - run: npm run e2e:headless
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: playground-e2e
+          path: |
+            packages/e2e/playwright-report
+            packages/e2e/test-results
 
   pages:
     needs: [quality, e2e]

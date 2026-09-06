@@ -1,7 +1,8 @@
 import { activate as activateExtensionApi, registerFileSystemProvider, type FileSystemProvider } from '@lvce-editor/api'
+import { instructions } from './instructions.ts'
 
 const files = new Map<string, string>([
-  ['/README.md', '# Hello from memfs\n\nEdit this provider and save to rebuild the preview.'],
+  ['/README.md', `# Hello from memfs\n\n${instructions}`],
   ['/src/example.ts', "export const greeting = 'Hello from an extension file system'"],
 ])
 
