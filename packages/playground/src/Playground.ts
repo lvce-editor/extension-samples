@@ -1,0 +1,240 @@
+type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
+type Files = Record<string, string>
+interface Sample {
+  readonly id: string
+  readonly route: string
+  readonly title: string
+}
+
+const fetchJson = async <T>(url: string): Promise<T> => {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`Unable to load ${url}: ${response.status}`)
+  return response.json()
+}
+
+const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
+  paths.map((path) => {
+    const content = files[`/${path.replace(/^\.\//, '')}`]
+    if (typeof content !== 'string') throw new Error(`Missing icon: ${path}`)
+    return content
+  })
+
+export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExtensions: readonly unknown[]): Promise<void> => {
+  await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.lineNumbers': true })
+  const sourceId = 'source'
+  const previewId = 'preview'
+  const sampleId = document.body.dataset.sampleId || 'file-system-provider'
+  const previewWorkspace = sampleId === 'file-system-provider' ? 'sample-memfs:///' : 'memfs:///preview'
+  const previewFiles: Files =
+    sampleId === 'file-system-provider'
+      ? {}
+      : {
+          '/README.md': '# Preview workspace\n',
+          '/src/main.ts': 'export const message = "Preview file"\n',
+        }
+  const picker = document.querySelector<HTMLSelectElement>('#sample-picker')!
+  const status = document.querySelector<HTMLElement>('#preview-status')!
+  const samples = await fetchJson<Sample[]>(`${prefix}/samples.json`)
+  for (const sample of samples) picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
+  picker.addEventListener('change', () => location.assign(`${prefix}/${picker.value}/`))
+  const storageKey = `extension-samples:workspace:${sampleId}`
+  document.querySelector('#reset-button')!.addEventListener('click', () => {
+    try {
+      localStorage.removeItem(storageKey)
+    } finally {
+      location.reload()
+    }
+  })
+  const initialFiles = await fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`)
+  const tooling = await fetchJson<Files>(`${prefix}/tooling.json`)
+  let files = { ...initialFiles }
+  try {
+    const stored = JSON.parse(localStorage.getItem(storageKey) || 'null')
+    if (stored && !Array.isArray(stored) && Object.entries(stored).every(([path, value]) => path.startsWith('/') && typeof value === 'string'))
+      files = stored
+  } catch {
+    /* A corrupt draft must not prevent opening the sample. */
+  }
+
+  const compiler = new Worker(new URL('compiler.js', import.meta.url), { name: 'Sample compiler', type: 'module' })
+  let nextBuild = 0
+  const pending = new Map<number, { resolve: (code: string) => void; reject: (error: Error) => void }>()
+  let compilerError: Error | undefined
+  compiler.onerror = (event): void => {
+    compilerError = new Error(event.message || 'The sample compiler stopped unexpectedly')
+    for (const request of pending.values()) request.reject(compilerError)
+    pending.clear()
+  }
+  compiler.onmessage = ({ data }: MessageEvent<{ id: number; code: string; error?: string }>): void => {
+    const request = pending.get(data.id)
+    pending.delete(data.id)
+    if (data.error) request?.reject(new Error(data.error))
+    else request?.resolve(data.code)
+  }
+  const compile = (): Promise<string> =>
+    new Promise((resolve, reject) => {
+      if (compilerError) return reject(compilerError)
+      const id = ++nextBuild
+      pending.set(id, { reject, resolve })
+      compiler.postMessage({ files: { ...files }, id })
+    })
+
+  const mount = async (id: string, workspaceUri: string, workspaceFiles: Files, extensions: readonly unknown[]): Promise<void> => {
+    const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
+    const { height, width } = root.getBoundingClientRect()
+    await invoke('Application.create', {
+      extensions,
+      files: Object.fromEntries(Object.entries(workspaceFiles).map(([path, content]) => [`${workspaceUri}${path}`, content])),
+      height,
+      href: location.href,
+      id,
+      rootId: root.id,
+      textFileExtensions: id === sourceId ? ['.svg'] : [],
+      width,
+      workspacePath: workspaceUri,
+      workspaceUri,
+    })
+    for (const command of ['Layout.hideTitleBar', 'Layout.hideStatusBar', 'Layout.hideActivityBar', 'Layout.moveSideBarLeft', 'Layout.showSideBar']) {
+      await invoke('Application.execute', id, command)
+    }
+    await invoke('Application.execute', id, 'Layout.openSideBarViewlet', 'Explorer')
+  }
+
+  const observers: ResizeObserver[] = []
+  for (const id of [sourceId, previewId]) {
+    const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
+    // Editor workers use coordinates relative to their application's viewport.
+    for (const type of ['pointerdown', 'pointermove', 'pointerup', 'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick', 'contextmenu']) {
+      root.addEventListener(
+        type,
+        (event) => {
+          const pointer = event as MouseEvent
+          const { left, top } = root.getBoundingClientRect()
+          Object.defineProperties(pointer, { clientX: { value: pointer.clientX - left }, clientY: { value: pointer.clientY - top } })
+        },
+        { capture: true },
+      )
+    }
+  }
+
+  let previewExists = false
+  let previewUrl = ''
+  let iconUrls: string[] = []
+  let revision = 0
+  let running = false
+  let requested = false
+  const rebuild = async (): Promise<void> => {
+    requested = true
+    if (running) return
+    running = true
+    try {
+      while (requested) {
+        requested = false
+        const started = performance.now()
+        status.textContent = 'Building…'
+        const code = await compile()
+        if (requested) continue
+        const manifest = JSON.parse(files['/extension.json'])
+        const icons = readIcons(manifest['source-control-icons'] || [], files)
+        const wasPreviewMounted = previewExists
+        previewExists = false
+        if (wasPreviewMounted) await invoke('Application.dispose', previewId)
+        URL.revokeObjectURL(previewUrl)
+        for (const url of iconUrls) URL.revokeObjectURL(url)
+        iconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
+        previewUrl = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+        await mount(previewId, previewWorkspace, previewFiles, [
+          {
+            ...manifest,
+            browser: previewUrl,
+            contentSecurityPolicy: [],
+            isWeb: true,
+            path: location.origin,
+            'source-control-icons': iconUrls,
+            uri: location.origin,
+          },
+        ])
+        previewExists = true
+        await invoke('Application.execute', previewId, 'Main.openUri', `${previewWorkspace.replace(/\/$/, '')}/README.md`, false)
+        if (sampleId === 'source-control-provider') await invoke('Application.execute', previewId, 'Layout.openSideBarViewlet', 'Source Control')
+        document.body.dataset.previewRevision = String(++revision)
+        document.body.dataset.previewBuildMs = String(Math.round(performance.now() - started))
+        status.textContent = 'Preview ready'
+      }
+    } catch (error) {
+      status.textContent = String(error)
+    } finally {
+      running = false
+      if (requested) void rebuild()
+    }
+  }
+  await mount(sourceId, 'memfs:///sample', { ...tooling, ...files }, sourceExtensions)
+  await invoke('Application.execute', sourceId, 'Main.openUri', 'memfs:///sample/src/main.ts')
+  await rebuild()
+  for (const id of [sourceId, previewId]) {
+    const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
+    const observer = new ResizeObserver(() => {
+      if (id === previewId && !previewExists) return
+      const observedRevision = revision
+      const { height, width } = root.getBoundingClientRect()
+      if (width > 0 && height > 0)
+        void invoke('Application.resize', id, width, height).catch((error) => {
+          if (id !== previewId || (previewExists && revision === observedRevision)) status.textContent = String(error)
+        })
+    })
+    observer.observe(root)
+    observers.push(observer)
+  }
+  let reading = false
+  let readRequested = false
+  const readWorkspace = async (): Promise<void> => {
+    readRequested = true
+    if (reading) return
+    reading = true
+    try {
+      while (readRequested) {
+        readRequested = false
+        const snapshot: Files = {}
+        const visit = async (path: string): Promise<void> => {
+          const entries = await invoke('Application.execute', sourceId, 'FileSystem.readDirWithFileTypes', `memfs:///sample${path}`)
+          for (const entry of entries) {
+            if (['node_modules', '.git', 'dist'].includes(entry.name)) continue
+            const relative = `${path}/${entry.name}`
+            if (entry.type === 3) await visit(relative)
+            else snapshot[relative] = await invoke('Application.execute', sourceId, 'FileSystem.readFile', `memfs:///sample${relative}`)
+          }
+        }
+        await visit('')
+        if (readRequested) continue
+        files = snapshot
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(files))
+        } catch {
+          // Storage can be unavailable or full; live editing must still work.
+        }
+        void rebuild()
+      }
+    } catch (error) {
+      if (!readRequested) status.textContent = String(error)
+    } finally {
+      reading = false
+      if (readRequested) void readWorkspace()
+    }
+  }
+  globalThis.addEventListener('lvce-file-saved', (event) => {
+    const { applicationId, uri } = (event as CustomEvent<{ applicationId: string; uri: string }>).detail
+    if (applicationId !== sourceId || !uri.startsWith('memfs:///sample/')) return
+    void readWorkspace()
+  })
+  document.body.dataset.playgroundReady = 'true'
+  window.addEventListener(
+    'pagehide',
+    () => {
+      compiler.terminate()
+      for (const observer of observers) observer.disconnect()
+      URL.revokeObjectURL(previewUrl)
+      for (const url of iconUrls) URL.revokeObjectURL(url)
+    },
+    { once: true },
+  )
+}

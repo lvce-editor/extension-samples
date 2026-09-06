@@ -1,188 +1,168 @@
 import { build } from 'esbuild'
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
-import { brotliDecompress } from 'node:zlib'
+import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { builtinModules, createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { promisify } from 'node:util'
+import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
 import { createHtml } from './html.ts'
 import { samples } from './samples.ts'
 
 const root = resolve(import.meta.dirname, '../../..')
 const outputRoot = join(root, '.tmp', 'static')
-const playgroundRoot = join(root, 'packages', 'playground')
-const eslintVersion = '1.17.0'
-const eslintRoot = join(root, '.tmp', 'extensions', 'builtin.eslint')
-const decompressBrotli = promisify(brotliDecompress)
-
-const copyFile = async (from: string, to: string): Promise<void> => {
-  await mkdir(dirname(to), { recursive: true })
-  await cp(from, to)
+const require = createRequire(import.meta.url)
+const writeJson = async (path: string, value: unknown): Promise<void> => {
+  await mkdir(dirname(path), { recursive: true })
+  await writeFile(path, `${JSON.stringify(value, undefined, 2)}\n`)
 }
 
-const buildExtensionPackages = async (): Promise<void> => {
-  await Promise.all(
-    samples.map(async (sample) => {
-      const packageRoot = join(root, 'packages', sample.packageName)
-      await build({
-        bundle: true,
-        entryPoints: [join(packageRoot, 'src', 'main.ts')],
-        external: ['@lvce-editor/api'],
-        format: 'esm',
-        outfile: join(packageRoot, 'dist', 'main.js'),
-        platform: 'browser',
-        sourcemap: true,
-        target: 'es2022',
-      })
-    }),
-  )
-}
-
-const copySamples = async (): Promise<void> => {
-  for (const sample of samples) {
-    const packageRoot = join(root, 'packages', sample.packageName)
-    const sampleOutput = join(outputRoot, 'samples', sample.id)
-    await copyFile(join(packageRoot, 'extension.json'), join(sampleOutput, 'extension.json'))
-    await copyFile(join(packageRoot, 'src', 'main.ts'), join(sampleOutput, 'src', 'main.ts'))
-    await copyFile(join(packageRoot, 'dist', 'main.js'), join(sampleOutput, 'dist', 'main.js'))
-    await copyFile(join(packageRoot, 'dist', 'main.js.map'), join(sampleOutput, 'dist', 'main.js.map'))
+const readWorkspace = async (directory: string): Promise<Record<string, string>> => {
+  const files: Record<string, string> = {}
+  const visit = async (path: string): Promise<void> => {
+    for (const entry of await readdir(join(directory, path), { withFileTypes: true })) {
+      if (['node_modules', 'dist', '.git'].includes(entry.name)) continue
+      const relative = `${path}/${entry.name}`
+      if (entry.isDirectory()) await visit(relative)
+      else if (!relative.endsWith('.tsbuildinfo')) files[relative] = await readFile(join(directory, relative), 'utf8')
+    }
   }
+  await visit('')
+  files['/eslint.config.js'] =
+    "import parser from '@typescript-eslint/parser'\n\nexport default [{ files: ['**/*.ts', '**/*.js'], languageOptions: { parser, parserOptions: { tsconfigRootDir: '/sample' } }, rules: { 'no-debugger': 'error' } }]\n"
+  return files
 }
 
-const buildPlaygroundExtension = async (): Promise<void> => {
-  const outputDirectory = join(playgroundRoot, 'dist')
-  await rm(outputDirectory, { force: true, recursive: true })
-  await mkdir(outputDirectory, { recursive: true })
-  await build({
-    bundle: true,
-    entryPoints: [join(playgroundRoot, 'src', 'extensionMain.ts')],
-    external: ['electron', 'node:*'],
-    format: 'esm',
-    outfile: join(outputDirectory, 'extensionMain.js'),
-    platform: 'browser',
-    sourcemap: true,
-    target: 'esnext',
-  })
-  await copyFile(join(root, 'node_modules', 'esbuild-wasm', 'esbuild.wasm'), join(outputDirectory, 'esbuild.wasm'))
-  for (const sample of samples) {
-    await copyFile(join(root, 'packages', sample.packageName, 'src', 'main.ts'), join(outputDirectory, 'samples', sample.id, 'main.ts'))
+const buildTooling = async (): Promise<Record<string, string>> => {
+  const files: Record<string, string> = {}
+  for (const [name, entry] of [
+    ['eslint', 'eslint/universal'],
+    ['@typescript-eslint/parser', '@typescript-eslint/parser'],
+  ]) {
+    const result = await build({
+      entryPoints: [require.resolve(entry)],
+      bundle: true,
+      platform: 'browser',
+      format: 'cjs',
+      external: ['node:*', ...builtinModules],
+      write: false,
+    })
+    files[`/node_modules/${name}/index.cjs`] = result.outputFiles[0].text
+    files[`/node_modules/${name}/package.json`] = JSON.stringify({ name, main: 'index.cjs' })
   }
-}
-
-const buildSite = async (): Promise<void> => {
-  await build({
-    bundle: true,
-    entryPoints: [join(playgroundRoot, 'src', 'site.ts')],
-    format: 'esm',
-    outfile: join(outputRoot, 'assets', 'site.js'),
-    platform: 'browser',
-    sourcemap: true,
-    target: 'es2022',
-  })
-  await copyFile(join(playgroundRoot, 'src', 'app.css'), join(outputRoot, 'assets', 'app.css'))
-}
-
-const downloadEslintExtension = async (): Promise<void> => {
-  const archiveUrl = `https://github.com/lvce-editor/eslint/releases/download/v${eslintVersion}/eslint-v${eslintVersion}.tar.br`
-  const response = await fetch(archiveUrl)
-  if (!response.ok) {
-    throw new Error(`Failed to download ESLint extension ${eslintVersion}: ${response.status}`)
+  const apiRoot = dirname(dirname(require.resolve('@lvce-editor/api')))
+  const visit = async (relative: string): Promise<void> => {
+    for (const entry of await readdir(join(apiRoot, relative), { withFileTypes: true })) {
+      const path = `${relative}/${entry.name}`
+      if (entry.isDirectory()) await visit(path)
+      else if (entry.name.endsWith('.d.ts')) files[`/node_modules/@lvce-editor/api${path}`] = await readFile(join(apiRoot, path), 'utf8')
+    }
   }
-  const compressed = Buffer.from(await response.arrayBuffer())
-  const archive = await decompressBrotli(compressed)
+  await visit('/dist')
+  files['/node_modules/@lvce-editor/api/package.json'] = await readFile(join(apiRoot, 'package.json'), 'utf8')
+  return files
+}
+
+const installEslint = async (commitHash: string, pathPrefix: string): Promise<void> => {
+  const version = '1.17.0'
+  const response = await fetch(`https://github.com/lvce-editor/eslint/releases/download/v${version}/eslint-v${version}.tar.br`)
+  if (!response.ok) throw new Error(`Failed to download ESLint: ${response.status}`)
   const archivePath = join(root, '.tmp', 'eslint-extension.tar')
-  await rm(eslintRoot, { force: true, recursive: true })
-  await mkdir(eslintRoot, { recursive: true })
-  await writeFile(archivePath, archive)
-  await extractTar({ cwd: eslintRoot, file: archivePath })
-  await rm(archivePath)
-}
-
-interface ExtensionManifest {
-  readonly id: string
-  readonly [key: string]: unknown
-}
-
-const installEslintExtension = async (commitHash: string, pathPrefix: string): Promise<void> => {
+  await writeFile(archivePath, brotliDecompressSync(Buffer.from(await response.arrayBuffer())))
   const extensionDirectory = join(root, 'dist', commitHash, 'extensions', 'builtin.eslint')
-  await rm(extensionDirectory, { force: true, recursive: true })
-  await cp(eslintRoot, extensionDirectory, { recursive: true })
-  const manifest = JSON.parse(await readFile(join(eslintRoot, 'extension.json'), 'utf8')) as ExtensionManifest
-  const path = `${pathPrefix}/${commitHash}/extensions/${manifest.id}`
-  const configRoot = join(root, 'dist', commitHash, 'config')
-  const extensionsPath = join(configRoot, 'extensions.json')
-  const extensions = JSON.parse(await readFile(extensionsPath, 'utf8')) as ExtensionManifest[]
-  await writeFile(extensionsPath, `${JSON.stringify([...extensions.filter(({ id }) => id !== manifest.id), { ...manifest, path }], undefined, 2)}\n`)
-  const webExtensionsPath = join(configRoot, 'webExtensions.json')
-  const webExtensions = JSON.parse(await readFile(webExtensionsPath, 'utf8')) as ExtensionManifest[]
-  await writeFile(
-    webExtensionsPath,
-    `${JSON.stringify([...webExtensions.filter(({ id }) => id !== manifest.id), { ...manifest, isWeb: true, path }], undefined, 2)}\n`,
-  )
-}
-
-const createPlaygroundExtension = async (sampleId: string): Promise<string> => {
-  const extensionRoot = join(root, '.tmp', 'playground-extensions', sampleId)
-  await rm(extensionRoot, { force: true, recursive: true })
-  await mkdir(extensionRoot, { recursive: true })
-  await cp(join(playgroundRoot, 'src'), join(extensionRoot, 'src'), { recursive: true })
-  const manifest = JSON.parse(await readFile(join(playgroundRoot, 'extension.json'), 'utf8')) as Record<string, unknown>
-  if (sampleId !== 'source-control-provider') {
-    delete manifest.sourceControlProviders
-  }
-  await writeFile(join(extensionRoot, 'extension.json'), `${JSON.stringify(manifest, undefined, 2)}\n`)
-  return extensionRoot
-}
-
-const exportWorkbench = async (sampleId: string): Promise<void> => {
-  const sharedProcessUrl = pathToFileURL(join(root, 'node_modules', '@lvce-editor', 'shared-process', 'index.js')).toString()
-  const sharedProcess = await import(sharedProcessUrl)
-  const pathPrefix = `/extension-samples/workbench/${sampleId}`
-  process.env.PATH_PREFIX = pathPrefix
-  const extensionPath = await createPlaygroundExtension(sampleId)
-  const { commitHash } = await sharedProcess.exportStatic({
-    extensionPath,
-    onLoadCommands: [
+  await mkdir(extensionDirectory, { recursive: true })
+  await extractTar({ cwd: extensionDirectory, file: archivePath })
+  const manifest = JSON.parse(await readFile(join(extensionDirectory, 'extension.json'), 'utf8'))
+  for (const name of ['extensions.json', 'webExtensions.json']) {
+    const path = join(root, 'dist', commitHash, 'config', name)
+    const extensions = JSON.parse(await readFile(path, 'utf8')) as { id: string }[]
+    await writeJson(path, [
+      ...extensions.filter(({ id }) => id !== manifest.id),
       {
-        args: [],
-        command: 'extensionSamples.openPlayground',
-        name: 'Open extension sample playground',
+        ...manifest,
+        isWeb: true,
+        path: `${pathPrefix}/${commitHash}/extensions/${manifest.id}`,
       },
-    ],
-    root,
-  })
-  await cp(join(playgroundRoot, 'dist'), join(root, 'dist', commitHash, 'extensions', 'builtin.extension-samples-playground', 'dist'), {
-    force: true,
-    recursive: true,
-  })
-  await installEslintExtension(commitHash, pathPrefix)
-  await cp(join(root, 'dist'), join(outputRoot, 'workbench', sampleId), { recursive: true })
-}
-
-const writeRoutes = async (): Promise<void> => {
-  const [defaultSample] = samples
-  await writeFile(join(outputRoot, 'index.html'), createHtml(defaultSample, false))
-  await writeFile(join(outputRoot, '404.html'), createHtml(defaultSample, false))
-  for (const sample of samples) {
-    const routeRoot = join(outputRoot, sample.route)
-    await mkdir(routeRoot, { recursive: true })
-    await writeFile(join(routeRoot, 'index.html'), createHtml(sample, true))
+    ])
   }
-  await writeFile(join(outputRoot, 'samples.json'), `${JSON.stringify(samples, undefined, 2)}\n`)
-  await writeFile(join(outputRoot, '.nojekyll'), '')
 }
 
 export const buildStatic = async (): Promise<void> => {
-  await rm(outputRoot, { force: true, recursive: true })
+  await rm(outputRoot, { recursive: true, force: true })
   await mkdir(outputRoot, { recursive: true })
-  await Promise.all([buildExtensionPackages(), buildPlaygroundExtension(), downloadEslintExtension()])
-  for (const sample of samples) {
-    await exportWorkbench(sample.id)
+  const sharedProcess = await import(
+    pathToFileURL(join(dirname(require.resolve('@lvce-editor/shared-process')), 'src/parts/ExportStatic/ExportStatic.js')).href
+  )
+  const pathPrefix = '/extension-samples/runtime'
+  let commitHash: string
+  if (process.env.LVCE_STATIC_PATH) {
+    // A local LVCE static build must use PATH_PREFIX=/extension-samples/runtime.
+    await rm(join(root, 'dist'), { recursive: true, force: true })
+    await cp(process.env.LVCE_STATIC_PATH, join(root, 'dist'), { recursive: true })
+    commitHash = (await readdir(join(root, 'dist'))).find((name) => /^[a-f0-9]{7,40}$/.test(name))!
+  } else {
+    ;({ commitHash } = await sharedProcess.exportStatic({ root, pathPrefix }))
   }
-  await Promise.all([buildSite(), copySamples()])
-  await writeRoutes()
+  await installEslint(commitHash, pathPrefix)
+  await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })
+  const assetDir = `${pathPrefix}/${commitHash}`
+  const webExtensions = JSON.parse(await readFile(join(root, 'dist', commitHash, 'config', 'webExtensions.json'), 'utf8'))
+  // ESLint owns source diagnostics; retain TypeScript's other language features
+  // without running a second full diagnostic pass on every playground edit.
+  const sourceExtensions = webExtensions
+    .filter((extension: { id: string }) => extension.id === 'builtin.language-features-typescript')
+    .map((extension: object) => ({ ...extension, diagnosticProviders: [] }))
+  await writeJson(join(outputRoot, 'runtime.json'), { entry: `${assetDir}/packages/renderer-process/dist/rendererProcessMain.js`, sourceExtensions })
+  await writeJson(join(outputRoot, 'tooling.json'), await buildTooling())
+
+  const assets = join(outputRoot, 'assets')
+  await mkdir(assets, { recursive: true })
+  for (const [entry, output] of [
+    ['site.ts', 'site.js'],
+    ['CompilerWorker.ts', 'compiler.js'],
+  ]) {
+    await build({
+      bundle: true,
+      entryPoints: [join(root, 'packages/playground/src', entry)],
+      format: 'esm',
+      outfile: join(assets, output),
+      platform: 'browser',
+      target: 'esnext',
+      sourcemap: true,
+    })
+  }
+  await build({
+    bundle: true,
+    entryPoints: [require.resolve('@lvce-editor/api')],
+    format: 'esm',
+    outfile: join(assets, 'api.js'),
+    platform: 'browser',
+    target: 'es2022',
+    external: ['node:*', 'electron'],
+  })
+  await cp(join(root, 'node_modules/esbuild-wasm/esbuild.wasm'), join(assets, 'esbuild.wasm'))
+  await cp(join(root, 'packages/playground/src/app.css'), join(assets, 'app.css'))
+  for (const sample of samples) {
+    const packageRoot = join(root, 'packages', sample.packageName)
+    const files = await readWorkspace(packageRoot)
+    await writeJson(join(outputRoot, 'samples', sample.id, 'files.json'), files)
+    await build({
+      bundle: true,
+      entryPoints: [join(packageRoot, 'src/main.ts')],
+      external: ['@lvce-editor/api'],
+      format: 'esm',
+      outfile: join(packageRoot, 'dist/main.js'),
+      platform: 'browser',
+      sourcemap: true,
+      target: 'es2022',
+    })
+    const route = join(outputRoot, sample.route)
+    await mkdir(route, { recursive: true })
+    await writeFile(join(route, 'index.html'), createHtml(sample, true, assetDir))
+  }
+  await writeFile(join(outputRoot, 'index.html'), createHtml(samples[0], false, assetDir))
+  await writeFile(join(outputRoot, '404.html'), createHtml(samples[0], false, assetDir))
+  await writeJson(join(outputRoot, 'samples.json'), samples)
+  await writeFile(join(outputRoot, '.nojekyll'), '')
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) {
-  await buildStatic()
-}
+if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) await buildStatic()

@@ -7,9 +7,10 @@
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
   "activation": ["onSourceControl:file"],
+  "source-control-icons": ["icons/modified.svg"],
   "sourceControlProviders": [
     {
-      "id": "sampleSourceControl"
+      "id": "source-control-provider"
     }
   ]
 }
