@@ -2,6 +2,8 @@
 
 Interactive examples for the [Lvce Editor](https://github.com/lvce-editor/lvce-editor) extension API.
 
+[Open the playground](https://lvce-editor.github.io/extension-samples/).
+
 Each extension lives in `packages/sample-<id>`. The static playground shows two real LVCE IDEs side by side: the sample workspace on the left and the running extension on the right. Saving with `Ctrl+S` bundles the workspace in the browser with esbuild-wasm and refreshes the preview.
 
 ## Samples
