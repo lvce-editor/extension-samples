@@ -118,11 +118,48 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   }
 
   let previewExists = false
-  let previewUrl = ''
-  let iconUrls: string[] = []
+  let previewExtensionId = ''
+  const previewUrls = new Set<string>()
   let revision = 0
   let running = false
   let requested = false
+  const updatePreview = async (
+    code: string,
+    manifest: { readonly id: string; readonly [key: string]: unknown },
+    icons: readonly string[],
+  ): Promise<void> => {
+    const nextIconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
+    const nextPreviewUrl = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+    const extension = {
+      ...manifest,
+      browser: nextPreviewUrl,
+      contentSecurityPolicy: [],
+      isWeb: true,
+      path: location.origin,
+      'source-control-icons': nextIconUrls,
+      uri: location.origin,
+    }
+    previewUrls.add(nextPreviewUrl)
+    for (const url of nextIconUrls) previewUrls.add(url)
+    if (previewExists) {
+      await invoke('Application.execute', previewId, 'Extensions.reload', previewExtensionId, extension)
+    } else {
+      await mount(previewId, previewWorkspace, previewFiles, [extension])
+      previewExists = true
+      await invoke('Application.execute', previewId, 'Main.openUri', `${previewWorkspace.replace(/\/$/, '')}/README.md`, false)
+      if (sampleId === 'source-control-provider') await invoke('Application.execute', previewId, 'Layout.openSideBarViewlet', 'Source Control')
+    }
+    const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
+    for (const url of previewUrls) {
+      if (retainedUrls.has(url)) {
+        continue
+      }
+
+      URL.revokeObjectURL(url)
+      previewUrls.delete(url)
+    }
+    previewExtensionId = extension.id
+  }
   const rebuild = async (): Promise<void> => {
     requested = true
     if (running) return
@@ -136,27 +173,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         if (requested) continue
         const manifest = JSON.parse(files['/extension.json'])
         const icons = readIcons(manifest['source-control-icons'] || [], files)
-        const wasPreviewMounted = previewExists
-        previewExists = false
-        if (wasPreviewMounted) await invoke('Application.dispose', previewId)
-        URL.revokeObjectURL(previewUrl)
-        for (const url of iconUrls) URL.revokeObjectURL(url)
-        iconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
-        previewUrl = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
-        await mount(previewId, previewWorkspace, previewFiles, [
-          {
-            ...manifest,
-            browser: previewUrl,
-            contentSecurityPolicy: [],
-            isWeb: true,
-            path: location.origin,
-            'source-control-icons': iconUrls,
-            uri: location.origin,
-          },
-        ])
-        previewExists = true
-        await invoke('Application.execute', previewId, 'Main.openUri', `${previewWorkspace.replace(/\/$/, '')}/README.md`, false)
-        if (sampleId === 'source-control-provider') await invoke('Application.execute', previewId, 'Layout.openSideBarViewlet', 'Source Control')
+        await updatePreview(code, manifest, icons)
         document.body.dataset.previewRevision = String(++revision)
         document.body.dataset.previewBuildMs = String(Math.round(performance.now() - started))
         status.textContent = 'Preview ready'
@@ -232,8 +249,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     () => {
       compiler.terminate()
       for (const observer of observers) observer.disconnect()
-      URL.revokeObjectURL(previewUrl)
-      for (const url of iconUrls) URL.revokeObjectURL(url)
+      for (const url of previewUrls) URL.revokeObjectURL(url)
     },
     { once: true },
   )

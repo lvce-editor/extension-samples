@@ -40,11 +40,31 @@ test('runs the built-in ESLint extension in the source editor', async ({ page })
   await expect(sourceEditor.locator('.LayerDiagnostics .DiagnosticError')).toHaveCount(0)
 })
 
-test('saving TypeScript rebuilds and refreshes the provider preview', async ({ page }) => {
+test('saving TypeScript reloads the provider without replacing the preview editor', async ({ page }) => {
   const workbench = page
   const sourceEditor = workbench.locator('.Editor').first()
+  const previewUid = await page.locator('#preview-ide .Editor').getAttribute('data-uid')
+  await page.locator('#preview-ide').getByRole('treeitem', { exact: true, name: 'src' }).click()
+  await expect(page.locator('#preview-ide').getByRole('treeitem', { exact: true, name: 'example.ts' })).toBeVisible()
+  const previewViews = await page.locator('#preview-ide .Viewlet').elementHandles()
+  await page.locator('#preview-ide').evaluate((root) => {
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (
+            node instanceof Element &&
+            (node.matches('.TitleBar, .StatusBar, .ActivityBar') || node.querySelector('.TitleBar, .StatusBar, .ActivityBar'))
+          ) {
+            root.dataset.chromeRemounted = 'true'
+          }
+        }
+      }
+    })
+    observer.observe(root, { childList: true, subtree: true })
+  })
   const response = await page.request.get('/extension-samples/samples/file-system-provider/files.json')
   const files = await response.json()
+  await sourceEditor.click()
   await sourceEditor.locator('textarea').focus()
   await page.keyboard.press('Control+a')
   await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from memfs', 'Edited live in LVCE:'))
@@ -52,6 +72,13 @@ test('saving TypeScript rebuilds and refreshes the provider preview', async ({ p
 
   const previewEditor = workbench.locator('.Editor').nth(1)
   await expect(previewEditor).toContainText('Edited live in LVCE:', { timeout: 30_000 })
+  await expect(previewEditor).toHaveAttribute('data-uid', previewUid!, { timeout: 1000 })
+  for (const view of previewViews) {
+    const result = await view.evaluate((element) => ({ className: (element as Element).className, connected: element.isConnected }))
+    expect(result.connected, result.className).toBe(true)
+  }
+  await expect(page.locator('#preview-ide')).not.toHaveAttribute('data-chrome-remounted', 'true')
+  await expect(page.locator('#preview-ide').getByRole('treeitem', { exact: true, name: 'example.ts' })).toBeVisible()
 })
 
 test('rebuilds an imported file repeatedly without replacing the source IDE or shared workers', async ({ page }, testInfo) => {
@@ -61,16 +88,19 @@ test('rebuilds an imported file repeatedly without replacing the source IDE or s
   await source.getByRole('treeitem', { exact: true, name: 'instructions.ts' }).click()
   await expect(source.getByRole('tab', { exact: true, name: 'instructions.ts Close' })).toBeVisible()
   const sourceUid = await source.locator('.Editor').getAttribute('data-uid')
+  const previewUid = await preview.locator('.Editor').getAttribute('data-uid')
   const sharedWorkers = page.workers().filter((worker) => /(?:renderer|editor|mainArea)WorkerMain/.test(worker.url()))
   expect(sharedWorkers.length).toBeGreaterThan(0)
   const timings: number[] = []
   for (let index = 1; index <= 3; index++) {
+    await source.locator('.Editor').click()
     await source.locator('.Editor textarea').focus()
     await page.keyboard.press('Control+a')
     await page.keyboard.insertText(`export const instructions = 'Imported file revision ${index}'`)
     await page.keyboard.press('Control+s')
     await expect(preview.locator('.Editor')).toContainText(`Imported file revision ${index}`, { timeout: 30_000 })
     await expect(source.locator('.Editor')).toHaveAttribute('data-uid', sourceUid!)
+    await expect(preview.locator('.Editor')).toHaveAttribute('data-uid', previewUid!)
     for (const worker of sharedWorkers) expect(page.workers()).toContain(worker)
     const ids = await page.locator('[id]').evaluateAll((elements) => elements.map((element) => element.id))
     expect(new Set(ids).size).toBe(ids.length)
@@ -115,4 +145,23 @@ test('editing the provider workspace does not save or rebuild the source applica
   await expect(preview.locator('.Editor')).toContainText('Written through the sample filesystem provider')
   await expect(source.locator('.Editor')).toContainText('registerFileSystemProvider')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+})
+
+test('reloads the currently open provider file without switching back to README', async ({ page }) => {
+  const source = page.locator('#source-ide')
+  const preview = page.locator('#preview-ide')
+  await preview.getByRole('treeitem', { exact: true, name: 'src' }).click()
+  await preview.getByRole('treeitem', { exact: true, name: 'example.ts' }).click()
+  await expect(preview.locator('.Editor')).toContainText('Hello from an extension file system')
+  const previewUid = await preview.locator('.Editor').getAttribute('data-uid')
+  const response = await page.request.get('/extension-samples/samples/file-system-provider/files.json')
+  const files = await response.json()
+  await source.locator('.Editor').click()
+  await source.locator('.Editor textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from an extension file system', 'Updated provider file'))
+  await page.keyboard.press('Control+s')
+  await expect(preview.locator('.Editor')).toContainText('Updated provider file')
+  await expect(preview.locator('.Editor')).toHaveAttribute('data-uid', previewUid!)
+  await expect(preview.getByRole('tab', { exact: true, name: 'example.ts Close' })).toHaveAttribute('aria-selected', 'true')
 })
