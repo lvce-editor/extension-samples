@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "esbuild src/main.ts --bundle --format=esm --outfile=dist/main.js",
+    "lint": "eslint . --max-warnings 0",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
