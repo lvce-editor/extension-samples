@@ -9,12 +9,12 @@ const documentation: Record<string, string> = {
 await activate()
 registerHoverProvider({
   id: 'sample-hover',
-  languageId: 'sample-settings',
+  languageId: 'plaintext',
   provideHover(document, offset) {
     for (const match of document.text.matchAll(/\b[a-z]+\b/g)) {
       if (offset >= match.index && offset < match.index + match[0].length) {
         const text = documentation[match[0]]
-        return text ? { text } : undefined
+        return text ? { documentation: text } : undefined
       }
     }
     return undefined

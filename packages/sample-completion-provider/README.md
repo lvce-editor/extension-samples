@@ -10,4 +10,4 @@ Edit `src/main.ts` or `extension.json` in the source editor and save with Ctrl+S
 
 ## API
 
-The isolated extension awaits `activate()` before registering its provider or command. `extension.json` declares the matching contribution IDs and the `.settings` language.
+The isolated extension awaits `activate()` before registering its provider or command. `extension.json` declares the matching contribution IDs and targets the built-in `plaintext` language.

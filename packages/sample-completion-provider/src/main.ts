@@ -5,7 +5,7 @@ const colors = ['blue', 'green', 'red']
 await activate()
 registerCompletionProvider({
   id: 'sample-completions',
-  languageId: 'sample-settings',
+  languageId: 'plaintext',
   provideCompletions(document, offset) {
     let start = offset
     while (start > 0 && /[a-z]/i.test(document.text[start - 1])) start--

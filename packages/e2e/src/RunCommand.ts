@@ -6,5 +6,7 @@ export const runCommand = async (page: Page, label: string): Promise<void> => {
   const input = page.locator('.QuickPick input')
   await expect(input).toBeVisible()
   await input.fill(`>${label}`)
-  await page.locator('.QuickPickItem').getByText(label, { exact: true }).click()
+  const command = page.locator('.QuickPick').getByRole('option', { exact: true, name: label })
+  await expect(command).toBeVisible()
+  await command.click()
 }

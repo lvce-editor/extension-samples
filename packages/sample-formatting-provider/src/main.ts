@@ -16,5 +16,5 @@ registerFormattingProvider({
     return [{ endOffset: document.text.length, inserted: formatted, startOffset: 0 }]
   },
   id: 'sample-formatting',
-  languageId: 'sample-settings',
+  languageId: 'plaintext',
 })

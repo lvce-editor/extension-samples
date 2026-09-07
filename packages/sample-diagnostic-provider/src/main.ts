@@ -3,7 +3,7 @@ import { activate, registerDiagnosticProvider, type Diagnostic } from '@lvce-edi
 await activate()
 registerDiagnosticProvider({
   id: 'sample-diagnostics',
-  languageId: 'sample-settings',
+  languageId: 'plaintext',
   provideDiagnostics(document) {
     const diagnostics: Diagnostic[] = []
     for (const [rowIndex, line] of document.text.split('\n').entries()) {

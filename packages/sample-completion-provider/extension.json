@@ -9,13 +9,7 @@
   "completionProviders": [
     {
       "id": "sample-completions",
-      "languageId": "sample-settings"
-    }
-  ],
-  "languages": [
-    {
-      "id": "sample-settings",
-      "extensions": [".settings"]
+      "languageId": "plaintext"
     }
   ]
 }

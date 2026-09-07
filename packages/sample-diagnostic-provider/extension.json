@@ -9,13 +9,7 @@
   "diagnosticProviders": [
     {
       "id": "sample-diagnostics",
-      "languageId": "sample-settings"
-    }
-  ],
-  "languages": [
-    {
-      "id": "sample-settings",
-      "extensions": [".settings"]
+      "languageId": "plaintext"
     }
   ]
 }

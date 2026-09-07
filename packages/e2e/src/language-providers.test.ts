@@ -1,5 +1,10 @@
-import { expect, test } from '@playwright/test'
-import { runCommand } from './RunCommand.ts'
+import { expect, test, type Locator, type Page } from '@playwright/test'
+
+const formatDocument = async (page: Page, editor: Locator): Promise<void> => {
+  await editor.locator('.EditorRow').first().click({ button: 'right' })
+  await page.getByRole('menuitem', { exact: true, name: 'Format Document' }).click()
+  await expect(page.getByRole('menuitem', { exact: true, name: 'Format Document' })).toBeHidden()
+}
 
 test('diagnostics track TODO markers as the preview document changes', async ({ page }) => {
   await page.goto('/extension-samples/diagnostic-provider/')
@@ -54,10 +59,11 @@ test('formatting normalizes settings and can be undone', async ({ page }) => {
   const editor = page.locator('#preview-ide .Editor')
   await expect(editor).toContainText('color=blue', { timeout: 30_000 })
   await editor.locator('textarea').focus()
-  await runCommand(page, 'Format Document')
+  await formatDocument(page, editor)
   await expect(editor.locator('.EditorRow')).toHaveText(['color = blue', 'size = large', ''])
-  await runCommand(page, 'Format Document')
+  await formatDocument(page, editor)
   await expect(editor.locator('.EditorRow')).toHaveText(['color = blue', 'size = large', ''])
+  await editor.locator('textarea').focus()
   await page.keyboard.press('Control+z')
   await expect(editor.locator('.EditorRow')).toHaveText(['  color=blue  ', 'size =large', ''])
 })
