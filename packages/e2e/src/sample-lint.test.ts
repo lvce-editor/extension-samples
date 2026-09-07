@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 for (const sample of ['file-system-provider', 'source-control-provider']) {
   for (const [rule, code] of [
     ['no-explicit-any', 'export type Unsafe = any'],
-    ['no-non-null-assertion', 'export const unsafe = (value: string | undefined): string => value!'],
+    ['no-non-null-assertion', 'String([1].at(0)!)'],
     ['unicorn/no-for-each', '[1].forEach(value => value)'],
   ]) {
     test(`${sample} reports ${rule} and clears it after undo`, async ({ page }) => {
