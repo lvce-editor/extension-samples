@@ -1,0 +1,21 @@
+{
+  "id": "sample.completion-provider",
+  "name": "Completion Provider Sample",
+  "description": "Suggest colors and insert the selected completion.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "completionProviders": [
+    {
+      "id": "sample-completions",
+      "languageId": "sample-settings"
+    }
+  ],
+  "languages": [
+    {
+      "id": "sample-settings",
+      "extensions": [".settings"]
+    }
+  ]
+}

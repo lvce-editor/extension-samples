@@ -15,6 +15,24 @@
     },
     {
       "path": "./packages/sample-source-control-provider"
+    },
+    {
+      "path": "./packages/sample-diagnostic-provider"
+    },
+    {
+      "path": "./packages/sample-completion-provider"
+    },
+    {
+      "path": "./packages/sample-hover-provider"
+    },
+    {
+      "path": "./packages/sample-quick-pick"
+    },
+    {
+      "path": "./packages/sample-formatting-provider"
+    },
+    {
+      "path": "./packages/sample-quick-input"
     }
   ]
 }

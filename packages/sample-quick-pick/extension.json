@@ -1,0 +1,16 @@
+{
+  "id": "sample.quick-pick",
+  "name": "Quick Pick Sample",
+  "description": "Choose custom items with labels, descriptions, icons, and distinct values.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.chooseEnvironment"],
+  "commands": [
+    {
+      "id": "sample.chooseEnvironment",
+      "label": "Sample: Choose Environment"
+    }
+  ]
+}

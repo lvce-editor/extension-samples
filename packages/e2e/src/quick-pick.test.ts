@@ -1,0 +1,59 @@
+import { expect, test } from '@playwright/test'
+import { runCommand } from './RunCommand.ts'
+
+test('custom quick-pick items filter and write their selected value', async ({ page }) => {
+  await page.goto('/extension-samples/quick-pick/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await runCommand(page, 'Sample: Choose Environment')
+  const input = page.getByPlaceholder('Choose a deployment environment')
+  await expect(input).toBeVisible()
+  const items = page.locator('.QuickPickItem')
+  await expect(items).toHaveCount(3)
+  await expect(items.nth(1)).toContainText('Staging')
+  await expect(items.nth(1)).toContainText('Test before shipping')
+  await expect(items.nth(1).locator('.MaskIcon')).toBeVisible()
+  await input.fill('Stag')
+  await expect(items).toHaveCount(1)
+  await items.first().click()
+  await expect(page.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('#preview-ide .Editor')).toContainText('Selected environment: staging')
+  await expect(page.locator('#preview-ide').getByRole('tab', { name: 'environment.txt' })).toBeVisible()
+})
+
+test('cancelling the custom picker leaves the current document unchanged', async ({ page }) => {
+  await page.goto('/extension-samples/quick-pick/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await runCommand(page, 'Sample: Choose Environment')
+  await expect(page.getByPlaceholder('Choose a deployment environment')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('#preview-ide').getByRole('tab', { name: 'README.md' })).toBeVisible()
+  await expect(page.locator('#preview-ide').getByRole('tab', { name: 'environment.txt' })).toHaveCount(0)
+  // Reopening also verifies that cancellation releases the pending prompt.
+  await runCommand(page, 'Sample: Choose Environment')
+  await expect(page.getByPlaceholder('Choose a deployment environment')).toBeVisible()
+  await page.keyboard.press('Escape')
+})
+
+test('quick input starts with a default and writes the entered greeting', async ({ page }) => {
+  await page.goto('/extension-samples/quick-input/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await runCommand(page, 'Sample: Create Greeting')
+  const input = page.getByPlaceholder('Who should we greet?')
+  await expect(input).toHaveValue('World')
+  await input.fill('  Ada  ')
+  await page.keyboard.press('Enter')
+  await expect(page.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('#preview-ide .Editor')).toContainText('Hello, Ada!')
+})
+
+test('cancelling quick input does not create a greeting', async ({ page }) => {
+  await page.goto('/extension-samples/quick-input/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await runCommand(page, 'Sample: Create Greeting')
+  await expect(page.getByPlaceholder('Who should we greet?')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('#preview-ide').getByRole('tab', { name: 'README.md' })).toBeVisible()
+  await expect(page.locator('#preview-ide').getByRole('tab', { name: 'greeting.txt' })).toHaveCount(0)
+})

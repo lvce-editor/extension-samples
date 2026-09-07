@@ -2,6 +2,10 @@ type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
 type Files = Record<string, string>
 interface Sample {
   readonly id: string
+  readonly preview?: {
+    readonly entry: string
+    readonly files: Files
+  }
   readonly route: string
   readonly title: string
 }
@@ -24,17 +28,19 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   const sourceId = 'source'
   const previewId = 'preview'
   const sampleId = document.body.dataset.sampleId || 'file-system-provider'
+  const samples = await fetchJson<Sample[]>(`${prefix}/samples.json`)
+  const sample = samples.find((sample) => sample.id === sampleId)
   const previewWorkspace = sampleId === 'file-system-provider' ? 'sample-memfs:///' : 'memfs:///preview'
   const previewFiles: Files =
-    sampleId === 'file-system-provider'
+    sample?.preview?.files ??
+    (sampleId === 'file-system-provider'
       ? {}
       : {
           '/README.md': '# Preview workspace\n',
           '/src/main.ts': 'export const message = "Preview file"\n',
-        }
+        })
   const picker = document.querySelector<HTMLSelectElement>('#sample-picker')!
   const status = document.querySelector<HTMLElement>('#preview-status')!
-  const samples = await fetchJson<Sample[]>(`${prefix}/samples.json`)
   for (const sample of samples) picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
   picker.addEventListener('change', () => location.assign(`${prefix}/${picker.value}/`))
   const storageKey = `extension-samples:workspace:${sampleId}`
@@ -155,7 +161,13 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
           },
         ])
         previewExists = true
-        await invoke('Application.execute', previewId, 'Main.openUri', `${previewWorkspace.replace(/\/$/, '')}/README.md`, false)
+        await invoke(
+          'Application.execute',
+          previewId,
+          'Main.openUri',
+          `${previewWorkspace.replace(/\/$/, '')}${sample?.preview?.entry || '/README.md'}`,
+          false,
+        )
         if (sampleId === 'source-control-provider') await invoke('Application.execute', previewId, 'Layout.openSideBarViewlet', 'Source Control')
         document.body.dataset.previewRevision = String(++revision)
         document.body.dataset.previewBuildMs = String(Math.round(performance.now() - started))

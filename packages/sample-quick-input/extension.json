@@ -1,0 +1,16 @@
+{
+  "id": "sample.quick-input",
+  "name": "Quick Input Sample",
+  "description": "Prompt for a name and write a greeting, with cancellation handling.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.createGreeting"],
+  "commands": [
+    {
+      "id": "sample.createGreeting",
+      "label": "Sample: Create Greeting"
+    }
+  ]
+}
