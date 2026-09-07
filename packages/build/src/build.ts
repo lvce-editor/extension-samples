@@ -157,6 +157,15 @@ export const buildStatic = async (): Promise<void> => {
       sourcemap: true,
       target: 'es2022',
     })
+    await build({
+      alias: { '@lvce-editor/api': join(assets, 'api.js') },
+      bundle: true,
+      entryPoints: [join(packageRoot, 'src/main.ts')],
+      format: 'esm',
+      outfile: join(outputRoot, 'samples', sample.id, 'main.js'),
+      platform: 'browser',
+      target: 'es2022',
+    })
     const route = join(outputRoot, sample.route)
     await mkdir(route, { recursive: true })
     await writeFile(join(route, 'index.html'), createHtml(sample, true, assetDir))
