@@ -101,6 +101,7 @@ test('rebuilds an imported file repeatedly without replacing the source IDE or s
     await expect(preview.locator('.Editor')).toContainText(`Imported file revision ${index}`, { timeout: 30_000 })
     await expect(source.locator('.Editor')).toHaveAttribute('data-uid', sourceUid!)
     await expect(preview.locator('.Editor')).toHaveAttribute('data-uid', previewUid!)
+    await expect(source.locator('.Editor textarea')).toBeFocused()
     for (const worker of sharedWorkers) expect(page.workers()).toContain(worker)
     const ids = await page.locator('[id]').evaluateAll((elements) => elements.map((element) => element.id))
     expect(new Set(ids).size).toBe(ids.length)
