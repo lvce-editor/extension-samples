@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Worker } from '@playwright/test'
 
 const compilerAsset = /\/assets\/(?:compiler\.js|esbuild\.wasm|api\.js)$/
 
@@ -39,7 +39,7 @@ test('an unchanged saved workspace still uses the precompiled preview', async ({
 test('loads the compiler on the first saved edit and restores edited drafts', async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
-  const compilerWorkers = () => page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))
+  const compilerWorkers = (): Worker[] => page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))
   expect(compilerWorkers()).toHaveLength(0)
   const response = await page.request.get('/extension-samples/samples/file-system-provider/files.json')
   const files = await response.json()
@@ -49,7 +49,7 @@ test('loads the compiler on the first saved edit and restores edited drafts', as
     const existingCompiler = compilerWorkers()[0]
     await source.locator('textarea').focus()
     await page.keyboard.press('Control+a')
-    await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from memfs', `Lazy compiler revision ${revision}`))
+    await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from memfs', () => `Lazy compiler revision ${revision}`))
     await expect(source).toContainText(`Lazy compiler revision ${revision}`)
     if (revision === 1) expect(compilerWorkers()).toHaveLength(0)
     await page.keyboard.press('Control+s')
