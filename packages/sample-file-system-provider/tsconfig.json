@@ -11,6 +11,7 @@
     "noEmit": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
     "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "strict": true,

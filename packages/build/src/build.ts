@@ -27,8 +27,9 @@ const readWorkspace = async (directory: string): Promise<Record<string, string>>
     }
   }
   await visit('')
+  files['/eslint.samples.config.js'] = await readFile(join(root, 'eslint.samples.config.js'), 'utf8')
   files['/eslint.config.js'] =
-    "import parser from '@typescript-eslint/parser'\n\nexport default [{ files: ['**/*.ts', '**/*.js'], languageOptions: { parser, parserOptions: { tsconfigRootDir: '/sample' } }, rules: { 'no-debugger': 'error' } }]\n"
+    "import tseslint from 'typescript-eslint'\nimport config from './eslint.samples.config.js'\n\n// Typed linting runs in CI; the browser filesystem does not yet support TypeScript projects.\nexport default [...config.map(entry => ({ ...entry, files: ['**/*.ts'] })), { ...tseslint.configs.disableTypeChecked, files: ['**/*.ts'], languageOptions: { parserOptions: { project: false, projectService: false, tsconfigRootDir: '/sample' } } }]\n"
   return files
 }
 
@@ -36,7 +37,8 @@ const buildTooling = async (): Promise<Record<string, string>> => {
   const files: Record<string, string> = {}
   for (const [name, entry] of [
     ['eslint', 'eslint/universal'],
-    ['@typescript-eslint/parser', '@typescript-eslint/parser'],
+    ['typescript-eslint', 'typescript-eslint'],
+    ['eslint-plugin-unicorn', 'eslint-plugin-unicorn'],
   ]) {
     const result = await build({
       entryPoints: [require.resolve(entry)],

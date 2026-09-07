@@ -136,6 +136,8 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   let revision = 0
   let running = false
   let requested = false
+  const createPreviewUrl = (code: string | undefined): string =>
+    code === undefined ? `${prefix}/samples/${sampleId}/main.js` : URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
   const rebuild = async (): Promise<void> => {
     requested = true
     if (running) return
@@ -155,7 +157,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         URL.revokeObjectURL(previewUrl)
         for (const url of iconUrls) URL.revokeObjectURL(url)
         iconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
-        previewUrl = code === undefined ? `${prefix}/samples/${sampleId}/main.js` : URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+        previewUrl = createPreviewUrl(code)
         await mount(previewId, previewWorkspace, previewFiles, [
           {
             ...manifest,

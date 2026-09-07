@@ -1,5 +1,6 @@
 import * as config from '@lvce-editor/eslint-config'
 import { defineConfig } from 'eslint/config'
+import sampleConfig from './eslint.samples.config.js'
 
 export default defineConfig([
   {
@@ -18,6 +19,16 @@ export default defineConfig([
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
+    },
+  },
+  {
+    files: ['packages/sample-*/**/*.ts'],
+    extends: sampleConfig,
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
   {
