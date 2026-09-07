@@ -29,7 +29,7 @@ const readWorkspace = async (directory: string): Promise<Record<string, string>>
   await visit('')
   files['/eslint.samples.config.js'] = await readFile(join(root, 'eslint.samples.config.js'), 'utf8')
   files['/eslint.config.js'] =
-    "import config from './eslint.samples.config.js'\n\nexport default [...config.map(entry => ({ ...entry, files: ['**/*.ts'] })), { files: ['**/*.ts'], languageOptions: { parserOptions: { project: ['./tsconfig.json'], tsconfigRootDir: '/sample' } } }]\n"
+    "import tseslint from 'typescript-eslint'\nimport config from './eslint.samples.config.js'\n\n// Typed linting runs in CI; the browser filesystem does not yet support TypeScript projects.\nexport default [...config.map(entry => ({ ...entry, files: ['**/*.ts'] })), { ...tseslint.configs.disableTypeChecked, files: ['**/*.ts'], languageOptions: { parserOptions: { project: false, projectService: false, tsconfigRootDir: '/sample' } } }]\n"
   return files
 }
 
@@ -38,7 +38,6 @@ const buildTooling = async (): Promise<Record<string, string>> => {
   for (const [name, entry] of [
     ['eslint', 'eslint/universal'],
     ['typescript-eslint', 'typescript-eslint'],
-    ['typescript', 'typescript'],
     ['eslint-plugin-unicorn', 'eslint-plugin-unicorn'],
   ]) {
     const result = await build({
@@ -46,18 +45,11 @@ const buildTooling = async (): Promise<Record<string, string>> => {
       bundle: true,
       platform: 'browser',
       format: 'cjs',
-      external: ['node:*', ...builtinModules, ...(name === 'typescript' ? [] : ['typescript'])],
+      external: ['node:*', ...builtinModules],
       write: false,
     })
     files[`/node_modules/${name}/index.cjs`] = result.outputFiles[0].text
     files[`/node_modules/${name}/package.json`] = JSON.stringify({ name, main: 'index.cjs' })
-  }
-  // The type-aware parser resolves standard library declarations next to TypeScript.
-  const typescriptRoot = dirname(require.resolve('typescript'))
-  for (const name of await readdir(typescriptRoot)) {
-    if (name.startsWith('lib.') && name.endsWith('.d.ts')) {
-      files[`/node_modules/typescript/${name}`] = await readFile(join(typescriptRoot, name), 'utf8')
-    }
   }
   const apiRoot = dirname(dirname(require.resolve('@lvce-editor/api')))
   const visit = async (relative: string): Promise<void> => {
