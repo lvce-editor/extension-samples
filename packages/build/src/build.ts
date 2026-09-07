@@ -46,7 +46,7 @@ const buildTooling = async (): Promise<Record<string, string>> => {
       bundle: true,
       platform: 'browser',
       format: 'cjs',
-      external: ['node:*', ...builtinModules, ...(name === 'typescript' ? [] : ['typescript']), ...(name === 'eslint' ? [] : ['eslint'])],
+      external: ['node:*', ...builtinModules, ...(name === 'typescript' ? [] : ['typescript'])],
       write: false,
     })
     files[`/node_modules/${name}/index.cjs`] = result.outputFiles[0].text
