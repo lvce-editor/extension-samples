@@ -28,6 +28,10 @@ Then open `http://localhost:3000/extension-samples/file-system-provider/`.
 
 Use `npm run build:static` to create the GitHub Pages artifact in `.tmp/static` and `npm run e2e:headless` to test the live-editing flow.
 
+Run `npm run lint` for repository checks, or `npm run lint --workspace=packages/sample-file-system-provider` (substitute any sample package) to lint one extension. Every `packages/sample-*` extension uses the shared `eslint.samples.config.js`: typescript-eslint's [strict type-checked rules](https://typescript-eslint.io/users/configs/#strict-type-checked) and [Unicorn's recommended rules](https://github.com/sindresorhus/eslint-plugin-unicorn). API abbreviations and explicit `undefined` values are allowed. Sample TypeScript projects also enable strict checking and checked indexed access.
+
+The playground shares the strict syntax and Unicorn rules, including checks against explicit `any` and non-null assertions. Type-aware rules (such as unsafe values and unhandled promises) run in CI and local lint commands; they are disabled in the browser because the playground's virtual filesystem does not yet support TypeScript project loading. New samples should include a `tsconfig.json` covering all source files.
+
 ## Playground architecture
 
 Both IDEs share one renderer and the UI workers; neither IDE is an iframe. Each application owns its layout, component UIDs, workspace, and extension services. Worker ID ranges do not overlap. Preview rebuilds dispose only the preview application, preserving the source IDE's tabs, selection, and undo history and retaining the shared UI workers.

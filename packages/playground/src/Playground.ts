@@ -62,28 +62,41 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     /* A corrupt draft must not prevent opening the sample. */
   }
 
-  const compiler = new Worker(new URL('compiler.js', import.meta.url), { name: 'Sample compiler', type: 'module' })
+  let compiler: Worker | undefined
   let nextBuild = 0
   const pending = new Map<number, { resolve: (code: string) => void; reject: (error: Error) => void }>()
   let compilerError: Error | undefined
-  compiler.onerror = (event): void => {
-    compilerError = new Error(event.message || 'The sample compiler stopped unexpectedly')
-    for (const request of pending.values()) request.reject(compilerError)
-    pending.clear()
-  }
-  compiler.onmessage = ({ data }: MessageEvent<{ id: number; code: string; error?: string }>): void => {
-    const request = pending.get(data.id)
-    pending.delete(data.id)
-    if (data.error) request?.reject(new Error(data.error))
-    else request?.resolve(data.code)
+  const getCompiler = (): Worker => {
+    if (compiler) return compiler
+    compiler = new Worker(new URL('compiler.js', import.meta.url), { name: 'Sample compiler', type: 'module' })
+    compiler.onerror = (event): void => {
+      compilerError = new Error(event.message || 'The sample compiler stopped unexpectedly')
+      for (const request of pending.values()) request.reject(compilerError)
+      pending.clear()
+    }
+    compiler.onmessage = ({ data }: MessageEvent<{ id: number; code: string; error?: string }>): void => {
+      const request = pending.get(data.id)
+      pending.delete(data.id)
+      if (data.error) request?.reject(new Error(data.error))
+      else request?.resolve(data.code)
+    }
+    return compiler
   }
   const compile = (): Promise<string> =>
     new Promise((resolve, reject) => {
       if (compilerError) return reject(compilerError)
+      const worker = getCompiler()
       const id = ++nextBuild
       pending.set(id, { reject, resolve })
-      compiler.postMessage({ files: { ...files }, id })
+      worker.postMessage({ files: { ...files }, id })
     })
+
+  const getPreviewCode = async (): Promise<string | undefined> => {
+    const unchanged =
+      Object.keys(files).length === Object.keys(initialFiles).length &&
+      Object.entries(initialFiles).every(([path, content]) => files[path] === content)
+    return unchanged ? undefined : compile()
+  }
 
   const mount = async (id: string, workspaceUri: string, workspaceFiles: Files, extensions: readonly unknown[]): Promise<void> => {
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
@@ -129,6 +142,10 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   let revision = 0
   let running = false
   let requested = false
+  const createPreviewUrl = (code: string | undefined): string =>
+    code === undefined
+      ? new URL(`${prefix}/samples/${sampleId}/main.js`, location.href).href
+      : URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
   const rebuild = async (): Promise<void> => {
     requested = true
     if (running) return
@@ -138,7 +155,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         requested = false
         const started = performance.now()
         status.textContent = 'Building…'
-        const code = await compile()
+        const code = await getPreviewCode()
         if (requested) continue
         const manifest = JSON.parse(files['/extension.json'])
         const icons = readIcons(manifest['source-control-icons'] || [], files)
@@ -148,7 +165,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         URL.revokeObjectURL(previewUrl)
         for (const url of iconUrls) URL.revokeObjectURL(url)
         iconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
-        previewUrl = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+        previewUrl = createPreviewUrl(code)
         await mount(previewId, previewWorkspace, previewFiles, [
           {
             ...manifest,
@@ -242,7 +259,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   window.addEventListener(
     'pagehide',
     () => {
-      compiler.terminate()
+      compiler?.terminate()
       for (const observer of observers) observer.disconnect()
       URL.revokeObjectURL(previewUrl)
       for (const url of iconUrls) URL.revokeObjectURL(url)
