@@ -5,10 +5,7 @@
     "composite": true,
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "esnext",
-      "dom"
-    ],
+    "lib": ["esnext", "dom"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": true,
@@ -20,7 +17,5 @@
     "strict": true,
     "target": "esnext"
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
