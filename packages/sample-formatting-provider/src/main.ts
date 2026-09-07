@@ -5,7 +5,12 @@ registerFormattingProvider({
   format(document) {
     const formatted = document.text
       .split('\n')
-      .map((line) => line.trim().replace(/^([^=]+?)\s*=\s*(.*)$/, '$1 = $2'))
+      .map((line) => {
+        const trimmed = line.trim()
+        const equals = trimmed.indexOf('=')
+        if (equals <= 0) return trimmed
+        return `${trimmed.slice(0, equals).trimEnd()} = ${trimmed.slice(equals + 1).trimStart()}`
+      })
       .join('\n')
     if (formatted === document.text) return []
     return [{ endOffset: document.text.length, inserted: formatted, startOffset: 0 }]

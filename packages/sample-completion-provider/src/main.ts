@@ -7,7 +7,9 @@ registerCompletionProvider({
   id: 'sample-completions',
   languageId: 'sample-settings',
   provideCompletions(document, offset) {
-    const prefix = /[a-z]*$/i.exec(document.text.slice(0, offset))?.[0] || ''
+    let start = offset
+    while (start > 0 && /[a-z]/i.test(document.text[start - 1])) start--
+    const prefix = document.text.slice(start, offset).toLowerCase()
     return colors.filter((color) => color.startsWith(prefix)).map((color) => ({ label: color, type: 1 }))
   },
 })
