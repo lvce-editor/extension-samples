@@ -85,6 +85,13 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       worker.postMessage({ files: { ...files }, id })
     })
 
+  const getPreviewCode = async (): Promise<string | undefined> => {
+    const unchanged =
+      Object.keys(files).length === Object.keys(initialFiles).length &&
+      Object.entries(initialFiles).every(([path, content]) => files[path] === content)
+    return unchanged ? undefined : compile()
+  }
+
   const mount = async (id: string, workspaceUri: string, workspaceFiles: Files, extensions: readonly unknown[]): Promise<void> => {
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
     const { height, width } = root.getBoundingClientRect()
@@ -138,10 +145,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         requested = false
         const started = performance.now()
         status.textContent = 'Building…'
-        const unchanged =
-          Object.keys(files).length === Object.keys(initialFiles).length &&
-          Object.entries(initialFiles).every(([path, content]) => files[path] === content)
-        const code = unchanged ? undefined : await compile()
+        const code = await getPreviewCode()
         if (requested) continue
         const manifest = JSON.parse(files['/extension.json'])
         const icons = readIcons(manifest['source-control-icons'] || [], files)
