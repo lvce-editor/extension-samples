@@ -15,6 +15,8 @@ for (const sample of ['file-system-provider', 'source-control-provider']) {
     await expect(page.locator('#source-ide .Editor')).toHaveCount(1)
     await expect(page.locator('#preview-ide .Editor')).toContainText(sample === 'file-system-provider' ? 'Hello from memfs' : 'Preview workspace')
     if (sample === 'source-control-provider') await expect(page.locator('#preview-ide .DecorationIcon').first()).toHaveJSProperty('naturalWidth', 16)
+    const previewWorker = page.workers().find((worker) => worker.url().endsWith(`/samples/${sample}/main.js`))
+    expect(previewWorker?.url()).toBe(new URL(`/extension-samples/samples/${sample}/main.js`, page.url()).href)
     expect(requests).toEqual([])
     expect(page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))).toHaveLength(0)
   })
