@@ -137,7 +137,9 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   let running = false
   let requested = false
   const createPreviewUrl = (code: string | undefined): string =>
-    code === undefined ? `${prefix}/samples/${sampleId}/main.js` : URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+    code === undefined
+      ? new URL(`${prefix}/samples/${sampleId}/main.js`, location.href).href
+      : URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
   const rebuild = async (): Promise<void> => {
     requested = true
     if (running) return
