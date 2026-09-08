@@ -1,0 +1,19 @@
+{
+  "id": "sample.sidebar-counter",
+  "name": "Sidebar Counter Sample",
+  "description": "An interactive sidebar counter rendered with virtual DOM",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onView:sample.sidebar-counter"],
+  "views": [
+    {
+      "id": "sample.sidebar-counter",
+      "title": "Counter",
+      "icon": "symbol-number",
+      "kind": "virtualDom",
+      "preferredLocation": "sideBar"
+    }
+  ]
+}

@@ -8,6 +8,7 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 ## Samples
 
+- [Sidebar counter](./packages/sample-sidebar-counter)
 - [Hello World](./packages/sample-hello-world)
 - [Dialog](./packages/sample-dialog)
 - [File system provider](./packages/sample-file-system-provider)

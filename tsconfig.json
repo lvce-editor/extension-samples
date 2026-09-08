@@ -39,6 +39,9 @@
     },
     {
       "path": "./packages/sample-dialog"
+    },
+    {
+      "path": "./packages/sample-sidebar-counter"
     }
   ]
 }
