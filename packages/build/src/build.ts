@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
+import { createIgnoreHashes } from './CreateIgnoreHashes.ts'
 import { createHtml } from './html.ts'
 import { samples } from './samples.ts'
 
@@ -147,6 +148,7 @@ export const buildStatic = async (): Promise<void> => {
     const packageRoot = join(root, 'packages', sample.packageName)
     const files = await readWorkspace(packageRoot)
     await writeJson(join(outputRoot, 'samples', sample.id, 'files.json'), files)
+    await writeJson(join(outputRoot, 'samples', sample.id, 'eslint-ignore-hashes.json'), createIgnoreHashes(files))
     await build({
       bundle: true,
       entryPoints: [join(packageRoot, 'src/main.ts')],

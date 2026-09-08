@@ -54,6 +54,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     }
   })
   const initialFiles = await fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`)
+  const ignoreHashes = await fetchJson<readonly string[]>(`${prefix}/samples/${sampleId}/eslint-ignore-hashes.json`)
   const tooling = await fetchJson<Files>(`${prefix}/tooling.json`)
   let files = { ...initialFiles }
   try {
@@ -222,6 +223,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     }
   }
   await mount(sourceId, 'memfs:///sample', { ...tooling, ...files }, sourceExtensions)
+  await invoke('Application.execute', sourceId, 'Preferences.update', { 'eslint.ignoreHashes': ignoreHashes })
   await invoke('Application.execute', sourceId, 'Main.openUri', 'memfs:///sample/src/main.ts')
   await rebuild()
   for (const id of [sourceId, previewId]) {
