@@ -5,9 +5,9 @@ const main = async (): Promise<void> => {
   registerCommand({
     async execute() {
       await executeCommand('Dialog.showWarning', {
-        title: 'Example Warning',
-        message: 'This is a sample warning dialog. No files have been changed.',
         confirmMessage: 'OK',
+        message: 'This is a sample warning dialog. No files have been changed.',
+        title: 'Example Warning',
       })
     },
     id: 'sample.showWarningDialog',
