@@ -64,13 +64,12 @@ const buildTooling = async (): Promise<Record<string, string>> => {
   return files
 }
 
-const installEslint = async (commitHash: string, pathPrefix: string): Promise<void> => {
-  const version = '1.17.0'
-  const response = await fetch(`https://github.com/lvce-editor/eslint/releases/download/v${version}/eslint-v${version}.tar.br`)
-  if (!response.ok) throw new Error(`Failed to download ESLint: ${response.status}`)
-  const archivePath = join(root, '.tmp', 'eslint-extension.tar')
+const installExtension = async (name: string, version: string, commitHash: string, pathPrefix: string): Promise<void> => {
+  const response = await fetch(`https://github.com/lvce-editor/${name}/releases/download/v${version}/${name}-v${version}.tar.br`)
+  if (!response.ok) throw new Error(`Failed to download ${name}: ${response.status}`)
+  const archivePath = join(root, '.tmp', `${name}-extension.tar`)
   await writeFile(archivePath, brotliDecompressSync(Buffer.from(await response.arrayBuffer())))
-  const extensionDirectory = join(root, 'dist', commitHash, 'extensions', 'builtin.eslint')
+  const extensionDirectory = join(root, 'dist', commitHash, 'extensions', `builtin.${name}`)
   await mkdir(extensionDirectory, { recursive: true })
   await extractTar({ cwd: extensionDirectory, file: archivePath })
   const manifest = JSON.parse(await readFile(join(extensionDirectory, 'extension.json'), 'utf8'))
@@ -104,15 +103,17 @@ export const buildStatic = async (): Promise<void> => {
   } else {
     ;({ commitHash } = await sharedProcess.exportStatic({ root, pathPrefix }))
   }
-  await installEslint(commitHash, pathPrefix)
+  await installExtension('eslint', '1.17.0', commitHash, pathPrefix)
+  await installExtension('prettier', '2.23.1', commitHash, pathPrefix)
   await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })
   const assetDir = `${pathPrefix}/${commitHash}`
   const webExtensions = JSON.parse(await readFile(join(root, 'dist', commitHash, 'config', 'webExtensions.json'), 'utf8'))
-  // ESLint owns source diagnostics; retain TypeScript's other language features
-  // without running a second full diagnostic pass on every playground edit.
+  // ESLint owns diagnostics and Prettier owns formatting; retain TypeScript's other language features.
   const sourceExtensions = webExtensions
-    .filter((extension: { id: string }) => extension.id === 'builtin.language-features-typescript')
-    .map((extension: object) => ({ ...extension, diagnosticProviders: [] }))
+    .filter((extension: { id: string }) => ['builtin.language-features-typescript', 'builtin.prettier'].includes(extension.id))
+    .map((extension: { id: string }) =>
+      extension.id === 'builtin.language-features-typescript' ? { ...extension, diagnosticProviders: [], formattingProviders: [] } : extension,
+    )
   await writeJson(join(outputRoot, 'runtime.json'), { entry: `${assetDir}/packages/renderer-process/dist/rendererProcessMain.js`, sourceExtensions })
   await writeJson(join(outputRoot, 'tooling.json'), await buildTooling())
 

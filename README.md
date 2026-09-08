@@ -4,7 +4,7 @@ Interactive examples for the [Lvce Editor](https://github.com/lvce-editor/lvce-e
 
 [Open the playground](https://lvce-editor.github.io/extension-samples/).
 
-Each extension lives in `packages/sample-<id>`. The static playground shows two real LVCE IDEs side by side: the sample workspace on the left and the running extension on the right. Saving with `Ctrl+S` bundles the workspace in the browser with esbuild-wasm and refreshes the preview.
+Each extension lives in `packages/sample-<id>`. The static playground shows two real LVCE IDEs side by side: the sample workspace on the left and the running extension on the right. Saving with `Ctrl+S` formats the code with Prettier, bundles the workspace in the browser with esbuild-wasm, and refreshes the preview. Each sample includes a `prettier` field in `package.json` with the default style (no semicolons, single quotes, and a print width of 150); edit it to customize formatting.
 
 ## Samples
 
