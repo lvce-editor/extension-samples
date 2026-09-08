@@ -29,8 +29,30 @@ select {
 
 .IdePair {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 6px minmax(0, 1fr);
   min-height: 0;
+}
+
+.PreviewDivider {
+  cursor: col-resize;
+  touch-action: none;
+  background: #292f38;
+}
+
+.PreviewDivider:hover,
+.PreviewDivider:focus-visible,
+.IdePairResizing > .PreviewDivider {
+  background: #3b9fc8;
+  outline: none;
+}
+
+.IdePairResizing {
+  user-select: none;
+}
+
+/* Both embedded IDEs have a left sidebar and no activity bar. */
+.IdeRoot .SashSideBar {
+  left: var(--SideBarWidth);
 }
 
 .IdePane {
