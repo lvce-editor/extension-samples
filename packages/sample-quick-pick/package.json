@@ -1,0 +1,17 @@
+{
+  "name": "@lvce-editor/sample-quick-pick",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --format=esm --outfile=dist/main.js",
+    "lint": "eslint . --max-warnings 0",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lvce-editor/api": "^9.28.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

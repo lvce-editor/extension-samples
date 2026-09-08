@@ -1,0 +1,15 @@
+{
+  "id": "sample.diagnostic-provider",
+  "name": "Diagnostic Provider Sample",
+  "description": "Underline TODO markers and clear diagnostics when they are resolved.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "diagnosticProviders": [
+    {
+      "id": "sample-diagnostics",
+      "languageId": "plaintext"
+    }
+  ]
+}

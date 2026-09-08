@@ -1,0 +1,15 @@
+{
+  "id": "sample.hover-provider",
+  "name": "Hover Provider Sample",
+  "description": "Show documentation for recognized color names.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "hoverProviders": [
+    {
+      "id": "sample-hover",
+      "languageId": "plaintext"
+    }
+  ]
+}

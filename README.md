@@ -10,6 +10,12 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [File system provider](./packages/sample-file-system-provider)
 - [Source control provider](./packages/sample-source-control-provider)
+- [Diagnostic Provider](./packages/sample-diagnostic-provider)
+- [Completion Provider](./packages/sample-completion-provider)
+- [Hover Provider](./packages/sample-hover-provider)
+- [Quick Pick](./packages/sample-quick-pick)
+- [Formatting Provider](./packages/sample-formatting-provider)
+- [Quick Input](./packages/sample-quick-input)
 
 ## Development
 

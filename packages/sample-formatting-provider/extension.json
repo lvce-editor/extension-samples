@@ -1,0 +1,15 @@
+{
+  "id": "sample.formatting-provider",
+  "name": "Formatting Provider Sample",
+  "description": "Format key-value settings using document edits.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "formattingProviders": [
+    {
+      "id": "sample-formatting",
+      "languageId": "plaintext"
+    }
+  ]
+}
