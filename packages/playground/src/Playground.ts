@@ -1,3 +1,5 @@
+import { setupPreview } from './SetupPreview.ts'
+
 type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
 type Files = Record<string, string>
 interface Sample {
@@ -151,6 +153,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     manifest: { readonly id: string; readonly [key: string]: unknown },
     icons: readonly string[],
   ): Promise<void> => {
+    const needsSetup = !previewExists
     const nextIconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
     const nextPreviewUrl = createPreviewUrl(code)
     const extension = {
@@ -176,7 +179,6 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         `${previewWorkspace.replace(/\/$/, '')}${sample?.preview?.entry || '/README.md'}`,
         false,
       )
-      if (sampleId === 'source-control-provider') await invoke('Application.execute', previewId, 'Layout.openSideBarViewlet', 'Source Control')
     }
     const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
     for (const url of previewUrls) {
@@ -188,6 +190,11 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       previewUrls.delete(url)
     }
     previewExtensionId = extension.id
+    if (needsSetup) {
+      await setupPreview(files['/.lvce/setup-preview.js'], previewWorkspace, (command, ...args) =>
+        invoke('Application.execute', previewId, command, ...args),
+      )
+    }
   }
   const rebuild = async (): Promise<void> => {
     requested = true
