@@ -9,7 +9,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@lvce-editor/api": "^9.28.3"
+    "@lvce-editor/api": "^9.32.0"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"

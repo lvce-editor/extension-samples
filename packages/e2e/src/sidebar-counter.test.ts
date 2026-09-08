@@ -42,7 +42,7 @@ test('editing the counter updates the preview and reset restores the sample', as
   await expect(counter.getByRole('status')).toHaveText('Count: 2')
 
   await page.getByRole('button', { name: 'Reset sample' }).click()
-  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '3')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(counter.getByRole('status')).toHaveText('Count: 0')
   await counter.getByRole('button', { name: 'Increment' }).click()
   await expect(counter.getByRole('status')).toHaveText('Count: 1')

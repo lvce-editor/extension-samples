@@ -122,11 +122,11 @@ test('a compile error keeps the last working preview and saving a correction rec
   await page.keyboard.insertText('const broken = ;\n')
   await expect(source.locator('.Editor')).toContainText('const broken = ;')
   await page.keyboard.press('Control+s')
-  await expect(page.getByRole('status')).toContainText('Build failed')
+  await expect(page.locator('#preview-status')).toContainText('Build failed')
   await expect(preview.locator('.Editor')).toContainText('Hello from memfs')
   await page.keyboard.press('Control+z')
   await page.keyboard.press('Control+s')
-  await expect(page.getByRole('status')).toHaveText('Preview ready')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
 })
 

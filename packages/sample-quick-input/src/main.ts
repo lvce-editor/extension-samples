@@ -4,6 +4,7 @@ const main = async (): Promise<void> => {
   await activate()
   registerCommand({
     async execute() {
+      // Freeform text input accepts any name without a results list.
       const name = await showQuickInput({ placeholder: 'Who should we greet?', value: 'World' })
       // Cancellation and an empty name leave the workspace unchanged.
       if (name === undefined || !name.trim()) return
