@@ -1,3 +1,6 @@
+import { setupPreview } from './SetupPreview.ts'
+import { setupPreviewDivider } from './SetupPreviewDivider.ts'
+
 type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
 type Files = Record<string, string>
 interface Sample {
@@ -24,6 +27,7 @@ const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
   })
 
 export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExtensions: readonly unknown[]): Promise<void> => {
+  setupPreviewDivider()
   await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.formatOnSave': true, 'editor.lineNumbers': true })
   const sourceId = 'source'
   const previewId = 'preview'
@@ -52,6 +56,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     }
   })
   const initialFiles = await fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`)
+  const ignoreHashes = await fetchJson<readonly string[]>(`${prefix}/samples/${sampleId}/eslint-ignore-hashes.json`)
   const tooling = await fetchJson<Files>(`${prefix}/tooling.json`)
   let files = { ...initialFiles }
   try {
@@ -162,6 +167,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     manifest: { readonly id: string; readonly [key: string]: unknown },
     icons: readonly string[],
   ): Promise<void> => {
+    const needsSetup = !previewExists
     const nextIconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
     const nextPreviewUrl = createPreviewUrl(code)
     const extension = {
@@ -187,7 +193,6 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         `${previewWorkspace.replace(/\/$/, '')}${sample?.preview?.entry || '/README.md'}`,
         false,
       )
-      if (sampleId === 'source-control-provider') await invoke('Application.execute', previewId, 'Layout.openSideBarViewlet', 'Source Control')
     }
     const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
     for (const url of previewUrls) {
@@ -199,6 +204,11 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       previewUrls.delete(url)
     }
     previewExtensionId = extension.id
+    if (needsSetup) {
+      await setupPreview(files['/.lvce/setup-preview.js'], previewWorkspace, (command, ...args) =>
+        invoke('Application.execute', previewId, command, ...args),
+      )
+    }
   }
   const rebuild = async (): Promise<void> => {
     requested = true
@@ -226,6 +236,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     }
   }
   await mount(sourceId, 'memfs:///sample', { ...tooling, ...files }, sourceExtensions)
+  await invoke('Application.execute', sourceId, 'Preferences.update', { 'eslint.ignoreHashes': ignoreHashes })
   await invoke('Application.execute', sourceId, 'Main.openUri', 'memfs:///sample/src/main.ts')
   await rebuild()
   for (const id of [sourceId, previewId]) {

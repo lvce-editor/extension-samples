@@ -28,6 +28,7 @@ export const createHtml = (sample: Sample, nested: boolean, assetDir = '/extensi
       </header>
       <div class="IdePair">
         <section class="IdePane" aria-label="Source IDE"><header>Source</header><div id="source-ide" class="IdeRoot"></div></section>
+        <div id="preview-divider" class="PreviewDivider" role="separator" aria-label="Resize source and preview" aria-orientation="vertical" aria-controls="source-ide preview-ide" aria-valuemin="20" aria-valuemax="80" aria-valuenow="50" tabindex="0"></div>
         <section class="IdePane" aria-label="Preview IDE"><header>Preview <span id="preview-status" role="status">Loading…</span></header><div id="preview-ide" class="IdeRoot"></div></section>
       </div>
     </main>

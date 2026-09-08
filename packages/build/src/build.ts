@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
+import { createIgnoreHashes } from './CreateIgnoreHashes.ts'
 import { createHtml } from './html.ts'
 import { samples } from './samples.ts'
 
@@ -107,7 +108,7 @@ export const buildStatic = async (): Promise<void> => {
   await cp(dirname(require.resolve('@lvce-editor/editor-worker')), join(root, 'dist', commitHash, 'packages', 'editor-worker', 'dist'), {
     recursive: true,
   })
-  await installExtension('eslint', '1.17.0', commitHash, pathPrefix)
+  await installExtension('eslint', '1.20.0', commitHash, pathPrefix)
   await installExtension('prettier', '2.23.1', commitHash, pathPrefix)
   await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })
   const assetDir = `${pathPrefix}/${commitHash}`
@@ -146,12 +147,13 @@ export const buildStatic = async (): Promise<void> => {
     target: 'es2022',
     external: ['node:*', 'electron'],
   })
-  await cp(join(root, 'node_modules/esbuild-wasm/esbuild.wasm'), join(assets, 'esbuild.wasm'))
+  await cp(require.resolve('esbuild-wasm/esbuild.wasm'), join(assets, 'esbuild.wasm'))
   await cp(join(root, 'packages/playground/src/app.css'), join(assets, 'app.css'))
   for (const sample of samples) {
     const packageRoot = join(root, 'packages', sample.packageName)
     const files = await readWorkspace(packageRoot)
     await writeJson(join(outputRoot, 'samples', sample.id, 'files.json'), files)
+    await writeJson(join(outputRoot, 'samples', sample.id, 'eslint-ignore-hashes.json'), createIgnoreHashes(files))
     await build({
       bundle: true,
       entryPoints: [join(packageRoot, 'src/main.ts')],

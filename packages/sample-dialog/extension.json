@@ -1,0 +1,16 @@
+{
+  "id": "sample.dialog",
+  "name": "Dialog Sample",
+  "description": "Show a warning dialog with a title, message, and dismiss button.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.showWarningDialog"],
+  "commands": [
+    {
+      "id": "sample.showWarningDialog",
+      "label": "Sample: Show Warning Dialog"
+    }
+  ]
+}
