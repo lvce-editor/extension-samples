@@ -8,7 +8,8 @@ test('hello world notifications stay within their applications and dismiss indep
   await runCommand(page, 'Sample: Hello World')
   await expect(preview.locator('.NotificationMessage')).toHaveText('Hello World!')
   await expect(page.locator('#source-ide .NotificationMessage')).toHaveCount(0)
-  const runtime = await (await page.request.get('/extension-samples/runtime.json')).json()
+  const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
+  const runtime = await runtimeResponse.json()
   await page.evaluate(async (entry) => {
     const renderer = await import(entry)
     await renderer.executeCommand('Application.execute', 'source', 'Notification.create', 'info', 'Source notification')
