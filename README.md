@@ -28,7 +28,7 @@ Then open `http://localhost:3000/extension-samples/file-system-provider/`.
 
 Use `npm run build:static` to create the GitHub Pages artifact in `.tmp/static` and `npm run e2e:headless` to test the live-editing flow.
 
-Run `npm run knip` to check unused files, exports, and dependencies across every package, including build tooling, e2e tests, the playground, and each extension sample. Both PR and main-branch CI run this check. To check one sample, use `npm run knip -- --workspace packages/sample-file-system-provider`.
+Run `npm run knip` to check unused files, exports, and dependencies across every package, including build tooling, e2e tests, the playground, and each extension sample. Both PR and main-branch CI run this check. The command also runs a production export check so sample entry-point exports are checked without Knip's build-script exemptions.
 
 New `packages/sample-*` workspaces are included automatically, with `src/main.ts` as the extension entry point. Knip checks other source files for unused code. Optional `.lvce/setup-preview.js` modules are also entry points; mark their dynamically called `setupPreview` export with `/** @public */`. Other unused entry-point exports are still reported.
 

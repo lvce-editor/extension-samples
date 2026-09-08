@@ -16,7 +16,8 @@
     },
     "packages/sample-*": {
       // The extension and optional, dynamically loaded preview setup module.
-      "entry": ["{src/main.ts,.lvce/setup-preview.js}"],
+      // Production mode also checks their exports without build-script exemptions.
+      "entry": ["{src/main.ts,.lvce/setup-preview.js}!"],
       "includeEntryExports": true
     }
   }
