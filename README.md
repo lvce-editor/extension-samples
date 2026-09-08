@@ -34,7 +34,7 @@ The playground shares the strict syntax and Unicorn rules, including checks agai
 
 ## Playground architecture
 
-Both IDEs share one renderer and the UI workers; neither IDE is an iframe. Each application owns its layout, component UIDs, workspace, and extension services. Worker ID ranges do not overlap. Preview rebuilds dispose only the preview application, preserving the source IDE's tabs, selection, and undo history and retaining the shared UI workers.
+Both IDEs share one renderer and the UI workers; neither IDE is an iframe. Each application owns its layout, component UIDs, workspace, and extension services. Worker ID ranges do not overlap. Preview rebuilds reload the extension in place, preserving both IDEs' tabs, selection, and undo history and retaining the shared UI workers.
 
 The source Explorer includes the complete sample, including `extension.json`, imported TypeScript files, and SVG decoration icons. TypeScript syntax highlighting and the released `builtin.eslint` web extension use normal LVCE editor paths. The build includes browser-compatible ESLint tooling in the source workspace; ESLint supplies diagnostics, while TypeScript retains its other language features. No package installation server is needed in the browser.
 
@@ -43,3 +43,29 @@ The compiler resolves relative workspace imports and `@lvce-editor/api`. Saving 
 Saved workspace snapshots persist in browser storage when available; **Reset sample** restores the example. The generated site is a static GitHub Pages artifact. Arbitrary npm imports, Node-only APIs, and binary asset editing are not supported by the browser compiler.
 
 Application isolation separates editor state and extension services; it is not a security sandbox for hostile code. Use the playground to experiment with code you trust.
+
+## Preview setup
+
+An extension sample can include an optional `.lvce/setup-preview.js` module exporting an async `setupPreview` function. The playground runs it after mounting the extension and opening the preview entry file. For example, the completion sample uses:
+
+```js
+export const setupPreview = async ({ openFile, setCursor, showCompletions }) => {
+  await openFile('example.txt')
+  await setCursor(0, 6)
+  await showCompletions()
+}
+```
+
+The supplied helpers operate on the preview IDE:
+
+| Helper                    | Behavior                                                      |
+| ------------------------- | ------------------------------------------------------------- |
+| `openFile(path)`          | Open and focus a file relative to the preview workspace.      |
+| `setCursor(line, column)` | Position the cursor using zero-based line and column indices. |
+| `showCompletions()`       | Open suggestions at the cursor.                               |
+| `showHover()`             | Show documentation at the cursor.                             |
+| `openSideBar(name)`       | Open a sidebar view, such as `Source Control`.                |
+
+Await each helper so actions run in order. Setup modules are standalone browser JavaScript; relative imports and extension API imports are not supported. They run in the playground page, separately from the extension.
+
+Setup runs once per page load, including **Reset sample**. Saving extension edits reloads the extension without rerunning setup or moving the user's cursor. To change setup, edit its file in the source Explorer, save, and reload the page. Saved setup changes persist with the sample workspace. Setup errors appear in the preview status. Samples without a setup module simply open their configured entry file.
