@@ -65,6 +65,7 @@ The supplied helpers operate on the preview IDE:
 | `showCompletions()`       | Open suggestions at the cursor.                               |
 | `showHover()`             | Show documentation at the cursor.                             |
 | `openSideBar(name)`       | Open a sidebar view, such as `Source Control`.                |
+| `openPanel(name)`         | Open a panel view, such as `Problems`.                        |
 
 Await each helper so actions run in order. Setup modules are standalone browser JavaScript; relative imports and extension API imports are not supported. They run in the playground page, separately from the extension.
 
