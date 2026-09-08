@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      // exportStatic discovers the server's static assets through the filesystem.
+      "ignoreDependencies": ["@lvce-editor/server"],
+    },
+    "packages/build": {
+      "includeEntryExports": true,
+    },
+    "packages/e2e": {},
+    "packages/playground": {
+      // Bundled separately by packages/build/src/build.ts.
+      "entry": ["src/site.ts", "src/CompilerWorker.ts"],
+      "includeEntryExports": true,
+    },
+    "packages/sample-*": {
+      // The extension and optional, dynamically loaded preview setup module.
+      // Production mode also checks their exports without build-script exemptions.
+      "entry": ["{src/main.ts,.lvce/setup-preview.js}!"],
+      "includeEntryExports": true,
+    },
+  },
+}

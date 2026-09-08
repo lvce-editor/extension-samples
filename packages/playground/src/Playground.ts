@@ -1,4 +1,5 @@
 import { setupPreview } from './SetupPreview.ts'
+import { setupPreviewDivider } from './SetupPreviewDivider.ts'
 
 type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
 type Files = Record<string, string>
@@ -26,6 +27,7 @@ const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
   })
 
 export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExtensions: readonly unknown[]): Promise<void> => {
+  setupPreviewDivider()
   await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.lineNumbers': true })
   const sourceId = 'source'
   const previewId = 'preview'

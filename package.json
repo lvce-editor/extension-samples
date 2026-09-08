@@ -14,6 +14,7 @@
     "e2e": "npm run e2e --workspace=packages/e2e",
     "e2e:headless": "npm run e2e:headless --workspace=packages/e2e",
     "format": "prettier --write .",
+    "knip": "knip && knip --production --exports",
     "lint": "eslint . && prettier --check .",
     "test": "node --test \"packages/**/test/**/*.test.ts\"",
     "type-check": "tsc -b"
@@ -30,6 +31,7 @@
     "eslint": "^10.9.1",
     "eslint-plugin-unicorn": "71.1.0",
     "jiti": "^2.7.0",
+    "knip": "^6.34.0",
     "prettier": "^3.9.6",
     "typescript": "^6.0.3",
     "typescript-eslint": "8.63.0"

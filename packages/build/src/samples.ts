@@ -85,4 +85,32 @@ export const samples: readonly Sample[] = [
     route: 'quick-input',
     title: 'Quick Input',
   },
+  {
+    description: 'Show a Hello World notification.',
+    id: 'hello-world',
+    packageName: 'sample-hello-world',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Hello World\n\nFocus the preview editor, press F1, and run **Sample: Hello World**. A notification saying **Hello World!** appears in the preview.\n',
+      },
+    },
+    route: 'hello-world',
+    title: 'Hello World',
+  },
+  {
+    description: 'Show a warning dialog with a title, message, and dismiss button.',
+    id: 'dialog',
+    packageName: 'sample-dialog',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Dialog\n\nFocus the preview editor, press F1, and run **Sample: Show Warning Dialog**. A warning dialog appears with a warning icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then run the command again.\n',
+      },
+    },
+    route: 'dialog',
+    title: 'Dialog',
+  },
 ]

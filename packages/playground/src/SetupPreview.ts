@@ -1,7 +1,8 @@
 type Execute = (command: string, ...args: readonly unknown[]) => Promise<unknown>
 
-export interface PreviewContext {
+interface PreviewContext {
   readonly openFile: (path: string) => Promise<unknown>
+  readonly openPanel: (name: string) => Promise<unknown>
   readonly openSideBar: (name: string) => Promise<unknown>
   readonly setCursor: (line: number, column: number) => Promise<unknown>
   readonly showCompletions: () => Promise<unknown>
@@ -16,6 +17,7 @@ export const setupPreview = async (source: string | undefined, workspace: string
     if (typeof module.setupPreview !== 'function') throw new Error('Export a setupPreview function from .lvce/setup-preview.js')
     const context: PreviewContext = {
       openFile: (path) => execute('Main.openUri', `${workspace.replace(/\/$/, '')}/${path.replace(/^\//, '')}`),
+      openPanel: (name) => execute('Layout.showPanel', name),
       openSideBar: (name) => execute('Layout.openSideBarViewlet', name),
       setCursor: (line, column) => execute('Editor.cursorSet', line, column),
       showCompletions: () => execute('Editor.openCompletion'),
