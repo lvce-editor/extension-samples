@@ -1,0 +1,16 @@
+{
+  "id": "sample.hello-world",
+  "name": "Hello World Sample",
+  "description": "Show a Hello World notification.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.helloWorld"],
+  "commands": [
+    {
+      "id": "sample.helloWorld",
+      "label": "Sample: Hello World"
+    }
+  ]
+}
