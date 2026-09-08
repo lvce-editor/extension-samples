@@ -11,7 +11,7 @@ for (const sample of ['file-system-provider', 'source-control-provider']) {
     })
     await page.goto(`/extension-samples/${sample}/`)
     await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
-    await expect(page.getByRole('status')).toHaveText('Preview ready')
+    await expect(page.locator('#preview-status')).toHaveText('Preview ready')
     await expect(page.locator('#source-ide .Editor')).toHaveCount(1)
     await expect(page.locator('#preview-ide .Editor')).toContainText(sample === 'file-system-provider' ? 'Hello from memfs' : 'Preview workspace')
     if (sample === 'source-control-provider') await expect(page.locator('#preview-ide .DecorationIcon').first()).toHaveJSProperty('naturalWidth', 16)
