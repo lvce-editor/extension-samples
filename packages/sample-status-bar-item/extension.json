@@ -1,0 +1,21 @@
+{
+  "id": "sample.status-bar-item",
+  "name": "Status Bar Item Sample",
+  "description": "Choose an environment from a clickable status bar item.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["*", "onCommand:sample.selectEnvironment"],
+  "statusBarItems": [
+    {
+      "id": "sample-environment"
+    }
+  ],
+  "commands": [
+    {
+      "id": "sample.selectEnvironment",
+      "label": "Sample: Select Environment"
+    }
+  ]
+}
