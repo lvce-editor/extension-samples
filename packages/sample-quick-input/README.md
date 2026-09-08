@@ -11,3 +11,5 @@ Edit `src/main.ts` or `extension.json` in the source editor and save with Ctrl+S
 ## API
 
 The isolated extension awaits `activate()` before registering its provider or command. `extension.json` declares the matching contribution IDs. File paths are resolved against the current workspace URI.
+
+`showQuickInput` opens a freeform text field: there are no items to select or filter, and no “No Results” message. For a list of choices, use `showQuickPick` (the default `type: 'select'`); `type: 'text'` opts that API into freeform input.
