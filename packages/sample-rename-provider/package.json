@@ -13,5 +13,10 @@
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 150
   }
 }
