@@ -21,7 +21,7 @@ test('saved setup edits apply on page load without interrupting hot reload', asy
   await page.reload()
   await expect(page.locator('.EditorCompletionItem')).toHaveText(['blue', 'green', 'red'], { timeout: 30_000 })
   await page.keyboard.press('Enter')
-  await expect(page.locator('#preview-ide .EditorRow').first()).toHaveText('bluecolor=')
+  await expect(page.locator('#preview-ide .EditorRow').first()).toHaveText(['blue', 'color='].join(''))
   await page.getByRole('button', { name: 'Reset sample' }).click()
   await expect(page.locator('.EditorCompletionItem')).toHaveText(['blue', 'green', 'red'], { timeout: 30_000 })
   await page.keyboard.press('Enter')
