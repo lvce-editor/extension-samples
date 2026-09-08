@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
+import { createIgnoreHashes } from './CreateIgnoreHashes.ts'
 import { createHtml } from './html.ts'
 import { samples } from './samples.ts'
 
@@ -65,7 +66,7 @@ const buildTooling = async (): Promise<Record<string, string>> => {
 }
 
 const installEslint = async (commitHash: string, pathPrefix: string): Promise<void> => {
-  const version = '1.17.0'
+  const version = '1.20.0'
   const response = await fetch(`https://github.com/lvce-editor/eslint/releases/download/v${version}/eslint-v${version}.tar.br`)
   if (!response.ok) throw new Error(`Failed to download ESLint: ${response.status}`)
   const archivePath = join(root, '.tmp', 'eslint-extension.tar')
@@ -147,6 +148,7 @@ export const buildStatic = async (): Promise<void> => {
     const packageRoot = join(root, 'packages', sample.packageName)
     const files = await readWorkspace(packageRoot)
     await writeJson(join(outputRoot, 'samples', sample.id, 'files.json'), files)
+    await writeJson(join(outputRoot, 'samples', sample.id, 'eslint-ignore-hashes.json'), createIgnoreHashes(files))
     await build({
       bundle: true,
       entryPoints: [join(packageRoot, 'src/main.ts')],
