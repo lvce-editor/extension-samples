@@ -45,6 +45,9 @@ test('edits an SVG decoration as source and reloads the image in the preview', a
   const source = page.locator('#source-ide')
   const preview = page.locator('#preview-ide')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const icon = preview.locator('.DecorationIcon').first()
+  await expect(icon).toHaveJSProperty('naturalWidth', 16)
+  const originalIconUrl = await icon.evaluate((element) => (element as HTMLImageElement).src)
   await source.getByRole('treeitem', { exact: true, name: 'icons' }).click()
   await source.getByRole('treeitem', { exact: true, name: 'modified.svg' }).click()
   await expect(source.locator('.Editor')).toContainText('<svg')
@@ -54,7 +57,7 @@ test('edits an SVG decoration as source and reloads the image in the preview', a
   await expect(source.locator('.Editor')).toContainText('<circle')
   await page.keyboard.press('Control+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
-  const icon = preview.locator('.DecorationIcon').first()
+  await expect(icon).not.toHaveAttribute('src', originalIconUrl)
   await expect(icon).toHaveJSProperty('naturalWidth', 16)
   const svg = await icon.evaluate(async (element) => {
     const response = await fetch((element as HTMLImageElement).src)
