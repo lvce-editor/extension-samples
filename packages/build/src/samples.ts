@@ -113,4 +113,18 @@ export const samples: readonly Sample[] = [
     route: 'dialog',
     title: 'Dialog',
   },
+  {
+    description: 'Render a sidebar with virtual DOM and increment/decrement a counter.',
+    id: 'sidebar-counter',
+    packageName: 'sample-sidebar-counter',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Sidebar Counter\n\nUse **Increment** and **Decrement** in the Counter sidebar. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
+      },
+    },
+    route: 'sidebar-counter',
+    title: 'Sidebar Counter',
+  },
 ]
