@@ -6,7 +6,7 @@ export const setupPreviewDivider = (): void => {
   const resize = (value: number): void => {
     percentage = Math.max(20, Math.min(80, value))
     pair.style.gridTemplateColumns = `minmax(0, ${percentage}fr) 6px minmax(0, ${100 - percentage}fr)`
-    divider.setAttribute('aria-valuenow', String(Math.round(percentage)))
+    divider.ariaValueNow = String(Math.round(percentage))
   }
   const resizeFromPointer = (event: PointerEvent): void => {
     const { left, width } = pair.getBoundingClientRect()
@@ -16,7 +16,7 @@ export const setupPreviewDivider = (): void => {
   divider.addEventListener('pointerdown', (event) => {
     if (event.button !== 0 || pointerId !== undefined) return
     event.preventDefault()
-    pointerId = event.pointerId
+    ;({ pointerId } = event)
     divider.setPointerCapture(pointerId)
     divider.focus()
     pair.classList.add('IdePairResizing')
@@ -42,11 +42,11 @@ export const setupPreviewDivider = (): void => {
       case 'ArrowRight':
         resize(percentage + 2)
         break
-      case 'Home':
-        resize(20)
-        break
       case 'End':
         resize(80)
+        break
+      case 'Home':
+        resize(20)
         break
       default:
         return

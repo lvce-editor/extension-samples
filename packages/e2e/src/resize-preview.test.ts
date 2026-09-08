@@ -30,13 +30,13 @@ for (const sample of ['source-control-provider', 'file-system-provider']) {
 
     await divider.focus()
     await page.keyboard.press('Home')
-    await expect(divider).toHaveAttribute('aria-valuenow', '20')
+    await expect(divider).toHaveJSProperty('ariaValueNow', '20')
     await page.keyboard.press('ArrowLeft')
-    await expect(divider).toHaveAttribute('aria-valuenow', '20')
+    await expect(divider).toHaveJSProperty('ariaValueNow', '20')
     await page.keyboard.press('End')
-    await expect(divider).toHaveAttribute('aria-valuenow', '80')
+    await expect(divider).toHaveJSProperty('ariaValueNow', '80')
     await page.keyboard.press('ArrowRight')
-    await expect(divider).toHaveAttribute('aria-valuenow', '80')
+    await expect(divider).toHaveJSProperty('ariaValueNow', '80')
     await expect(preview.locator('.SideBar')).toBeVisible()
     await expect(source.locator('.SideBar')).toBeVisible()
 
