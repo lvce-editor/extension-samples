@@ -66,7 +66,7 @@ const buildTooling = async (): Promise<Record<string, string>> => {
 }
 
 const installEslint = async (commitHash: string, pathPrefix: string): Promise<void> => {
-  const version = '1.17.0'
+  const version = '1.20.0'
   const response = await fetch(`https://github.com/lvce-editor/eslint/releases/download/v${version}/eslint-v${version}.tar.br`)
   if (!response.ok) throw new Error(`Failed to download ESLint: ${response.status}`)
   const archivePath = join(root, '.tmp', 'eslint-extension.tar')
