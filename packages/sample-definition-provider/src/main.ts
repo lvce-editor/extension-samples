@@ -5,7 +5,7 @@ const main = async (): Promise<void> => {
   await activate()
   registerDefinitionProvider({
     id: 'sample-definition',
-    languageId: 'sample-definition-provider',
+    languageId: 'plaintext',
     provideDefinition,
   })
 }

@@ -23,7 +23,10 @@ export const setupPreview = async (source: string | undefined, workspace: string
       setCursor: (line, column) => execute('Editor.cursorSet', line, column),
       showCompletions: () => execute('Editor.openCompletion'),
       showHover: () => execute('Editor.showHover'),
-      showStatusBar: () => execute('Layout.showStatusBar'),
+      showStatusBar: async () => {
+        await execute('Preferences.update', { 'statusBar.itemsVisible': true })
+        await execute('Layout.showStatusBar')
+      },
     }
     await module.setupPreview(context)
   } catch (error) {

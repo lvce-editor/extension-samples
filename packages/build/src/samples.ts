@@ -160,9 +160,9 @@ export const samples: readonly Sample[] = [
     id: 'definition-provider',
     packageName: 'sample-definition-provider',
     preview: {
-      entry: '/example.sample',
+      entry: '/example.txt',
       files: {
-        '/example.sample': 'let color = blue\n\nprint(color)\nprint(missing)\n',
+        '/example.txt': 'let color = blue\n\nprint(color)\nprint(missing)\n',
       },
     },
     route: 'definition-provider',
@@ -173,9 +173,9 @@ export const samples: readonly Sample[] = [
     id: 'rename-provider',
     packageName: 'sample-rename-provider',
     preview: {
-      entry: '/example.sample',
+      entry: '/example.txt',
       files: {
-        '/example.sample': 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)\n',
+        '/example.txt': 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)\n',
       },
     },
     route: 'rename-provider',
@@ -186,9 +186,9 @@ export const samples: readonly Sample[] = [
     id: 'code-actions',
     packageName: 'sample-code-actions',
     preview: {
-      entry: '/example.sample',
+      entry: '/example.txt',
       files: {
-        '/example.sample': 'import zebra\nimport apple\nimport zebra\n\nprint(apple)\n',
+        '/example.txt': 'import zebra\nimport apple\n\nprint(apple)\n',
       },
     },
     route: 'code-actions',

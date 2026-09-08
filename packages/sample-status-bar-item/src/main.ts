@@ -18,7 +18,7 @@ const main = async (): Promise<void> => {
   registerCommand({
     async execute() {
       const value = await showQuickPick({
-        items: ['Development', 'Staging', 'Production'].map((label) => ({ label, value: label })),
+        items: ['Development', 'Staging', 'Production'].map((label) => ({ description: `Use ${label.toLowerCase()} settings`, label, value: label })),
         placeholder: 'Choose an environment',
       })
       // Cancelling leaves the current environment unchanged.

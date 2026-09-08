@@ -6,19 +6,13 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onLanguage:sample-code-actions", "onCodeActions:sample-code-actions"],
-  "languages": [
-    {
-      "id": "sample-code-actions",
-      "extensions": [".sample"]
-    }
-  ],
+  "activation": ["onLanguage:plaintext", "onCodeAction:plaintext"],
   "codeActions": [
     {
       "kind": "source.organizeImports",
       "name": "Organize Imports",
       "command": "Editor.organizeImports",
-      "languageId": "sample-code-actions"
+      "languageId": "plaintext"
     }
   ]
 }

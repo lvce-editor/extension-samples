@@ -6,11 +6,5 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onLanguage:sample-rename-provider", "onRename:sample-rename-provider"],
-  "languages": [
-    {
-      "id": "sample-rename-provider",
-      "extensions": [".sample"]
-    }
-  ]
+  "activation": ["onLanguage:plaintext", "onRename:plaintext"]
 }

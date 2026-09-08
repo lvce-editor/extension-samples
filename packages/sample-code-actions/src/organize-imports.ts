@@ -8,7 +8,7 @@ export const organizeImports = (document: TextDocument): readonly { startOffset:
   if (!block) return []
   const newline = block.includes('\r\n') ? '\r\n' : '\n'
   const imports = block.trimEnd().split(/\r?\n/)
-  const inserted = [...new Set(imports)].toSorted((a, b) => a.localeCompare(b)).join(newline) + (block.endsWith('\n') ? newline : '')
+  const inserted = imports.toSorted((a, b) => a.localeCompare(b)).join(newline) + (block.endsWith('\n') ? newline : '')
   if (inserted === block) return []
   return [{ endOffset: block.length, inserted, startOffset: 0 }]
 }

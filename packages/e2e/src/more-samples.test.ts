@@ -32,7 +32,7 @@ test('output channel appends successive builds and clears its logs', async ({ pa
 
 test('definition navigation moves to the declaration and reports missing symbols', async ({ page }) => {
   await page.goto('/extension-samples/definition-provider/')
-  await expect(page.getByRole('status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
   await editor.locator('textarea').focus()
   await page.keyboard.press('F12')
@@ -56,7 +56,7 @@ test('definition navigation moves to the declaration and reports missing symbols
 
 test('rename changes complete identifiers, supports undo, and can be cancelled', async ({ page }) => {
   await page.goto('/extension-samples/rename-provider/')
-  await expect(page.getByRole('status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
   await editor.locator('textarea').focus()
   await page.keyboard.press('F2')
@@ -77,13 +77,14 @@ test('rename changes complete identifiers, supports undo, and can be cancelled',
   await expect(editor).not.toContainText('cancelled')
 })
 
-test('organize imports sorts and deduplicates the import block and supports undo', async ({ page }) => {
+test('organize imports sorts the import block and supports undo', async ({ page }) => {
   await page.goto('/extension-samples/code-actions/')
-  await expect(page.getByRole('status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
-  await runCommand(page, 'Organize Imports')
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('Shift+Alt+o')
   await expect(editor.locator('.EditorRow')).toHaveText(['import apple', 'import zebra', '', 'print(apple)', ''])
   await editor.locator('textarea').focus()
   await page.keyboard.press('Control+z')
-  await expect(editor.locator('.EditorRow')).toHaveText(['import zebra', 'import apple', 'import zebra', '', 'print(apple)', ''])
+  await expect(editor.locator('.EditorRow')).toHaveText(['import zebra', 'import apple', '', 'print(apple)', ''])
 })

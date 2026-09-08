@@ -5,7 +5,7 @@ const main = async (): Promise<void> => {
   await activate()
   registerRenameProvider({
     id: 'sample-rename',
-    languageId: 'sample-rename-provider',
+    languageId: 'plaintext',
     provideRename,
   })
 }
