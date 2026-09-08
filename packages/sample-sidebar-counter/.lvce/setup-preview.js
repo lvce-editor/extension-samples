@@ -1,4 +1,4 @@
 /** @public */
 export const setupPreview = async ({ openSideBar }) => {
-  await openSideBar('Counter')
+  await openSideBar('sample.sidebar-counter')
 }
