@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@lvce-editor/api": "^9.28.3",
-    "@lvce-editor/editor-worker": "^19.59.1",
+    "@lvce-editor/editor-worker": "^19.59.2",
     "@lvce-editor/shared-process": "^0.113.24",
     "esbuild": "^0.28.2",
     "esbuild-wasm": "^0.28.2",
