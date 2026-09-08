@@ -141,7 +141,7 @@ export const buildStatic = async (): Promise<void> => {
     target: 'es2022',
     external: ['node:*', 'electron'],
   })
-  await cp(join(root, 'node_modules/esbuild-wasm/esbuild.wasm'), join(assets, 'esbuild.wasm'))
+  await cp(require.resolve('esbuild-wasm/esbuild.wasm'), join(assets, 'esbuild.wasm'))
   await cp(join(root, 'packages/playground/src/app.css'), join(assets, 'app.css'))
   for (const sample of samples) {
     const packageRoot = join(root, 'packages', sample.packageName)

@@ -1,6 +1,6 @@
 type Execute = (command: string, ...args: readonly unknown[]) => Promise<unknown>
 
-export interface PreviewContext {
+interface PreviewContext {
   readonly openFile: (path: string) => Promise<unknown>
   readonly openPanel: (name: string) => Promise<unknown>
   readonly openSideBar: (name: string) => Promise<unknown>
