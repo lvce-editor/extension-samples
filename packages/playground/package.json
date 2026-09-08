@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@lvce-editor/api": "^9.28.3",
     "esbuild-wasm": "^0.28.2"
   }
 }

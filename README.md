@@ -30,6 +30,10 @@ Then open `http://localhost:3000/extension-samples/file-system-provider/`.
 
 Use `npm run build:static` to create the GitHub Pages artifact in `.tmp/static` and `npm run e2e:headless` to test the live-editing flow.
 
+Run `npm run knip` to check unused files, exports, and dependencies across every package, including build tooling, e2e tests, the playground, and each extension sample. Both PR and main-branch CI run this check. The command also runs a production export check so sample entry-point exports are checked without Knip's build-script exemptions.
+
+New `packages/sample-*` workspaces are included automatically, with `src/main.ts` as the extension entry point. Knip checks other source files for unused code. Optional `.lvce/setup-preview.js` modules are also entry points; mark their dynamically called `setupPreview` export with `/** @public */`. Other unused entry-point exports are still reported.
+
 Run `npm run lint` for repository checks, or `npm run lint --workspace=packages/sample-file-system-provider` (substitute any sample package) to lint one extension. Every `packages/sample-*` extension uses the shared `eslint.samples.config.js`: typescript-eslint's [strict type-checked rules](https://typescript-eslint.io/users/configs/#strict-type-checked) and [Unicorn's recommended rules](https://github.com/sindresorhus/eslint-plugin-unicorn). API abbreviations and explicit `undefined` values are allowed. Sample TypeScript projects also enable strict checking and checked indexed access.
 
 The playground shares the strict syntax and Unicorn rules, including checks against explicit `any` and non-null assertions. Type-aware rules (such as unsafe values and unhandled promises) run in CI and local lint commands; they are disabled in the browser because the playground's virtual filesystem does not yet support TypeScript project loading. New samples should include a `tsconfig.json` covering all source files.

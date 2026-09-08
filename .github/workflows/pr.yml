@@ -23,6 +23,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: npm
       - run: npm ci
+      - run: npm run knip
       - run: npm run build:static
       - run: npm test
       - run: npm run type-check
