@@ -177,6 +177,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         false,
       )
       if (sampleId === 'source-control-provider') await invoke('Application.execute', previewId, 'Layout.openSideBarViewlet', 'Source Control')
+      if (sampleId === 'diagnostic-provider') await invoke('Application.execute', previewId, 'Layout.showPanel', 'Problems')
     }
     const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
     for (const url of previewUrls) {
