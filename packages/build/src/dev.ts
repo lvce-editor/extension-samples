@@ -14,6 +14,7 @@ const contentTypes: Readonly<Record<string, string>> = {
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.map': 'application/json; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
   '.ts': 'text/plain; charset=utf-8',
   '.wasm': 'application/wasm',
 }

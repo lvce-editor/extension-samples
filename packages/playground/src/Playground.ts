@@ -28,7 +28,7 @@ const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
 
 export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExtensions: readonly unknown[]): Promise<void> => {
   setupPreviewDivider()
-  await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.lineNumbers': true })
+  await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.formatOnSave': true, 'editor.lineNumbers': true })
   const sourceId = 'source'
   const previewId = 'preview'
   const sampleId = document.body.dataset.sampleId || 'file-system-provider'
@@ -65,6 +65,17 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       files = stored
   } catch {
     /* A corrupt draft must not prevent opening the sample. */
+  }
+
+  // Existing drafts predate the sample formatting defaults; preserve their other package fields.
+  try {
+    const packageJson = JSON.parse(files['/package.json'])
+    if (packageJson.prettier === undefined) {
+      packageJson.prettier = JSON.parse(initialFiles['/package.json']).prettier
+      files['/package.json'] = `${JSON.stringify(packageJson, undefined, 2)}\n`
+    }
+  } catch {
+    // Keep an unfinished package.json editable.
   }
 
   let compiler: Worker | undefined

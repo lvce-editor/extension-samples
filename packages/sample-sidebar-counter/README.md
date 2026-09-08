@@ -12,6 +12,6 @@ Edit `src/main.ts` and save with Ctrl+S to rebuild the preview. For example, cha
 
 The manifest contributes a view with `kind: "virtualDom"`, `preferredLocation: "sideBar"`, and a matching `onView` activation event. The isolated extension awaits `activate()` and calls `registerView()` with the same ID.
 
-`create()` owns the count for each view instance. `render()` returns a flat, depth-first virtual DOM array; each node's `childCount` counts its direct children. Buttons have a `name` that arrives in `handleEvent()` with `type: 'click'`. LVCE renders the updated virtual DOM after the handler returns. `getCss()` styles the view, and the count uses a live status region.
+`create()` owns the count for each view instance. `render()` returns a flat, depth-first virtual DOM array; each node's `childCount` counts its direct children. Buttons bind `onClick: 'handleClick'` and have a `name` that arrives in `handleEvent()` with `type: 'click'`. LVCE renders the updated virtual DOM after the handler returns. `getCss()` styles the view, and the count uses a live status region.
 
 `.lvce/setup-preview.js` opens the contributed sidebar in the playground. It is playground setup, not part of the extension API.
