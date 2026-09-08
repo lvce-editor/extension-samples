@@ -11,10 +11,19 @@ test('warning dialog shows its content and supports confirming, reopening, and c
   await expect(dialog.locator('.DialogMessage')).toHaveText('This is a sample warning dialog. No files have been changed.')
   await expect(dialog.locator('.DialogWarningIcon.MaskIconWarning')).toBeVisible()
   await expect(page.locator('#source-ide').getByRole('dialog')).toHaveCount(0)
+  await expect
+    .poll(() =>
+      page.locator('#preview-ide').evaluate((element) => {
+        const parent = element.getBoundingClientRect()
+        const popup = element.querySelector('[role=dialog]')!.getBoundingClientRect()
+        return popup.left >= parent.left && popup.right <= parent.right && popup.top >= parent.top && popup.bottom <= parent.bottom
+      }),
+    )
+    .toBe(true)
   await dialog.getByRole('button', { exact: true, name: 'OK' }).click()
   await expect(dialog).toBeHidden()
   await runCommand(page, 'Sample: Show Warning Dialog')
   await expect(dialog).toBeVisible()
-  await dialog.getByRole('button', { exact: true, name: 'Close' }).click()
+  await dialog.getByRole('button', { exact: true, name: 'Cancel' }).click()
   await expect(dialog).toBeHidden()
 })
