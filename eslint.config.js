@@ -4,7 +4,7 @@ import sampleConfig from './eslint.samples.config.js'
 
 export default defineConfig([
   {
-    ignores: ['.tmp/**', 'dist/**'],
+    ignores: ['.tmp/**', 'dist/**', '**/playwright-report/**', '**/test-results/**'],
   },
   ...config.default,
   ...config.recommendedTsconfig,

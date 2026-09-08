@@ -1,0 +1,57 @@
+import { expect, test } from '@playwright/test'
+
+test('opens and edits preview component state in the preview application', async ({ page }) => {
+  await page.goto('/extension-samples/source-control-provider/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const source = page.locator('#source-ide')
+  const preview = page.locator('#preview-ide')
+  const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
+  const { entry } = await runtimeResponse.json()
+  await page.evaluate(async (entry) => {
+    const { executeCommand } = await import(entry)
+    await executeCommand('Application.execute', 'preview', 'Layout.showSecondarySideBar')
+    await executeCommand('Application.execute', 'preview', 'Layout.openSecondarySideBarViewlet', 'ComponentState')
+  }, entry)
+  const card = preview.locator('.ComponentStateCard').filter({ has: page.locator('.ComponentStateCardTitle', { hasText: /^Source Control$/ }) })
+  await expect(card).toBeVisible()
+  const uid = await card.getAttribute('data-uid')
+  await card.click()
+  await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
+  await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText('main.ts')
+  await expect(preview.locator('.Editor')).toContainText('memfs:///preview/README.md')
+  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: /^Explorer$/ })).toHaveCount(0)
+  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: /^Layout$/ })).toHaveCount(1)
+  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: /^Main$/ })).toHaveCount(1)
+  const content = await page.evaluate(
+    async ({ componentUid, entry }) => {
+      const { executeCommand } = await import(entry)
+      return executeCommand('Application.execute', 'preview', 'FileSystem.readFile', `live-component-state:///${componentUid}.json`)
+    },
+    { componentUid: uid, entry },
+  )
+  const state = JSON.parse(content)
+  await preview.locator('.Editor textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(`${JSON.stringify({ ...state, inputSource: 2, inputValue: 'preview component edit' }, null, 2)}\n`)
+  await expect(preview.getByRole('textbox', { name: 'Source Control Input' })).toHaveValue('preview component edit')
+  await page.keyboard.press('Control+s')
+  await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
+  await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText('main.ts')
+
+  await page.evaluate(async (entry) => {
+    const { executeCommand } = await import(entry)
+    await executeCommand('Application.execute', 'source', 'Layout.showSecondarySideBar')
+    await executeCommand('Application.execute', 'source', 'Layout.openSecondarySideBarViewlet', 'ComponentState')
+  }, entry)
+  const sourceCard = source.locator('.ComponentStateCard').filter({ has: page.locator('.ComponentStateCardTitle', { hasText: /^Explorer$/ }) })
+  await expect(sourceCard).toBeVisible()
+  const sourceUid = await sourceCard.getAttribute('data-uid')
+  await sourceCard.click()
+  await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText(`${sourceUid}.json`)
+  await expect(source.locator('.Editor')).toContainText('memfs:///sample')
+  await expect(source.locator('.ComponentStateCardTitle').filter({ hasText: /^Source Control$/ })).toHaveCount(0)
+  await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
+  await card.click()
+  await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
+  await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText(`${sourceUid}.json`)
+})
