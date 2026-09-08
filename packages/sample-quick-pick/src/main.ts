@@ -11,6 +11,7 @@ const main = async (): Promise<void> => {
           { description: 'Serve real users', icon: 'Color', label: 'Production', value: 'production' },
         ],
         placeholder: 'Choose a deployment environment',
+        type: 'select',
       })
       // Escape returns undefined: do not write a file when the picker is cancelled.
       if (typeof value !== 'string') return
