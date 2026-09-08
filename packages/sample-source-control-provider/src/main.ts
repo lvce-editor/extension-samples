@@ -57,5 +57,9 @@ const provider: SourceControlProvider = {
   },
 }
 
-await activateExtensionApi()
-registerSourceControlProvider(provider)
+const main = async (): Promise<void> => {
+  await activateExtensionApi()
+  registerSourceControlProvider(provider)
+}
+
+main().catch(console.error)
