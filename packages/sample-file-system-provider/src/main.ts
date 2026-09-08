@@ -64,5 +64,9 @@ const provider: FileSystemProvider = {
   },
 }
 
-await activateExtensionApi()
-registerFileSystemProvider(provider)
+const main = async (): Promise<void> => {
+  await activateExtensionApi()
+  registerFileSystemProvider(provider)
+}
+
+main().catch(console.error)
