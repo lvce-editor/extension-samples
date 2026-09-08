@@ -104,6 +104,9 @@ export const buildStatic = async (): Promise<void> => {
   } else {
     ;({ commitHash } = await sharedProcess.exportStatic({ root, pathPrefix }))
   }
+  const settingsPath = join(root, 'dist', commitHash, 'config', 'defaultSettings.json')
+  const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
+  await writeJson(settingsPath, { ...settings, 'application.useOnLoadJson': true })
   // Ship editor fixes independently of the full server runtime release.
   await cp(dirname(require.resolve('@lvce-editor/editor-worker')), join(root, 'dist', commitHash, 'packages', 'editor-worker', 'dist'), {
     recursive: true,
