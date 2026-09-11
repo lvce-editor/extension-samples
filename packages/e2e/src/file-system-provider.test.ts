@@ -169,8 +169,9 @@ test('reloads the currently open provider file without switching back to README'
 
 test('idle samples keep their tabs and preview unchanged', async ({ page }) => {
   await page.evaluate(() => {
+    const { document } = globalThis
     document.body.dataset.idleSaves = '0'
-    window.addEventListener('lvce-file-saved', () => {
+    globalThis.addEventListener('lvce-file-saved', () => {
       document.body.dataset.idleSaves = String(Number(document.body.dataset.idleSaves) + 1)
     })
   })
@@ -183,7 +184,8 @@ test('idle samples keep their tabs and preview unchanged', async ({ page }) => {
 
 test('unchanged source save notifications do not rebuild the preview', async ({ page }) => {
   await page.evaluate(() => {
-    window.dispatchEvent(new CustomEvent('lvce-file-saved', { detail: { applicationId: 'source', uri: 'memfs:///sample/src/main.ts' } }))
+    const { CustomEvent } = globalThis
+    globalThis.dispatchEvent(new CustomEvent('lvce-file-saved', { detail: { applicationId: 'source', uri: 'memfs:///sample/src/main.ts' } }))
   })
   await page.waitForTimeout(3500)
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
