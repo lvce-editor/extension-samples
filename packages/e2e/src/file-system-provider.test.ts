@@ -166,3 +166,27 @@ test('reloads the currently open provider file without switching back to README'
   await expect(preview.locator('.Editor')).toHaveAttribute('data-uid', previewUid!)
   await expect(preview.getByRole('tab', { exact: true, name: 'example.ts Close' })).toHaveAttribute('aria-selected', 'true')
 })
+
+test('idle samples keep their tabs and preview unchanged', async ({ page }) => {
+  await page.evaluate(() => {
+    const { document } = globalThis
+    document.body.dataset.idleSaves = '0'
+    globalThis.addEventListener('lvce-file-saved', () => {
+      document.body.dataset.idleSaves = String(Number(document.body.dataset.idleSaves) + 1)
+    })
+  })
+  const tabs = await page.getByRole('tab').elementHandles()
+  await page.waitForTimeout(3500)
+  await expect(page.locator('body')).toHaveAttribute('data-idle-saves', '0')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+  for (const tab of tabs) expect(await tab.evaluate((element) => element.isConnected)).toBe(true)
+})
+
+test('unchanged source save notifications do not rebuild the preview', async ({ page }) => {
+  await page.evaluate(() => {
+    const { CustomEvent } = globalThis
+    globalThis.dispatchEvent(new CustomEvent('lvce-file-saved', { detail: { applicationId: 'source', uri: 'memfs:///sample/src/main.ts' } }))
+  })
+  await page.waitForTimeout(3500)
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+})
