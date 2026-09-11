@@ -274,6 +274,9 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         }
         await visit('')
         if (readRequested) continue
+        const unchanged =
+          Object.keys(snapshot).length === Object.keys(files).length && Object.entries(files).every(([path, content]) => snapshot[path] === content)
+        if (unchanged) continue
         files = snapshot
         try {
           localStorage.setItem(storageKey, JSON.stringify(files))
