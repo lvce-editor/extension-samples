@@ -1,0 +1,10 @@
+{
+  "id": "sample.definition-provider",
+  "name": "Definition Provider Sample",
+  "description": "Jump from a variable reference to its declaration.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onDefinition:plaintext"]
+}

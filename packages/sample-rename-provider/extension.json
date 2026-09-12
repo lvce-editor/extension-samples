@@ -1,0 +1,10 @@
+{
+  "id": "sample.rename-provider",
+  "name": "Rename Provider Sample",
+  "description": "Rename every matching identifier in a document.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onRename:plaintext"]
+}

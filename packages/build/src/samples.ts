@@ -127,4 +127,71 @@ export const samples: readonly Sample[] = [
     route: 'sidebar-counter',
     title: 'Sidebar Counter',
   },
+  {
+    description: 'Choose an environment from a clickable status bar item.',
+    id: 'status-bar-item',
+    packageName: 'sample-status-bar-item',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Status Bar Item\n\nClick **Environment: Development** in the preview status bar. Choose **Staging** or **Production** to update the label. Escape cancels without changing it. The command palette also offers **Sample: Select Environment**.\n',
+      },
+    },
+    route: 'status-bar-item',
+    title: 'Status Bar Item',
+  },
+  {
+    description: 'Write, append, and clear simulated build logs in the Output panel.',
+    id: 'output-channel',
+    packageName: 'sample-output-channel',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Output Channel\n\nThe Output panel opens with a welcome line. Focus the preview editor, press F1, and run **Sample: Run Build**. Each run appends a numbered simulated build. Run **Sample: Clear Build Output** to clear the log.\n',
+      },
+    },
+    route: 'output-channel',
+    title: 'Output Channel',
+  },
+  {
+    description: 'Jump from a variable reference to its declaration.',
+    id: 'definition-provider',
+    packageName: 'sample-definition-provider',
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'let color = blue\n\nprint(color)\nprint(missing)\n',
+      },
+    },
+    route: 'definition-provider',
+    title: 'Definition Provider',
+  },
+  {
+    description: 'Rename every matching identifier in a document.',
+    id: 'rename-provider',
+    packageName: 'sample-rename-provider',
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)\n',
+      },
+    },
+    route: 'rename-provider',
+    title: 'Rename Provider',
+  },
+  {
+    description: 'Organize a block of imports with a source code action.',
+    id: 'code-actions',
+    packageName: 'sample-code-actions',
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'import zebra\nimport apple\n\nprint(apple)\n',
+      },
+    },
+    route: 'code-actions',
+    title: 'Code Actions',
+  },
 ]

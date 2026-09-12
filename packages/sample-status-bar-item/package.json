@@ -1,0 +1,22 @@
+{
+  "name": "@lvce-editor/sample-status-bar-item",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --format=esm --outfile=dist/main.js",
+    "lint": "eslint . --max-warnings 0",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lvce-editor/api": "^9.28.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 150
+  }
+}

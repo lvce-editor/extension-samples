@@ -42,6 +42,21 @@
     },
     {
       "path": "./packages/sample-sidebar-counter"
+    },
+    {
+      "path": "./packages/sample-status-bar-item"
+    },
+    {
+      "path": "./packages/sample-output-channel"
+    },
+    {
+      "path": "./packages/sample-definition-provider"
+    },
+    {
+      "path": "./packages/sample-rename-provider"
+    },
+    {
+      "path": "./packages/sample-code-actions"
     }
   ]
 }

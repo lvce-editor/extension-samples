@@ -20,6 +20,12 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)
 
+- [Status Bar Item](./packages/sample-status-bar-item)
+- [Output Channel](./packages/sample-output-channel)
+- [Definition Provider](./packages/sample-definition-provider)
+- [Rename Provider](./packages/sample-rename-provider)
+- [Code Actions](./packages/sample-code-actions)
+
 ## Development
 
 ```sh
@@ -75,6 +81,8 @@ The supplied helpers operate on the preview IDE:
 | `showHover()`             | Show documentation at the cursor.                             |
 | `openSideBar(name)`       | Open a sidebar view, such as `Source Control`.                |
 | `openPanel(name)`         | Open a panel view, such as `Problems`.                        |
+
+`showStatusBar()` reveals the preview status bar for samples that contribute status bar items.
 
 Await each helper so actions run in order. Setup modules are standalone browser JavaScript; relative imports and extension API imports are not supported. They run in the playground page, separately from the extension.
 
