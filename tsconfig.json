@@ -38,6 +38,9 @@
       "path": "./packages/sample-hello-world"
     },
     {
+      "path": "./packages/sample-text-manipulation"
+    },
+    {
       "path": "./packages/sample-dialog"
     },
     {

@@ -10,6 +10,7 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Sidebar counter](./packages/sample-sidebar-counter)
 - [Hello World](./packages/sample-hello-world)
+- [Text Manipulation](./packages/sample-text-manipulation)
 - [Dialog](./packages/sample-dialog)
 - [File system provider](./packages/sample-file-system-provider)
 - [Source control provider](./packages/sample-source-control-provider)
