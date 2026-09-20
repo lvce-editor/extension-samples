@@ -100,6 +100,17 @@ export const samples: readonly Sample[] = [
     title: 'Hello World',
   },
   {
+    description: 'Insert text at the cursor or replace the current selection.',
+    id: 'text-manipulation',
+    packageName: 'sample-text-manipulation',
+    preview: {
+      entry: '/example.txt',
+      files: { '/example.txt': 'Hello, Lvce!\nKeep this line unchanged.\n' },
+    },
+    route: 'text-manipulation',
+    title: 'Text Manipulation',
+  },
+  {
     description: 'Show a warning dialog with a title, message, and dismiss button.',
     id: 'dialog',
     packageName: 'sample-dialog',
