@@ -34,6 +34,8 @@ test('text insertion changes only the preview selection and supports undo', asyn
   await expect(source).not.toContainText('Keep this line unchanged.')
 
   await preview.locator('.EditorRow').first().click()
+  await preview.locator('textarea').focus()
+  await expect(preview.locator('textarea')).toBeFocused()
   await page.keyboard.press('Control+z')
   await expect(preview.locator('.EditorRow')).toHaveText(['Hello, Lvce!', 'Keep this line unchanged.', ''])
 })
