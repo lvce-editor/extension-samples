@@ -111,6 +111,19 @@ export const samples: readonly Sample[] = [
     title: 'Text Manipulation',
   },
   {
+    description: 'Count words in the active preview document.',
+    id: 'word-count',
+    packageName: 'sample-word-count',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md': '# Word Count\n\nCount words in the active document. Edit this text and run **Sample: Count Words** again.\n',
+      },
+    },
+    route: 'word-count',
+    title: 'Word Count',
+  },
+  {
     description: 'Show a warning dialog with a title, message, and dismiss button.',
     id: 'dialog',
     packageName: 'sample-dialog',

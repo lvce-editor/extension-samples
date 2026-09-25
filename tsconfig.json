@@ -41,6 +41,9 @@
       "path": "./packages/sample-text-manipulation"
     },
     {
+      "path": "./packages/sample-word-count"
+    },
+    {
       "path": "./packages/sample-dialog"
     },
     {
