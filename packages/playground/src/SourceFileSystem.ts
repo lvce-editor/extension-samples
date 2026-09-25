@@ -9,6 +9,7 @@ import {
   remove,
   writeFile,
 } from '@lvce-editor/api'
+import { readGeneratedBundle } from './GeneratedBundleStorage.ts'
 
 const prefix = 'sample-source://'
 const memoryUri = (uri: string): string => uri.replace(prefix, 'memfs://')
@@ -43,7 +44,7 @@ const main = async (): Promise<void> => {
     async readFile(uri) {
       if (!isGenerated(uri)) return readFile(memoryUri(uri))
       if (uri !== `${generatedRoot}/main.js`) throw new Error(`File not found: ${uri}`)
-      const response = await fetch(generatedUrl)
+      const response = await readGeneratedBundle(generatedUrl)
       if (!response.ok) throw new Error(`Unable to load generated output: ${response.status}`)
       return response.text()
     },

@@ -1,3 +1,4 @@
+import { deleteGeneratedBundle, storeGeneratedBundle } from './GeneratedBundleStorage.ts'
 import { setupPreview } from './SetupPreview.ts'
 import { setupPreviewDivider } from './SetupPreviewDivider.ts'
 
@@ -232,12 +233,12 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         const icons = readIcons(manifest['source-control-icons'] || [], files)
         await updatePreview(output?.code, manifest, icons)
         const nextGeneratedUrl = output
-          ? URL.createObjectURL(new Blob([output.generated], { type: 'text/javascript' }))
+          ? await storeGeneratedBundle(output.generated)
           : new URL(`${prefix}/samples/${sampleId}/dist/main.js`, location.href).href
         try {
           await invoke('Application.execute', sourceId, 'ExtensionHost.executeCommand', 'sampleSource.setGeneratedUrl', nextGeneratedUrl)
         } catch (error) {
-          URL.revokeObjectURL(nextGeneratedUrl)
+          await deleteGeneratedBundle(nextGeneratedUrl)
           throw error
         }
         const previousGeneratedUrl = generatedUrl
@@ -245,7 +246,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         try {
           await invoke('Application.execute', sourceId, 'Layout.handleWorkspaceRefresh', { changed: ['sample-source:///sample/dist/main.js'] })
         } finally {
-          if (previousGeneratedUrl) URL.revokeObjectURL(previousGeneratedUrl)
+          if (previousGeneratedUrl) await deleteGeneratedBundle(previousGeneratedUrl)
         }
         document.body.dataset.previewRevision = String(++revision)
         document.body.dataset.previewBuildMs = String(Math.round(performance.now() - started))
@@ -338,7 +339,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     'pagehide',
     () => {
       compiler?.terminate()
-      if (generatedUrl) URL.revokeObjectURL(generatedUrl)
+      if (generatedUrl) void deleteGeneratedBundle(generatedUrl)
       for (const observer of observers) observer.disconnect()
       for (const url of previewUrls) URL.revokeObjectURL(url)
     },
