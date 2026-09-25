@@ -130,10 +130,12 @@ export const buildStatic = async (): Promise<void> => {
   for (const [entry, output] of [
     ['site.ts', 'site.js'],
     ['CompilerWorker.ts', 'compiler.js'],
+    ['SourceFileSystem.ts', 'source-files.js'],
   ]) {
     await build({
       bundle: true,
       entryPoints: [join(root, 'packages/playground/src', entry)],
+      external: ['node:*', 'electron'],
       format: 'esm',
       outfile: join(assets, output),
       platform: 'browser',
@@ -167,6 +169,7 @@ export const buildStatic = async (): Promise<void> => {
       sourcemap: true,
       target: 'es2022',
     })
+    await cp(join(packageRoot, 'dist'), join(outputRoot, 'samples', sample.id, 'dist'), { recursive: true })
     await build({
       alias: { '@lvce-editor/api': join(assets, 'api.js') },
       bundle: true,

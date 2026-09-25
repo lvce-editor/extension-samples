@@ -13,41 +13,46 @@ const getLoader = (path: string): esbuild.Loader => {
   return 'js'
 }
 
+const buildOutput = async (files: Record<string, string>, api: string, inlineApi: boolean): Promise<string> => {
+  const result = await esbuild.build({
+    bundle: true,
+    entryPoints: ['/src/main.ts'],
+    format: 'esm',
+    platform: 'browser',
+    plugins: [
+      {
+        name: 'sample-workspace',
+        setup(build): void {
+          build.onResolve({ filter: /.*/ }, (args) => {
+            if (args.path === '@lvce-editor/api') return inlineApi ? { namespace: 'api', path: 'api' } : { external: true, path: args.path }
+            if (args.importer && !args.path.startsWith('.')) {
+              return { errors: [{ text: `Only relative imports and @lvce-editor/api are supported: ${args.path}` }] }
+            }
+            const path = new URL(args.path, `https://workspace${args.importer || '/'}`).pathname
+            const match = [path, `${path}.ts`, `${path}.js`, `${path}/index.ts`].find((candidate) => candidate in files)
+            return match ? { namespace: 'workspace', path: match } : { errors: [{ text: `File not found: ${path}` }] }
+          })
+          build.onLoad({ filter: /.*/, namespace: 'api' }, () => ({ contents: api, loader: 'js' }))
+          build.onLoad({ filter: /.*/, namespace: 'workspace' }, ({ path }) => ({
+            contents: files[path],
+            loader: getLoader(path),
+          }))
+        },
+      },
+    ],
+    target: 'es2022',
+    write: false,
+  })
+  return result.outputFiles[0].text
+}
+
 onmessage = async (event: MessageEvent<{ files: Record<string, string>; id: number }>): Promise<void> => {
   const { files, id } = event.data
   try {
     await initialized
     const api = await apiSource
-    const result = await esbuild.build({
-      bundle: true,
-      entryPoints: ['/src/main.ts'],
-      format: 'esm',
-      platform: 'browser',
-      plugins: [
-        {
-          name: 'sample-workspace',
-          setup(build): void {
-            build.onResolve({ filter: /.*/ }, (args) => {
-              if (args.path === '@lvce-editor/api') return { namespace: 'api', path: 'api' }
-              if (args.importer && !args.path.startsWith('.')) {
-                return { errors: [{ text: `Only relative imports and @lvce-editor/api are supported: ${args.path}` }] }
-              }
-              const path = new URL(args.path, `https://workspace${args.importer || '/'}`).pathname
-              const match = [path, `${path}.ts`, `${path}.js`, `${path}/index.ts`].find((candidate) => candidate in files)
-              return match ? { namespace: 'workspace', path: match } : { errors: [{ text: `File not found: ${path}` }] }
-            })
-            build.onLoad({ filter: /.*/, namespace: 'api' }, () => ({ contents: api, loader: 'js' }))
-            build.onLoad({ filter: /.*/, namespace: 'workspace' }, ({ path }) => ({
-              contents: files[path],
-              loader: getLoader(path),
-            }))
-          },
-        },
-      ],
-      target: 'es2022',
-      write: false,
-    })
-    postMessage({ code: result.outputFiles[0].text, id })
+    const [code, generated] = await Promise.all([buildOutput(files, api, true), buildOutput(files, api, false)])
+    postMessage({ code, generated, id })
   } catch (error) {
     postMessage({ error: String(error), id })
   }
