@@ -48,7 +48,7 @@ test('opens and edits preview component state in the preview application', async
   const sourceUid = await sourceCard.getAttribute('data-uid')
   await sourceCard.click()
   await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText(`${sourceUid}.json`)
-  await expect(source.locator('.Editor')).toContainText('memfs:///sample')
+  await expect(source.locator('.Editor')).toContainText('sample-source:///sample')
   await expect(source.locator('.ComponentStateCardTitle').filter({ hasText: /^Source Control$/ })).toHaveCount(0)
   await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
   await card.click()

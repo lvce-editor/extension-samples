@@ -11,7 +11,7 @@
     "packages/e2e": {},
     "packages/playground": {
       // Bundled separately by packages/build/src/build.ts.
-      "entry": ["src/site.ts", "src/CompilerWorker.ts"],
+      "entry": ["src/site.ts", "src/CompilerWorker.ts", "src/SourceFileSystem.ts"],
       "includeEntryExports": true,
     },
     "packages/sample-*": {
