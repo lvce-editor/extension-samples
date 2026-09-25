@@ -66,6 +66,19 @@ test('generated output follows successful saves, survives failed builds, and res
   await execute(page, 'FileSystem.writeFile', 'memfs:///sample/src/main.ts', edited.replace('Generated revision!', 'Next generated revision!'))
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '3')
   await expect(source).toContainText('Next generated revision!')
+  const cachedBundles = await page.evaluate(async () => {
+    const cache = await globalThis.caches.open('lvce-playground-generated-bundles')
+    const keys = await cache.keys()
+    return Promise.all(
+      keys.map(async (key) => {
+        const response = await cache.match(key)
+        return response!.text()
+      }),
+    )
+  })
+  expect(cachedBundles).toHaveLength(1)
+  expect(cachedBundles[0]).toContain('Next generated revision!')
+
   const draft = await page.evaluate(() => JSON.parse(globalThis.localStorage.getItem('extension-samples:workspace:hello-world')!))
   expect(Object.keys(draft).some((path) => path.startsWith('/dist/'))).toBe(false)
   await page.reload()
