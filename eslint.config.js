@@ -1,6 +1,6 @@
 import * as config from '@lvce-editor/eslint-config'
 import { defineConfig } from 'eslint/config'
-import sampleConfig from './eslint.samples.config.js'
+import { sampleConfig } from './eslint.samples.config.js'
 
 export default defineConfig([
   {

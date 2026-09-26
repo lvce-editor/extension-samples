@@ -1,7 +1,7 @@
 import unicorn from 'eslint-plugin-unicorn'
 import tseslint from 'typescript-eslint'
 
-export default [
+export const sampleConfig = [
   ...tseslint.configs.strictTypeChecked,
   unicorn.configs.recommended,
   {

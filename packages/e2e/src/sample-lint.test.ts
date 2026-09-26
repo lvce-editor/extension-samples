@@ -1,6 +1,15 @@
 import { expect, test } from '@playwright/test'
 
 for (const sample of ['file-system-provider', 'source-control-provider']) {
+  test(`${sample} workspace exposes one self-contained ESLint config`, async ({ page }) => {
+    const response = await page.request.get(`/extension-samples/samples/${sample}/files.json`)
+    const files = await response.json()
+    const configPaths = Object.keys(files).filter((path) => path.endsWith('/eslint.config.js'))
+    expect(configPaths).toEqual(['/eslint.config.js'])
+    expect(files).not.toHaveProperty('/eslint.samples.config.js')
+    expect(files['/eslint.config.js']).not.toContain('eslint.samples.config.js')
+  })
+
   for (const [rule, code] of [
     ['no-explicit-any', 'export type Unsafe = any'],
     ['no-non-null-assertion', 'String([1].at(0)!)'],

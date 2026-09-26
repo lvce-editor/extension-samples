@@ -17,7 +17,7 @@ const writeJson = async (path: string, value: unknown): Promise<void> => {
   await writeFile(path, `${JSON.stringify(value, undefined, 2)}\n`)
 }
 
-const readWorkspace = async (directory: string): Promise<Record<string, string>> => {
+export const readWorkspace = async (directory: string): Promise<Record<string, string>> => {
   const files: Record<string, string> = {}
   const visit = async (path: string): Promise<void> => {
     for (const entry of await readdir(join(directory, path), { withFileTypes: true })) {
@@ -28,9 +28,9 @@ const readWorkspace = async (directory: string): Promise<Record<string, string>>
     }
   }
   await visit('')
-  files['/eslint.samples.config.js'] = await readFile(join(root, 'eslint.samples.config.js'), 'utf8')
+  const sampleConfig = await readFile(join(root, 'eslint.samples.config.js'), 'utf8')
   files['/eslint.config.js'] =
-    "import tseslint from 'typescript-eslint'\nimport config from './eslint.samples.config.js'\n\n// Typed linting runs in CI; the browser filesystem does not yet support TypeScript projects.\nexport default [...config.map(entry => ({ ...entry, files: ['**/*.ts'] })), { ...tseslint.configs.disableTypeChecked, files: ['**/*.ts'], languageOptions: { parserOptions: { project: false, projectService: false, tsconfigRootDir: '/sample' } } }]\n"
+    `${sampleConfig}\n// Typed linting runs in CI; the browser filesystem does not yet support TypeScript projects.\nexport default [...sampleConfig.map(entry => ({ ...entry, files: ['**/*.ts'] })), { ...tseslint.configs.disableTypeChecked, files: ['**/*.ts'], languageOptions: { parserOptions: { project: false, projectService: false, tsconfigRootDir: '/sample' } } }]\n`
   return files
 }
 
