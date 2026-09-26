@@ -62,4 +62,4 @@ const main = async (): Promise<void> => {
   registerSourceControlProvider(provider)
 }
 
-main().catch(console.error)
+main()

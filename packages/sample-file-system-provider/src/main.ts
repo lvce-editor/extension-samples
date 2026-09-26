@@ -69,4 +69,4 @@ const main = async (): Promise<void> => {
   registerFileSystemProvider(provider)
 }
 
-main().catch(console.error)
+main()
