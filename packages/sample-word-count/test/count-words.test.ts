@@ -1,12 +1,11 @@
-import assert from 'node:assert/strict'
-import test from 'node:test'
+import { expect, test } from '@jest/globals'
 import { countWords } from '../src/count-words.ts'
 
-void test('countWords returns zero for empty and whitespace-only text', () => {
-  assert.equal(countWords(''), 0)
-  assert.equal(countWords(' \t\n  '), 0)
+test('countWords returns zero for empty and whitespace-only text', () => {
+  expect(countWords('')).toBe(0)
+  expect(countWords(' \t\n  ')).toBe(0)
 })
 
-void test('countWords counts whitespace-separated words across lines', () => {
-  assert.equal(countWords('one two\nthree\tfour'), 4)
+test('countWords counts whitespace-separated words across lines', () => {
+  expect(countWords('one two\nthree\tfour')).toBe(4)
 })

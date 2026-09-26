@@ -1,8 +1,7 @@
 import { ESLint } from 'eslint'
-import assert from 'node:assert/strict'
+import { expect, test } from '@jest/globals'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { test } from 'node:test'
 import { samples } from '../src/samples.ts'
 
 const root = resolve(import.meta.dirname, '../../..')
@@ -13,7 +12,7 @@ for (const sample of samples) {
     const filePath = resolve(root, 'packages', sample.packageName, 'src/main.ts')
     const source = await readFile(filePath, 'utf8')
     const [baseline] = await eslint.lintText(source, { filePath })
-    assert.deepEqual(baseline.messages, [])
+    expect(baseline.messages).toEqual([])
 
     for (const [rule, code] of [
       ['@typescript-eslint/no-explicit-any', 'export type Unsafe = any'],
@@ -22,11 +21,8 @@ for (const sample of samples) {
       ['unicorn/no-for-each', '[1].forEach(value => value)'],
     ]) {
       const [result] = await eslint.lintText(`${source}\n${code}\n`, { filePath })
-      assert.equal(result.fatalErrorCount, 0)
-      assert.ok(
-        result.messages.some(({ ruleId, severity }) => ruleId === rule && severity === 2),
-        `Expected ${rule} to reject ${code}`,
-      )
+      expect(result.fatalErrorCount).toBe(0)
+      expect(result.messages).toContainEqual(expect.objectContaining({ ruleId: rule, severity: 2 }))
     }
   })
 }
