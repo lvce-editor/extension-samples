@@ -6,12 +6,12 @@ interface WheelRegistration {
   readonly targetId: number
 }
 
-type WindowWithWheelRegistrations = Window & {
+type GlobalWithWheelRegistrations = typeof globalThis & {
   __extensionSamplesWheelRegistrations?: WheelRegistration[]
 }
 
 const expectPassiveWheelListeners = async (page: Page): Promise<void> => {
-  const registrations = await page.evaluate(() => (globalThis as WindowWithWheelRegistrations).__extensionSamplesWheelRegistrations || [])
+  const registrations = await page.evaluate(() => (globalThis as GlobalWithWheelRegistrations).__extensionSamplesWheelRegistrations || [])
   const editorListeners = registrations.filter((registration) => registration.targetClass === 'EditorContent')
   expect(new Set(editorListeners.map((registration) => registration.targetId)).size).toBeGreaterThanOrEqual(2)
   expect(editorListeners.every((registration) => registration.passive)).toBe(true)
@@ -44,7 +44,7 @@ test('word count editors keep passive wheel listeners and scroll after rebuild a
     }
   })
   await page.addInitScript(() => {
-    const global = globalThis as WindowWithWheelRegistrations
+    const global = globalThis as GlobalWithWheelRegistrations
     global.__extensionSamplesWheelRegistrations = []
     const targetIds = new WeakMap<EventTarget, number>()
     let nextTargetId = 1
