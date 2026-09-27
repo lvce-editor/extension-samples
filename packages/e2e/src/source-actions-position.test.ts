@@ -39,7 +39,8 @@ test('positions empty source actions next to the cursor in the embedded editor',
   await assertSourceActionsPosition('preview')
 
   await page.addStyleTag({
-    content: '.Playground { grid-template-rows: 0 minmax(0, 1fr) } .Toolbar, .IdePane > header { display: none } .IdePane { grid-template-rows: 0 minmax(0, 1fr) }',
+    content:
+      '.Playground { grid-template-rows: 0 minmax(0, 1fr) } .Toolbar, .IdePane > header { display: none } .IdePane { grid-template-rows: 0 minmax(0, 1fr) }',
   })
   await expect.poll(async () => (await source.boundingBox())!.y).toBe(0)
   await assertSourceActionsPosition('source', false)
