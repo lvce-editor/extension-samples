@@ -1,0 +1,12 @@
+{
+  "id": "sample.html-preview",
+  "name": "Live HTML Preview Sample",
+  "description": "Parse the active HTML document into a live virtual DOM preview.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.openHtmlPreview"],
+  "commands": [{ "id": "sample.openHtmlPreview", "label": "Sample: Open HTML Preview" }],
+  "views": [{ "id": "sample.html-preview", "title": "HTML Preview", "kind": "virtualDom", "preferredLocation": "sideBar" }]
+}
