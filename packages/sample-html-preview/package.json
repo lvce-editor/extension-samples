@@ -1,0 +1,26 @@
+{
+  "name": "@lvce-editor/sample-html-preview",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --format=esm --external:node:* --external:electron --outfile=dist/main.js",
+    "lint": "eslint . --max-warnings 0",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lvce-editor/api": "^9.32.0",
+    "@lvce-editor/constants": "^5.30.0",
+    "@lvce-editor/virtual-dom-worker": "^11.18.1",
+    "parse5": "^8.0.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.0.0",
+    "esbuild": "^0.28.2"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 150
+  }
+}

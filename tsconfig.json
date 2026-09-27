@@ -48,6 +48,9 @@
     },
     {
       "path": "./packages/sample-sidebar-counter"
+    },
+    {
+      "path": "./packages/sample-html-preview"
     }
   ]
 }

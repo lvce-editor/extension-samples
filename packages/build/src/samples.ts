@@ -151,4 +151,17 @@ export const samples: readonly Sample[] = [
     route: 'sidebar-counter',
     title: 'Sidebar Counter',
   },
+  {
+    description: 'Parse unsaved HTML into a live virtual DOM preview and report malformed markup.',
+    id: 'html-preview',
+    packageName: 'sample-html-preview',
+    preview: {
+      entry: '/index.html',
+      files: {
+        '/index.html': '<main class="page"><h1>Hello, HTML</h1><p>Edit this document to update the preview.</p></main>\n',
+      },
+    },
+    route: 'html-preview',
+    title: 'Live HTML Preview',
+  },
 ]
