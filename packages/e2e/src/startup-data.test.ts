@@ -1,10 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('starts independent sample data requests without waiting for the sample index', async ({ page }) => {
-  let releaseIndex: () => void = () => {}
-  const indexGate = new Promise<void>((resolve) => {
-    releaseIndex = resolve
-  })
+  const { promise: indexGate, resolve: releaseIndex } = Promise.withResolvers<void>()
   await page.route('**/samples.json', async (route) => {
     await indexGate
     await route.continue()
