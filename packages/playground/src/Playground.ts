@@ -37,7 +37,12 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   const sourceId = 'source'
   const previewId = 'preview'
   const sampleId = document.body.dataset.sampleId || 'file-system-provider'
-  const samples = await fetchJson<Sample[]>(`${prefix}/samples.json`)
+  const [samples, initialFiles, ignoreHashes, tooling] = await Promise.all([
+    fetchJson<Sample[]>(`${prefix}/samples.json`),
+    fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`),
+    fetchJson<readonly string[]>(`${prefix}/samples/${sampleId}/eslint-ignore-hashes.json`),
+    fetchJson<Files>(`${prefix}/tooling.json`),
+  ])
   const sample = samples.find((sample) => sample.id === sampleId)
   const previewWorkspace = sampleId === 'file-system-provider' ? 'sample-memfs:///' : 'memfs:///preview'
   const previewFiles: Files =
@@ -60,9 +65,6 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       location.reload()
     }
   })
-  const initialFiles = await fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`)
-  const ignoreHashes = await fetchJson<readonly string[]>(`${prefix}/samples/${sampleId}/eslint-ignore-hashes.json`)
-  const tooling = await fetchJson<Files>(`${prefix}/tooling.json`)
   let files = { ...initialFiles }
   try {
     const stored = JSON.parse(localStorage.getItem(storageKey) || 'null')
