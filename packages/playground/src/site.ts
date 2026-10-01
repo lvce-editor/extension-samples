@@ -4,6 +4,12 @@ const parameters = new URL(location.href)
 parameters.searchParams.set('applicationHost', '1')
 history.replaceState(null, '', parameters)
 
+const removeApplicationHostParameter = (): void => {
+  const url = new URL(location.href)
+  url.searchParams.delete('applicationHost')
+  history.replaceState(null, '', url)
+}
+
 const prefix = document.body.dataset.routePrefix || '.'
 try {
   const response = await fetch(`${prefix}/runtime.json`)
@@ -13,6 +19,7 @@ try {
   await renderer.ready
   await renderer.executeCommand('Application.waitForHost')
   await mountPlayground(renderer.executeCommand, prefix, sourceExtensions)
+  removeApplicationHostParameter()
 } catch (error) {
   document.querySelector('#preview-status')!.textContent = String(error)
 }
