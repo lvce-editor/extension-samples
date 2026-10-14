@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+const sharedWorkerUrl = /(?:renderer|editor|mainArea)WorkerMain/
+
 test.beforeEach(async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/')
   await expect(page.locator('#source-ide .Editor')).toHaveCount(1, { timeout: 30_000 })
@@ -89,7 +91,7 @@ test('rebuilds an imported file repeatedly without replacing the source IDE or s
   await expect(source.getByRole('tab', { exact: true, name: 'instructions.ts Close' })).toBeVisible()
   const sourceUid = await source.locator('.Editor').getAttribute('data-uid')
   const previewUid = await preview.locator('.Editor').getAttribute('data-uid')
-  const sharedWorkers = page.workers().filter((worker) => /(?:renderer|editor|mainArea)WorkerMain/.test(worker.url()))
+  const sharedWorkers = page.workers().filter((worker) => sharedWorkerUrl.test(worker.url()))
   expect(sharedWorkers.length).toBeGreaterThan(0)
   const timings: number[] = []
   for (let index = 1; index <= 3; index++) {

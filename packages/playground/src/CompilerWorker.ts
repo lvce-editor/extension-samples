@@ -1,5 +1,7 @@
 import * as esbuild from 'esbuild-wasm'
 
+const allPaths = /.*/
+
 const initialized = esbuild.initialize({ wasmURL: new URL('esbuild.wasm', import.meta.url).href, worker: false })
 const loadApi = async (): Promise<string> => {
   const response = await fetch(new URL('api.js', import.meta.url))
@@ -23,7 +25,7 @@ const buildOutput = async (files: Record<string, string>, api: string, inlineApi
       {
         name: 'sample-workspace',
         setup(build): void {
-          build.onResolve({ filter: /.*/ }, (args) => {
+          build.onResolve({ filter: allPaths }, (args) => {
             if (args.path === '@lvce-editor/api') return inlineApi ? { namespace: 'api', path: 'api' } : { external: true, path: args.path }
             if (args.importer && !args.path.startsWith('.')) {
               return { errors: [{ text: `Only relative imports and @lvce-editor/api are supported: ${args.path}` }] }
@@ -32,8 +34,8 @@ const buildOutput = async (files: Record<string, string>, api: string, inlineApi
             const match = [path, `${path}.ts`, `${path}.js`, `${path}/index.ts`].find((candidate) => candidate in files)
             return match ? { namespace: 'workspace', path: match } : { errors: [{ text: `File not found: ${path}` }] }
           })
-          build.onLoad({ filter: /.*/, namespace: 'api' }, () => ({ contents: api, loader: 'js' }))
-          build.onLoad({ filter: /.*/, namespace: 'workspace' }, ({ path }) => ({
+          build.onLoad({ filter: allPaths, namespace: 'api' }, () => ({ contents: api, loader: 'js' }))
+          build.onLoad({ filter: allPaths, namespace: 'workspace' }, ({ path }) => ({
             contents: files[path],
             loader: getLoader(path),
           }))
