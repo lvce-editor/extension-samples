@@ -2,6 +2,9 @@ import { deleteGeneratedBundle, storeGeneratedBundle } from './GeneratedBundleSt
 import { setupPreview } from './SetupPreview.ts'
 import { setupPreviewDivider } from './SetupPreviewDivider.ts'
 
+const relativePathPrefix = /^\.\//
+const trailingSlash = /\/$/
+
 type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
 type Files = Record<string, string>
 interface BuildOutput {
@@ -26,7 +29,7 @@ const fetchJson = async <T>(url: string): Promise<T> => {
 
 const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
   paths.map((path) => {
-    const content = files[`/${path.replace(/^\.\//, '')}`]
+    const content = files[`/${path.replace(relativePathPrefix, '')}`]
     if (typeof content !== 'string') throw new Error(`Missing icon: ${path}`)
     return content
   })
@@ -218,7 +221,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         'Application.execute',
         previewId,
         'Main.openUri',
-        `${previewWorkspace.replace(/\/$/, '')}${sample?.preview?.entry || '/README.md'}`,
+        `${previewWorkspace.replace(trailingSlash, '')}${sample?.preview?.entry || '/README.md'}`,
         false,
       )
     }

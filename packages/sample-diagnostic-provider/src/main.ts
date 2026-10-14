@@ -1,5 +1,7 @@
 import { activate, registerDiagnosticProvider, type Diagnostic } from '@lvce-editor/api'
 
+const todoMarker = /\bTODO\b/g
+
 const main = async (): Promise<void> => {
   await activate()
   registerDiagnosticProvider({
@@ -8,7 +10,7 @@ const main = async (): Promise<void> => {
     provideDiagnostics(document) {
       const diagnostics: Diagnostic[] = []
       for (const [rowIndex, line] of document.text.split('\n').entries()) {
-        for (const match of line.matchAll(/\bTODO\b/g)) {
+        for (const match of line.matchAll(todoMarker)) {
           diagnostics.push({
             columnIndex: match.index,
             endColumnIndex: match.index + match[0].length,

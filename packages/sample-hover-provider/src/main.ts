@@ -5,6 +5,7 @@ const documentation: Record<string, string> = {
   green: 'Green: the color of fresh leaves.',
   red: 'Red: the color of ripe strawberries.',
 }
+const words = /\b[a-z]+\b/g
 
 const main = async (): Promise<void> => {
   await activate()
@@ -12,7 +13,7 @@ const main = async (): Promise<void> => {
     id: 'sample-hover',
     languageId: 'plaintext',
     provideHover(document, offset) {
-      for (const match of document.text.matchAll(/\b[a-z]+\b/g)) {
+      for (const match of document.text.matchAll(words)) {
         if (offset >= match.index && offset < match.index + match[0].length) {
           const text = documentation[match[0]]
           return text ? { documentation: text } : undefined
