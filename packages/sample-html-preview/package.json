@@ -9,13 +9,13 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@lvce-editor/api": "^9.32.0",
+    "@lvce-editor/api": "^9.46.0",
     "@lvce-editor/constants": "^5.30.0",
-    "@lvce-editor/virtual-dom-worker": "^11.18.1",
+    "@lvce-editor/virtual-dom-worker": "^11.23.3",
     "parse5": "^8.0.1"
   },
   "devDependencies": {
-    "@jest/globals": "^30.0.0",
+    "@jest/globals": "^30.5.2",
     "esbuild": "^0.28.2"
   },
   "prettier": {

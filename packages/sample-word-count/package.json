@@ -9,10 +9,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@lvce-editor/api": "^9.28.3"
+    "@lvce-editor/api": "^9.46.0"
   },
   "devDependencies": {
-    "@jest/globals": "^30.0.0",
+    "@jest/globals": "^30.5.2",
     "esbuild": "^0.28.2"
   },
   "prettier": {
