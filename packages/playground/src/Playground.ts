@@ -136,10 +136,30 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       workspacePath: workspaceUri,
       workspaceUri,
     })
-    for (const command of ['Layout.hideTitleBar', 'Layout.hideStatusBar', 'Layout.hideActivityBar', 'Layout.moveSideBarLeft', 'Layout.showSideBar']) {
+    const commands = ['Layout.hideTitleBar', 'Layout.hideStatusBar']
+    if (id !== previewId || sampleId !== 'source-control-provider') commands.push('Layout.hideActivityBar')
+    commands.push('Layout.moveSideBarLeft', 'Layout.showSideBar')
+    for (const command of commands) {
       await invoke('Application.execute', id, command)
     }
     await invoke('Application.execute', id, 'Layout.openSideBarViewlet', 'Explorer')
+    if (id === previewId && sampleId === 'source-control-provider') {
+      root.addEventListener(
+        'mousedown',
+        (event) => {
+          const { target } = event
+          if (!(target instanceof Element)) return
+          const item = target.closest<HTMLElement>('.ActivityBarItem')
+          const viewlet = item?.title
+          if (!item || (viewlet !== 'Explorer' && viewlet !== 'Source Control') || item.getAttribute('aria-selected') === 'true') return
+          event.preventDefault()
+          event.stopPropagation()
+          event.stopImmediatePropagation()
+          void invoke('Application.execute', id, 'Layout.openSideBarViewlet', viewlet)
+        },
+        { capture: true },
+      )
+    }
   }
 
   const observers: ResizeObserver[] = []
