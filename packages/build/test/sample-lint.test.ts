@@ -18,6 +18,7 @@ for (const sample of samples) {
       ['@typescript-eslint/no-explicit-any', 'export type Unsafe = any'],
       ['@typescript-eslint/no-unsafe-return', 'export const unsafe = (): string => JSON.parse(\'"value"\')'],
       ['@typescript-eslint/no-floating-promises', "Promise.resolve('lint test')"],
+      ['regex/hoist-regex', 'export const matchesSample = (value: string): boolean => /sample/.test(value)'],
       ['unicorn/no-for-each', '[1].forEach(value => value)'],
     ]) {
       const [result] = await eslint.lintText(`${source}\n${code}\n`, { filePath })
