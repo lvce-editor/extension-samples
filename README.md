@@ -22,6 +22,8 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)
 
+- [Output Channel](packages/sample-output-channel) — append simulated build logs to a named Output channel.
+
 ## Development
 
 ```sh

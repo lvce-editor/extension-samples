@@ -164,4 +164,18 @@ export const samples: readonly Sample[] = [
     route: 'html-preview',
     title: 'Live HTML Preview',
   },
+  {
+    description: 'Write, append, and clear simulated build logs in the Output panel.',
+    id: 'output-channel',
+    packageName: 'sample-output-channel',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Output Channel\n\nThe Output panel opens with a welcome line. Focus the preview editor, press F1, and run **Sample: Run Build**. Each run appends a numbered simulated build. Run **Sample: Clear Build Output** to clear the log.\n',
+      },
+    },
+    route: 'output-channel',
+    title: 'Output Channel',
+  },
 ]
