@@ -19,9 +19,12 @@ test('opens the real LVCE source-control view beside the sample source', async (
   const sourceControlTab = workbench.getByRole('tab', { name: 'Source Control' })
   await explorerTab.click()
   await expect(explorerTab).toHaveAttribute('aria-selected', 'true')
+  await expect(workbench.getByRole('tree', { name: 'Files Explorer' })).toBeVisible()
+  await expect(workbench.locator('.SourceControl')).toBeHidden()
   await sourceControlTab.click()
   await expect(sourceControlTab).toHaveAttribute('aria-selected', 'true')
   await expect(workbench.locator('.SourceControl')).toBeVisible()
+  await expect(workbench.getByRole('tree', { name: 'Files Explorer' })).toBeHidden()
 })
 
 test('keeps the source-control preview activity bar visible after resize, reload, and reset', async ({ page }) => {
