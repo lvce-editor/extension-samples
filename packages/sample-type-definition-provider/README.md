@@ -12,4 +12,4 @@ Edit the TypeScript source or `extension.json` and save with Ctrl+S to rebuild t
 
 ## API
 
-The isolated extension awaits `activate()` before calling `registerTypeDefinitionProvider`. The manifest declares its plaintext provider. `provideTypeDefinition` returns a URI and start/end offsets, or `undefined` when the variable or type is unknown.
+The isolated extension awaits `activate()` before calling `registerTypeDefinitionProvider`. The manifest declares `onTypeDefinition:plaintext` so the runtime can discover the provider. `provideTypeDefinition` returns a URI and start/end offsets, or `undefined` when the variable or type is unknown.

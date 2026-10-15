@@ -10,4 +10,4 @@ Edit the TypeScript source or `extension.json` and save with Ctrl+S to rebuild t
 
 ## API
 
-The isolated extension awaits `activate()` before registering its providers and commands. Its manifest declares the plaintext definition provider. `provideDefinition` returns a URI and start/end offsets, or `undefined` for unknown symbols. This tiny language uses document-wide declarations rather than full programming-language scoping.
+The isolated extension awaits `activate()` before registering its providers and commands. Its manifest declares `onDefinition:plaintext` so the runtime can discover the provider. `provideDefinition` returns a URI and start/end offsets, or `undefined` for unknown symbols. This tiny language uses document-wide declarations rather than full programming-language scoping.

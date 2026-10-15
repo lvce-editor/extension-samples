@@ -6,10 +6,5 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "typeDefinitionProviders": [
-    {
-      "id": "sample-type-definition",
-      "languageId": "plaintext"
-    }
-  ]
+  "activation": ["onLanguage:plaintext", "onTypeDefinition:plaintext"]
 }
