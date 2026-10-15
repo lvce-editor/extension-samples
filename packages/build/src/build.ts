@@ -111,6 +111,12 @@ export const buildStatic = async (): Promise<void> => {
   await cp(dirname(require.resolve('@lvce-editor/editor-worker')), join(root, 'dist', commitHash, 'packages', 'editor-worker', 'dist'), {
     recursive: true,
   })
+  // Keep application-scoped diagnostic streaming compatible with the editor worker.
+  await cp(
+    dirname(require.resolve('@lvce-editor/extension-management-worker')),
+    join(root, 'dist', commitHash, 'packages', 'extension-management-worker', 'dist'),
+    { recursive: true },
+  )
   await installExtension('eslint', '1.20.0', commitHash, pathPrefix)
   await installExtension('prettier', '2.23.1', commitHash, pathPrefix)
   await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })

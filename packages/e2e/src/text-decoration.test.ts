@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 const command = async (page: Page, label: string): Promise<void> => {
+  await page.locator('#preview-ide .Editor textarea').focus()
   await page.keyboard.press('F1')
   const input = page.locator('#preview-ide .QuickPick input')
   await expect(input).toBeVisible()
@@ -132,6 +133,7 @@ test('custom underlines coexist with links, diagnostics, line and gutter decorat
   await preview.locator('textarea').focus()
   await page.keyboard.press('Control+a')
   await page.keyboard.insertText('https://example.com\nsecond line\n')
+  await focusPreview(page)
   await expect(preview.locator('.DiagnosticError')).toHaveCount(1)
   await expect(preview.locator('.EditorGutterDecorationModified')).toHaveCount(1)
   await expect(preview.locator('.EditorLineDecoration')).toHaveText('Existing line decoration')
