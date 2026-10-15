@@ -1,5 +1,5 @@
-import { deepStrictEqual, equal } from 'node:assert/strict'
 import { test } from '@jest/globals'
+import { deepStrictEqual, equal } from 'node:assert/strict'
 import { prepareRename, provideRename } from '../src/provide-rename.ts'
 
 test('rename uses original offsets for a longer replacement without matching identifier prefixes', () => {

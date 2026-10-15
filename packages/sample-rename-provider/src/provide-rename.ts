@@ -11,8 +11,11 @@ interface RenameResult {
   }[]
 }
 
-const getRenameWord = (document: TextDocument, offset: number) => {
-  const match = document.text.matchAll(/\b[a-zA-Z_]\w*\b/g).find((word) => offset >= word.index && offset < word.index + word[0].length)
+const identifierPattern = /\b[a-zA-Z_]\w*\b/g
+const validNamePattern = /^[a-zA-Z_]\w*$/
+
+const getRenameWord = (document: TextDocument, offset: number): RegExpExecArray | undefined => {
+  const match = document.text.matchAll(identifierPattern).find((word) => offset >= word.index && offset < word.index + word[0].length)
   return match && match[0] !== 'let' && match[0] !== 'print' ? match : undefined
 }
 
@@ -23,9 +26,9 @@ export const prepareRename = (document: TextDocument, offset: number): { readonl
 
 // The sample language has no scopes, strings, or comments: identifiers match across the document.
 export const provideRename = (document: TextDocument, offset: number, newName: string): RenameResult => {
-  const words = document.text.matchAll(/\b[a-zA-Z_]\w*\b/g).toArray()
+  const words = document.text.matchAll(identifierPattern).toArray()
   const word = getRenameWord(document, offset)?.[0]
-  if (!word || !/^[a-zA-Z_]\w*$/.test(newName) || newName === 'let' || newName === 'print') {
+  if (!word || !validNamePattern.test(newName) || newName === 'let' || newName === 'print') {
     return { canRename: false, edits: [] }
   }
   return {

@@ -1,5 +1,5 @@
-import { deepStrictEqual } from 'node:assert/strict'
 import { test } from '@jest/globals'
+import { deepStrictEqual } from 'node:assert/strict'
 import { organizeImports } from '../src/organize-imports.ts'
 
 test('organize imports preserves the body and line endings and becomes a no-op', () => {
