@@ -235,11 +235,12 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       previewUrls.delete(url)
     }
     previewExtensionId = extension.id
-    if (needsSetup) {
-      await setupPreview(files['/.lvce/setup-preview.js'], previewWorkspace, (command, ...args) =>
-        invoke('Application.execute', previewId, command, ...args),
-      )
-    }
+    await setupPreview(
+      files['/.lvce/setup-preview.js'],
+      previewWorkspace,
+      (command, ...args) => invoke('Application.execute', previewId, command, ...args),
+      !needsSetup,
+    )
   }
   const rebuild = async (): Promise<void> => {
     requested = true

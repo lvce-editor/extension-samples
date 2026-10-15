@@ -14,6 +14,20 @@ test('status bar item updates after selection and preserves its value on cancell
   await page.keyboard.press('Escape')
   await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
   await expect(item).toHaveText('Environment: Staging')
+
+  const response = await page.request.get('/extension-samples/samples/status-bar-item/files.json')
+  const files = await response.json()
+  const source = page.locator('#source-ide .Editor textarea')
+  await source.focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace("let environment = 'Development'", "let environment = 'Production'"))
+  await page.keyboard.press('Control+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(item).toHaveText('Environment: Production')
+  await expect(item).toHaveCount(1)
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(item).toHaveText('Environment: Development', { timeout: 30_000 })
+  await expect(item).toHaveCount(1)
 })
 
 test('output channel appends successive builds and clears its logs', async ({ page }) => {
@@ -27,6 +41,10 @@ test('output channel appends successive builds and clears its logs', async ({ pa
   await runCommand(page, 'Sample: Clear Build Output')
   await expect(output).toHaveText('')
   await expect(page.locator('#source-ide .OutputContent')).toHaveCount(0)
+  await page.reload()
+  await runCommand(page, 'Sample: Run Build')
+  await expect(output).toContainText('Build 1: starting')
+  await expect(output).not.toContainText('Build 2: starting')
 })
 
 test('definition navigation moves to the declaration and reports missing symbols', async ({ page }) => {
