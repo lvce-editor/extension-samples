@@ -1,4 +1,4 @@
-import { activate as activateExtensionApi, registerSourceControlProvider, type SourceControlProvider } from '@lvce-editor/api'
+import { activate as activateExtensionApi, registerCommand, registerSourceControlProvider, type SourceControlProvider } from '@lvce-editor/api'
 
 const providerId = 'source-control-provider'
 const workspaceRoot = '/extension-samples/source-control-provider'
@@ -6,6 +6,14 @@ const changedFiles = [
   { file: `${workspaceRoot}/README.md`, icon: 0, iconTitle: 'Modified', status: 1 },
   { file: `${workspaceRoot}/src/main.ts`, icon: 0, iconTitle: 'Modified', status: 2 },
 ]
+
+const discardFile = (path: string): string => {
+  const index = changedFiles.findIndex(({ file }) => path.endsWith(file.slice(workspaceRoot.length)))
+  if (index !== -1) {
+    changedFiles.splice(index, 1)
+  }
+  return `Discarded ${path}`
+}
 
 const provider: SourceControlProvider = {
   acceptInput(value) {
@@ -15,13 +23,7 @@ const provider: SourceControlProvider = {
   add(path) {
     return `Staged ${path}`
   },
-  discard(path) {
-    const index = changedFiles.findIndex(({ file }) => file === path)
-    if (index !== -1) {
-      changedFiles.splice(index, 1)
-    }
-    return `Discarded ${path}`
-  },
+  discard: discardFile,
   generateCommitMessage() {
     return 'feat: update extension sample'
   },
@@ -60,6 +62,10 @@ const provider: SourceControlProvider = {
 const main = async (): Promise<void> => {
   await activateExtensionApi()
   registerSourceControlProvider(provider)
+  registerCommand({
+    execute: discardFile,
+    id: 'sampleSourceControl.discard',
+  })
 }
 
 main()
