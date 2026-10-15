@@ -1,4 +1,4 @@
-import { activate, executeCommand, getWorkspaceUri, registerCommand, showQuickPick, writeFile } from '@lvce-editor/api'
+import { activate, getWorkspaceUri, openUri, registerCommand, showQuickPick, writeFile } from '@lvce-editor/api'
 
 const trailingSlash = /\/$/
 
@@ -20,7 +20,7 @@ const main = async (): Promise<void> => {
       const workspaceUri = await getWorkspaceUri()
       const uri = `${workspaceUri.replace(trailingSlash, '')}/environment.txt`
       await writeFile(uri, `Selected environment: ${value}\n`)
-      await executeCommand('Main.openUri', uri)
+      await openUri(uri)
     },
     id: 'sample.chooseEnvironment',
   })
