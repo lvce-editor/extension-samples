@@ -3,10 +3,19 @@ import { instructions } from './instructions.ts'
 
 const sampleMemfsScheme = /^sample-memfs:\/\//
 
-const files = new Map<string, string>([
-  ['/README.md', `# Hello from memfs\n\n${instructions}`],
-  ['/src/example.ts', "export const greeting = 'Hello from an extension file system'"],
-])
+const fileStore: { contents: Record<string, string> } = { contents: Object.create(null) as Record<string, string> }
+fileStore.contents['/README.md'] = `# Hello from memfs\n\n${instructions}`
+fileStore.contents['/src/example.ts'] = "export const greeting = 'Hello from an extension file system'"
+
+const removeFiles = (shouldRemove: (file: string) => boolean): void => {
+  const remainingFiles = Object.create(null) as Record<string, string>
+  for (const [file, content] of Object.entries(fileStore.contents)) {
+    if (!shouldRemove(file)) {
+      remainingFiles[file] = content
+    }
+  }
+  fileStore.contents = remainingFiles
+}
 
 const normalize = (uri: string): string => {
   const path = uri.replace(sampleMemfsScheme, '')
@@ -15,18 +24,18 @@ const normalize = (uri: string): string => {
 
 const getDirectChildren = (directory: string): Array<{ name: string; type: number }> => {
   const prefix = directory === '/' ? '/' : `${directory}/`
-  const children = new Map<string, number>()
-  for (const file of files.keys()) {
+  const children = Object.create(null) as Record<string, number>
+  for (const file of Object.keys(fileStore.contents)) {
     if (!file.startsWith(prefix)) {
       continue
     }
     const relative = file.slice(prefix.length)
     const [name, ...rest] = relative.split('/')
     if (name) {
-      children.set(name, rest.length === 0 ? 7 : 3)
+      children[name] = rest.length === 0 ? 7 : 3
     }
   }
-  return Array.from(children, ([name, type]) => ({ name, type }))
+  return Object.entries(children).map(([name, type]) => ({ name, type }))
 }
 
 const provider: FileSystemProvider = {
@@ -37,7 +46,7 @@ const provider: FileSystemProvider = {
   },
   readFile(uri) {
     const path = normalize(uri)
-    const content = files.get(path)
+    const content = fileStore.contents[path]
     if (content === undefined) {
       throw new Error(`File not found: ${path}`)
     }
@@ -45,24 +54,19 @@ const provider: FileSystemProvider = {
   },
   remove(uri) {
     const path = normalize(uri)
-    files.delete(path)
-    for (const file of files.keys()) {
-      if (file.startsWith(`${path}/`)) {
-        files.delete(file)
-      }
-    }
+    removeFiles((file) => file === path || file.startsWith(`${path}/`))
   },
   rename(oldUri, newUri) {
     const oldPath = normalize(oldUri)
     const newPath = normalize(newUri)
-    const content = files.get(oldPath)
+    const content = fileStore.contents[oldPath]
     if (content !== undefined) {
-      files.delete(oldPath)
-      files.set(newPath, content)
+      removeFiles((file) => file === oldPath)
+      fileStore.contents[newPath] = content
     }
   },
   writeFile(uri, content) {
-    files.set(normalize(uri), content)
+    fileStore.contents[normalize(uri)] = content
   },
 }
 

@@ -111,13 +111,20 @@ export const buildStatic = async (): Promise<void> => {
   await cp(dirname(require.resolve('@lvce-editor/editor-worker')), join(root, 'dist', commitHash, 'packages', 'editor-worker', 'dist'), {
     recursive: true,
   })
+  // Keep application-scoped diagnostic streaming compatible with the editor worker.
+  await cp(
+    dirname(require.resolve('@lvce-editor/extension-management-worker')),
+    join(root, 'dist', commitHash, 'packages', 'extension-management-worker', 'dist'),
+    { recursive: true },
+  )
   await installExtension('eslint', '1.20.0', commitHash, pathPrefix)
   await installExtension('prettier', '2.23.1', commitHash, pathPrefix)
   await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })
   const assetDir = `${pathPrefix}/${commitHash}`
   const runtimeHtml = await readFile(join(outputRoot, 'runtime', 'index.html'), 'utf8')
   const runtimeConfigText = runtimeHtml.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)?.[1]
-  const runtimeConfig = runtimeConfigText ? JSON.parse(runtimeConfigText) : undefined
+  if (!runtimeConfigText) throw new Error('Runtime config not found in exported index.html')
+  const runtimeConfig = JSON.parse(runtimeConfigText)
   const webExtensions = JSON.parse(await readFile(join(root, 'dist', commitHash, 'config', 'webExtensions.json'), 'utf8'))
   // ESLint owns diagnostics and Prettier owns formatting; retain TypeScript's other language features.
   const sourceExtensions = webExtensions

@@ -140,7 +140,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       workspaceUri,
     })
     const commands = ['Layout.hideTitleBar', 'Layout.hideStatusBar']
-    if (id !== previewId || sampleId !== 'source-control-provider') commands.push('Layout.hideActivityBar')
+    if (id !== previewId || (sampleId !== 'source-control-provider' && sampleId !== 'sidebar-counter')) commands.push('Layout.hideActivityBar')
     commands.push('Layout.moveSideBarLeft', 'Layout.showSideBar')
     for (const command of commands) {
       await invoke('Application.execute', id, command)
@@ -224,6 +224,9 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         `${previewWorkspace.replace(trailingSlash, '')}${sample?.preview?.entry || '/README.md'}`,
         false,
       )
+    }
+    if (Array.isArray(manifest.activation) && manifest.activation.includes('onEditorTextDecoration')) {
+      await invoke('Application.execute', previewId, 'Editor.refreshTextDecorations')
     }
     const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
     for (const url of previewUrls) {
