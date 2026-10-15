@@ -53,7 +53,13 @@
       "path": "./packages/sample-html-preview"
     },
     {
-      "path": "packages/sample-output-channel"
+      "path": "./packages/sample-output-channel"
+    },
+    {
+      "path": "./packages/sample-definition-provider"
+    },
+    {
+      "path": "./packages/sample-type-definition-provider"
     }
   ]
 }
