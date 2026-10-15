@@ -18,7 +18,7 @@ test('word count reads the active preview document and includes unsaved edits', 
   await runCommand(page, 'Sample: Count Words')
   await expect(preview.getByText('There are 3 words.', { exact: true })).toBeVisible()
   await preview.locator('.NotificationCloseButton').last().click()
-  await expect(preview.locator('.EditorRow')).toHaveText('one two\nthree')
+  await expect(preview.locator('.EditorRow')).toHaveText(['one two', 'three'])
   await expect(source.locator('.NotificationMessage')).toHaveCount(0)
 
   await previewEditor.locator('textarea').focus()
