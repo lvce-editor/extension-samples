@@ -52,6 +52,7 @@ test('loads the compiler on the first saved edit and restores edited drafts', as
     await source.locator('textarea').focus()
     await page.keyboard.press('Control+a')
     await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from memfs', () => `Lazy compiler revision ${revision}`))
+    await page.keyboard.press('Control+Home')
     await expect(source).toContainText(`Lazy compiler revision ${revision}`)
     if (revision === 1) expect(compilerWorkers()).toHaveLength(0)
     await page.keyboard.press('Control+s')

@@ -127,6 +127,14 @@ export const samples: readonly Sample[] = [
     title: 'Text Manipulation',
   },
   {
+    description: 'Underline selected text with custom colors without editing the document.',
+    id: 'text-decoration',
+    packageName: 'sample-text-decoration',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'Select text and add an underline.\nAcross multiple lines, too.\n' } },
+    route: 'text-decoration',
+    title: 'Text Decoration',
+  },
+  {
     description: 'Count words in the active preview document.',
     id: 'word-count',
     packageName: 'sample-word-count',
