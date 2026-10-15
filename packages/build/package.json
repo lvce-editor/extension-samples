@@ -6,7 +6,7 @@
   "dependencies": {
     "@lvce-editor/api": "^9.46.0",
     "@lvce-editor/editor-worker": "19.67.8",
-    "@lvce-editor/shared-process": "0.118.8",
+    "@lvce-editor/shared-process": "0.122.23",
     "esbuild": "^0.28.2",
     "esbuild-wasm": "^0.28.2",
     "tar": "^7.5.22"

@@ -4,12 +4,19 @@ const escapeAttribute = (value: string): string => {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 }
 
-export const createHtml = (sample: Sample, nested: boolean, assetDir = '/extension-samples/runtime/test'): string => {
+export const getRuntimeConfigScript = (html: string): string => {
+  const script = html.match(/<script id="Config" type="application\/json">[\s\S]*?<\/script>/)?.[0]
+  if (!script) throw new Error('Exported runtime is missing its Config script')
+  return script
+}
+
+export const createHtml = (sample: Sample, nested: boolean, assetDir = '/extension-samples/runtime/test', runtimeConfigScript = ''): string => {
   const prefix = nested ? '..' : '.'
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
+    ${runtimeConfigScript}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="${escapeAttribute(sample.description)}">
     <title>${escapeAttribute(sample.title)} · Lvce Editor Extension Samples</title>

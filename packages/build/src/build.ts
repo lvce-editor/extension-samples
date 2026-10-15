@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url'
 import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
 import { createIgnoreHashes } from './CreateIgnoreHashes.ts'
-import { createHtml } from './html.ts'
+import { createHtml, getRuntimeConfigScript } from './html.ts'
 import { samples } from './samples.ts'
 
 const root = resolve(import.meta.dirname, '../../..')
@@ -104,6 +104,7 @@ export const buildStatic = async (): Promise<void> => {
   } else {
     ;({ commitHash } = await sharedProcess.exportStatic({ root, pathPrefix }))
   }
+  const runtimeConfigScript = getRuntimeConfigScript(await readFile(join(root, 'dist', 'index.html'), 'utf8'))
   const settingsPath = join(root, 'dist', commitHash, 'config', 'defaultSettings.json')
   const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
   await writeJson(settingsPath, { ...settings, 'application.useOnLoadJson': true })
@@ -181,10 +182,10 @@ export const buildStatic = async (): Promise<void> => {
     })
     const route = join(outputRoot, sample.route)
     await mkdir(route, { recursive: true })
-    await writeFile(join(route, 'index.html'), createHtml(sample, true, assetDir))
+    await writeFile(join(route, 'index.html'), createHtml(sample, true, assetDir, runtimeConfigScript))
   }
-  await writeFile(join(outputRoot, 'index.html'), createHtml(samples[0], false, assetDir))
-  await writeFile(join(outputRoot, '404.html'), createHtml(samples[0], false, assetDir))
+  await writeFile(join(outputRoot, 'index.html'), createHtml(samples[0], false, assetDir, runtimeConfigScript))
+  await writeFile(join(outputRoot, '404.html'), createHtml(samples[0], false, assetDir, runtimeConfigScript))
   await writeJson(join(outputRoot, 'samples.json'), samples)
   await writeFile(join(outputRoot, '.nojekyll'), '')
 }
