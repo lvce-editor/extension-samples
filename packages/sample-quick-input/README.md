@@ -12,4 +12,6 @@ Edit `src/main.ts` or `extension.json` in the source editor and save with Ctrl+S
 
 The isolated extension awaits `activate()` before registering its provider or command. `extension.json` declares the matching contribution IDs. File paths are resolved against the current workspace URI.
 
+`path.join(uri, ...segments)` joins slash-separated path segments to an extension URI while preserving its scheme, authority, and encoded content. It normalizes `.` and `..` segments without escaping the URI root. The Quick Input sample uses it to create `greeting.txt` in the workspace.
+
 `showQuickInput` opens a freeform text field: there are no items to select or filter, and no “No Results” message. For a list of choices, use `showQuickPick` (the default `type: 'select'`); `type: 'text'` opts that API into freeform input.

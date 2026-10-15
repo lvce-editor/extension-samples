@@ -35,6 +35,7 @@ test('status bar item updates after selection and preserves its value on cancell
 test('output channel appends successive builds and clears its logs', async ({ page }) => {
   await page.goto('/extension-samples/output-channel/')
   const output = page.locator('#preview-ide .OutputContent')
+  await expect(output).toContainText('Ready.', { timeout: 30_000 })
   await runCommand(page, 'Sample: Run Build')
   await expect(output.locator(':scope > .Line')).toContainText(['Build 1: starting', 'Compiling example.sample... done', 'Build succeeded.'])
   await runCommand(page, 'Sample: Run Build')

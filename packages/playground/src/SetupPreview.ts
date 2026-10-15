@@ -4,7 +4,7 @@ const trailingSlash = /\/$/
 const leadingSlash = /^\//
 
 interface PreviewContext {
-  readonly executeCommand: (command: string) => Promise<unknown>
+  readonly executeCommand: (command: string, ...args: readonly unknown[]) => Promise<unknown>
   readonly openFile: (path: string) => Promise<unknown>
   readonly openPanel: (name: string) => Promise<unknown>
   readonly openSideBar: (name: string) => Promise<unknown>
@@ -23,7 +23,7 @@ export const setupPreview = async (source: string | undefined, workspace: string
     if (reload && setup === undefined) return
     if (typeof setup !== 'function') throw new Error('Export a setupPreview function from .lvce/setup-preview.js')
     const context: PreviewContext = {
-      executeCommand: (command) => execute('ExtensionHost.executeCommand', command),
+      executeCommand: (command, ...args) => execute('ExtensionHost.executeCommand', command, ...args),
       openFile: (path) => execute('Main.openUri', `${workspace.replace(trailingSlash, '')}/${path.replace(leadingSlash, '')}`),
       openPanel: (name) => execute('Layout.showPanel', name),
       openSideBar: (name) => execute('Layout.openSideBarViewlet', name),

@@ -127,6 +127,14 @@ export const samples: readonly Sample[] = [
     title: 'Text Manipulation',
   },
   {
+    description: 'Underline selected text with custom colors without editing the document.',
+    id: 'text-decoration',
+    packageName: 'sample-text-decoration',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'Select text and add an underline.\nAcross multiple lines, too.\n' } },
+    route: 'text-decoration',
+    title: 'Text Decoration',
+  },
+  {
     description: 'Count words in the active preview document.',
     id: 'word-count',
     packageName: 'sample-word-count',
@@ -147,11 +155,39 @@ export const samples: readonly Sample[] = [
       entry: '/README.md',
       files: {
         '/README.md':
-          '# Dialog\n\nFocus the preview editor, press F1, and run **Sample: Show Warning Dialog**. A warning dialog appears with a warning icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then run the command again.\n',
+          '# Dialog\n\nThe warning dialog appears automatically when the playground opens. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Warning Dialog** to open it again.\n',
       },
     },
     route: 'dialog',
     title: 'Dialog',
+  },
+  {
+    description: 'Show an information dialog with an info icon and dismiss button.',
+    id: 'info-dialog',
+    packageName: 'sample-info-dialog',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Information Dialog\n\nThe information dialog appears automatically with an info icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Information Dialog** to open it again.\n',
+      },
+    },
+    route: 'info-dialog',
+    title: 'Information Dialog',
+  },
+  {
+    description: 'Show an error dialog with an error icon and dismiss button.',
+    id: 'error-dialog',
+    packageName: 'sample-error-dialog',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Error Dialog\n\nThe error dialog appears automatically with an error icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Error Dialog** to open it again.\n',
+      },
+    },
+    route: 'error-dialog',
+    title: 'Error Dialog',
   },
   {
     description: 'Render a sidebar with virtual DOM and increment/decrement a counter.',

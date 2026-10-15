@@ -14,14 +14,7 @@ const prefix = document.body.dataset.routePrefix || '.'
 try {
   const response = await fetch(`${prefix}/runtime.json`)
   if (!response.ok) throw new Error(`Unable to load the editor runtime: ${response.status}`)
-  const { config, entry, sourceExtensions } = (await response.json()) as { config?: unknown; entry: string; sourceExtensions: readonly unknown[] }
-  if (config) {
-    const element = document.createElement('script')
-    element.id = 'Config'
-    element.type = 'application/json'
-    element.textContent = JSON.stringify(config)
-    document.head.append(element)
-  }
+  const { entry, sourceExtensions } = (await response.json()) as { entry: string; sourceExtensions: readonly unknown[] }
   const renderer = await import(entry)
   await renderer.ready
   await renderer.executeCommand('Application.waitForHost')

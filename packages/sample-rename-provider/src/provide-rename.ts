@@ -1,6 +1,3 @@
-const identifierPattern = /\b[a-zA-Z_]\w*\b/g
-const validNamePattern = /^[a-zA-Z_]\w*$/
-
 interface TextDocument {
   readonly text: string
   readonly uri: string
@@ -14,20 +11,24 @@ interface RenameResult {
   }[]
 }
 
-export const prepareRename = (
-  document: TextDocument,
-  offset: number,
-): { readonly placeholder: string; readonly startOffset: number; readonly endOffset: number } | undefined => {
-  const word = document.text.matchAll(identifierPattern).find((match) => offset >= match.index && offset < match.index + match[0].length)
-  if (!word || word[0] === 'let' || word[0] === 'print') return undefined
-  return { endOffset: word.index + word[0].length, placeholder: word[0], startOffset: word.index }
+const identifierPattern = /\b[a-zA-Z_]\w*\b/g
+const validNamePattern = /^[a-zA-Z_]\w*$/
+
+const getRenameWord = (document: TextDocument, offset: number): RegExpExecArray | undefined => {
+  const match = document.text.matchAll(identifierPattern).find((word) => offset >= word.index && offset < word.index + word[0].length)
+  return match && match[0] !== 'let' && match[0] !== 'print' ? match : undefined
+}
+
+export const prepareRename = (document: TextDocument, offset: number): { readonly placeholder: string } | undefined => {
+  const word = getRenameWord(document, offset)
+  return word ? { placeholder: word[0] } : undefined
 }
 
 // The sample language has no scopes, strings, or comments: identifiers match across the document.
 export const provideRename = (document: TextDocument, offset: number, newName: string): RenameResult => {
   const words = document.text.matchAll(identifierPattern).toArray()
-  const word = words.find((match) => offset >= match.index && offset < match.index + match[0].length)?.[0]
-  if (!word || word === 'let' || word === 'print' || !validNamePattern.test(newName) || newName === 'let' || newName === 'print') {
+  const word = getRenameWord(document, offset)?.[0]
+  if (!word || !validNamePattern.test(newName) || newName === 'let' || newName === 'print') {
     return { canRename: false, edits: [] }
   }
   return {

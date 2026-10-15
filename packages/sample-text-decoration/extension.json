@@ -1,0 +1,29 @@
+{
+  "id": "sample.text-decoration",
+  "name": "Text Decoration Sample",
+  "description": "Underline selected text without editing the document.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": [
+    "onEditorTextDecoration",
+    "onCommand:sample.underlineSelection",
+    "onCommand:sample.clearUnderlines",
+    "onCommand:sample.disposeUnderlines"
+  ],
+  "commands": [
+    {
+      "id": "sample.underlineSelection",
+      "label": "Sample: Underline Selection"
+    },
+    {
+      "id": "sample.clearUnderlines",
+      "label": "Sample: Clear Underlines"
+    },
+    {
+      "id": "sample.disposeUnderlines",
+      "label": "Sample: Dispose Underlines"
+    }
+  ]
+}

@@ -225,6 +225,9 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         false,
       )
     }
+    if (Array.isArray(manifest.activation) && manifest.activation.includes('onEditorTextDecoration')) {
+      await invoke('Application.execute', previewId, 'Editor.refreshTextDecorations')
+    }
     const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
     for (const url of previewUrls) {
       if (retainedUrls.has(url)) {

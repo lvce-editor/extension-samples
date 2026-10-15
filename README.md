@@ -10,9 +10,12 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Sidebar counter](./packages/sample-sidebar-counter)
 - [Hello World](./packages/sample-hello-world)
+- [Text Decoration](./packages/sample-text-decoration)
 - [Text Manipulation](./packages/sample-text-manipulation)
 - [Word Count](./packages/sample-word-count)
 - [Dialog](./packages/sample-dialog)
+- [Information dialog](./packages/sample-info-dialog)
+- [Error dialog](./packages/sample-error-dialog)
 - [File system provider](./packages/sample-file-system-provider)
 - [Source control provider](./packages/sample-source-control-provider)
 - [Diagnostic Provider](./packages/sample-diagnostic-provider)
@@ -26,17 +29,15 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Status Bar Item](./packages/sample-status-bar-item)
 - [Output Channel](./packages/sample-output-channel)
+- [Definition Provider](./packages/sample-definition-provider)
 - [Rename Provider](./packages/sample-rename-provider)
 - [Code Actions](./packages/sample-code-actions)
+
 - [Preferences](./packages/sample-preferences)
 - [Document Symbols](./packages/sample-document-symbol-provider)
-
 - [Authentication Provider](./packages/sample-authentication-provider)
-
 - [Editor Decorations](./packages/sample-editor-decorations)
-
 - [Signature Help](./packages/sample-signature-help)
-
 - [Language Editing](./packages/sample-language-editing)
 
 ## Development

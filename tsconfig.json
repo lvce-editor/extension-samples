@@ -71,6 +71,9 @@
       "path": "./packages/sample-type-definition-provider"
     },
     {
+      "path": "./packages/sample-text-decoration"
+    },
+    {
       "path": "./packages/sample-preferences"
     },
     {

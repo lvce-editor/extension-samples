@@ -6,7 +6,22 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onSourceControl:file"],
+  "activation": ["onSourceControl:file", "onCommand:sampleSourceControl.discard"],
+  "commands": [
+    {
+      "id": "sampleSourceControl.discard",
+      "label": "Discard"
+    }
+  ],
+  "source-control-actions": {
+    "changes-item": [
+      {
+        "command": "sampleSourceControl.discard",
+        "label": "Discard",
+        "icon": "Discard"
+      }
+    ]
+  },
   "source-control-icons": ["icons/modified.svg"],
   "sourceControlProviders": [
     {
