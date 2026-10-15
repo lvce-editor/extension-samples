@@ -154,6 +154,34 @@ export const samples: readonly Sample[] = [
     title: 'Dialog',
   },
   {
+    description: 'Show an information dialog with an info icon and dismiss button.',
+    id: 'info-dialog',
+    packageName: 'sample-info-dialog',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Information Dialog\n\nThe information dialog appears automatically with an info icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Information Dialog** to open it again.\n',
+      },
+    },
+    route: 'info-dialog',
+    title: 'Information Dialog',
+  },
+  {
+    description: 'Show an error dialog with an error icon and dismiss button.',
+    id: 'error-dialog',
+    packageName: 'sample-error-dialog',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Error Dialog\n\nThe error dialog appears automatically with an error icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Error Dialog** to open it again.\n',
+      },
+    },
+    route: 'error-dialog',
+    title: 'Error Dialog',
+  },
+  {
     description: 'Render a sidebar with virtual DOM and increment/decrement a counter.',
     id: 'sidebar-counter',
     packageName: 'sample-sidebar-counter',
