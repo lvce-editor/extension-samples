@@ -10,9 +10,12 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Sidebar counter](./packages/sample-sidebar-counter)
 - [Hello World](./packages/sample-hello-world)
+- [Text Decoration](./packages/sample-text-decoration)
 - [Text Manipulation](./packages/sample-text-manipulation)
 - [Word Count](./packages/sample-word-count)
 - [Dialog](./packages/sample-dialog)
+- [Information dialog](./packages/sample-info-dialog)
+- [Error dialog](./packages/sample-error-dialog)
 - [File system provider](./packages/sample-file-system-provider)
 - [Source control provider](./packages/sample-source-control-provider)
 - [Diagnostic Provider](./packages/sample-diagnostic-provider)

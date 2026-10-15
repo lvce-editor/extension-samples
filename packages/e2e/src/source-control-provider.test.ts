@@ -27,6 +27,27 @@ test('opens the real LVCE source-control view beside the sample source', async (
   await expect(workbench.getByRole('tree', { name: 'Files Explorer' })).toBeHidden()
 })
 
+test('discards changed files individually from the source-control view', async ({ page }) => {
+  await page.goto('/extension-samples/source-control-provider/')
+  const workbench = page.locator('#preview-ide')
+  const sourceControl = workbench.locator('.SourceControl')
+  const changedFiles = sourceControl.locator('.TreeItem')
+
+  await expect(sourceControl.locator('.SourceControlBadge')).toHaveText('2', { timeout: 30_000 })
+  await expect(changedFiles).toHaveCount(3)
+  const firstFile = changedFiles.nth(1)
+  await firstFile.hover()
+  await firstFile.locator('.SourceControlButton[name="Discard"]').click()
+  await expect(sourceControl.locator('.SourceControlBadge')).toHaveText('1')
+  await expect(changedFiles).toHaveCount(2)
+
+  const remainingFile = changedFiles.nth(1)
+  await remainingFile.hover()
+  await remainingFile.locator('.SourceControlButton[name="Discard"]').click()
+  await expect(sourceControl.locator('.SourceControlBadge')).toHaveCount(0)
+  await expect(changedFiles).toHaveCount(0)
+})
+
 test('keeps the source-control preview activity bar visible after resize, reload, and reset', async ({ page }) => {
   await page.goto('/extension-samples/source-control-provider/')
   const preview = page.locator('#preview-ide')

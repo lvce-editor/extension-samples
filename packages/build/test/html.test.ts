@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { createHtml, getRuntimeConfigScript } from '../src/html.ts'
+import { createHtml } from '../src/html.ts'
 import { samples } from '../src/samples.ts'
 
 test('creates a nested static route with relative assets', () => {
@@ -18,12 +18,26 @@ test('creates a root route with root-relative sample assets', () => {
   expect(html).toMatch(/src="\.\/assets\/site\.js"/)
 })
 
-test('preserves exported runtime worker URLs before the playground bootstraps', () => {
-  const config =
-    '<script id="Config" type="application/json">{"assetDir":"/runtime/release","platform":"web","rendererWorkerUrl":"/runtime/worker.js"}</script>'
-  const script = getRuntimeConfigScript(`<html><head>${config}</head></html>`)
-  const html = createHtml(samples[0], true, '/runtime/release', script)
-  expect(html).toContain(config)
-  expect(html.indexOf(config)).toBeLessThan(html.indexOf('assets/site.js'))
-  expect(() => getRuntimeConfigScript('<html></html>')).toThrow('missing its Config script')
+test('passes exported worker configuration to the runtime before startup', () => {
+  const config = {
+    assetDir: '/extension-samples/runtime/abc1234',
+    platform: 'web',
+    rendererWorkerUrl: '/extension-samples/runtime/abc1234/packages/renderer-worker/dist/rendererWorkerMain.js',
+    workerUrls: { 'develop.editorWorkerPath': '/extension-samples/runtime/abc1234/packages/editor-worker/dist/editorWorkerMain.js' },
+  }
+  for (const nested of [false, true]) {
+    const html = createHtml(samples[0], nested, config.assetDir, config)
+    const match = html.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)
+    expect(match).not.toBeNull()
+    expect(JSON.parse(match![1])).toEqual(config)
+    expect(html.indexOf('id="Config"')).toBeLessThan(html.indexOf('type="module"'))
+  }
+})
+
+test('escapes HTML inside runtime configuration', () => {
+  const config = { assetDir: '</script><script>alert(1)</script>' }
+  const html = createHtml(samples[0], false, undefined, config)
+  const match = html.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)!
+  expect(match[1]).not.toContain('<')
+  expect(JSON.parse(match[1])).toEqual(config)
 })
