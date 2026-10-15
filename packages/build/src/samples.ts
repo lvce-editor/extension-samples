@@ -12,6 +12,14 @@ export interface Sample {
 
 export const samples: readonly Sample[] = [
   {
+    description: 'Underline selected text with custom colors without editing the document.',
+    id: 'text-decoration',
+    packageName: 'sample-text-decoration',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'Select text and add an underline.\nAcross multiple lines, too.\n' } },
+    route: 'text-decoration',
+    title: 'Text Decoration',
+  },
+  {
     description: 'Build a writable in-memory workspace with files and folders.',
     id: 'file-system-provider',
     packageName: 'sample-file-system-provider',
