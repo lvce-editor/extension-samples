@@ -5,6 +5,7 @@ test('signature help changes its active parameter and disappears outside a call'
   await page.goto('/extension-samples/signature-help/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
+  await editor.locator('.EditorRow').first().click()
   await editor.locator('textarea').focus()
   await page.keyboard.press('Control+Home')
   for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowRight')

@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test'
 import { runCommand } from './RunCommand.ts'
 
+const horizontalCursorTranslation = /^[-\d.]+px(?: 0px)?$/
+
 test('status bar item updates after selection and preserves its value on cancellation', async ({ page }) => {
   await page.goto('/extension-samples/status-bar-item/')
   const item = page.locator('#preview-ide .StatusBarItem').filter({ hasText: 'Environment:' })
@@ -53,7 +55,7 @@ test('definition navigation moves to the declaration and reports missing symbols
   const editor = page.locator('#preview-ide .Editor')
   await editor.locator('textarea').focus()
   await page.keyboard.press('F12')
-  await expect(editor.locator('.EditorCursor')).toHaveCSS('translate', /^[-\d.]+px(?: 0px)?$/)
+  await expect(editor.locator('.EditorCursor')).toHaveCSS('translate', horizontalCursorTranslation)
   // Inserting at the resulting cursor proves that navigation reached the declaration.
   await page.keyboard.insertText('new_')
   await expect(editor.locator('.EditorRow').first()).toHaveText('let new_color = blue')

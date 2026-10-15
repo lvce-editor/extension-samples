@@ -286,4 +286,12 @@ export const samples: readonly Sample[] = [
     route: 'signature-help',
     title: 'Signature Help',
   },
+  {
+    description: 'Provide paired braces, closing tags, comments, selections, and log snippets.',
+    id: 'language-editing',
+    packageName: 'sample-language-editing',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'word\n<demo><\nlog\n' } },
+    route: 'language-editing',
+    title: 'Language Editing',
+  },
 ]

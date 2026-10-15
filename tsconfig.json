@@ -84,6 +84,9 @@
     },
     {
       "path": "./packages/sample-signature-help"
+    },
+    {
+      "path": "./packages/sample-language-editing"
     }
   ]
 }

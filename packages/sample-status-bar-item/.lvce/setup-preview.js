@@ -5,4 +5,6 @@ export const setupPreview = async ({ executeCommand, showStatusBar }) => {
 }
 
 /** @public */
-export const reloadPreview = setupPreview
+export const reloadPreview = async (context) => {
+  await setupPreview(context)
+}

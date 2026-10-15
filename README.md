@@ -37,6 +37,8 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Signature Help](./packages/sample-signature-help)
 
+- [Language Editing](./packages/sample-language-editing)
+
 ## Development
 
 ```sh

@@ -11,3 +11,5 @@ Edit the TypeScript source or `extension.json` and save with Ctrl+S to rebuild t
 ## API
 
 The isolated extension awaits `activate()` before registering its providers and commands. Its manifest declares the contributions and activation events.
+
+Run **Sample: Cache Build Artifact** to write a temporary text blob with `setCacheStorageItem`, read its body with `getCacheStorageItem`, and delete it with `removeCacheStorageItem` in a `finally` block. The Output panel shows the read-back text and confirms the cache entry is gone. The key belongs to this extension’s cache and is reserved for this demonstration. Repeat the command to observe the same result without accumulating artifacts.

@@ -68,6 +68,7 @@ test('selection API collapses a selection without replacing its text', async ({ 
   await page.goto('/extension-samples/text-manipulation/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const preview = page.locator('#preview-ide .Editor')
+  await preview.locator('.EditorRow').first().click()
   await preview.locator('textarea').focus()
   await selectFirstLine(page)
   await runSelectedCommand(page, 'Sample: Collapse Selections')

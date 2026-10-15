@@ -8,4 +8,5 @@ export const runSelectedCommand = async (page: Page, label: string): Promise<voi
   const command = page.locator('#preview-ide .QuickPick').getByRole('option', { exact: true, name: label })
   await expect(command).toBeVisible()
   await command.click()
+  await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
 }

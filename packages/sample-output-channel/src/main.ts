@@ -1,4 +1,12 @@
-import { activate, createOutputChannel, openOutputView, registerCommand } from '@lvce-editor/api'
+import {
+  activate,
+  createOutputChannel,
+  getCacheStorageItem,
+  openOutputView,
+  registerCommand,
+  removeCacheStorageItem,
+  setCacheStorageItem,
+} from '@lvce-editor/api'
 
 const output = createOutputChannel('sample-build')
 
@@ -24,6 +32,24 @@ const main = async (): Promise<void> => {
       await openOutputView({ channel: 'sample-build' })
     },
     id: 'sample.clearBuildOutput',
+  })
+  registerCommand({
+    async execute() {
+      await ready
+      const key = 'https://extension-samples.invalid/build-artifact'
+      try {
+        const result = await setCacheStorageItem(key, new Blob(['Compiled sample artifact'], { type: 'text/plain' }))
+        if (!result.success) throw new Error(result.errorMessage)
+        const cached = await getCacheStorageItem(key)
+        if (!cached) throw new Error('Cached artifact is missing')
+        await output.appendLine(`Cached artifact: ${await cached.blob.text()}`)
+      } finally {
+        await removeCacheStorageItem(key)
+      }
+      await output.appendLine(`Artifact removed: ${String((await getCacheStorageItem(key)) === null)}`)
+      await openOutputView({ channel: 'sample-build' })
+    },
+    id: 'sample.cacheBuildArtifact',
   })
   await ready
 }

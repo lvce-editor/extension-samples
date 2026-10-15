@@ -21,6 +21,10 @@
     {
       "id": "sample.clearBuildOutput",
       "label": "Sample: Clear Build Output"
+    },
+    {
+      "id": "sample.cacheBuildArtifact",
+      "label": "Sample: Cache Build Artifact"
     }
   ]
 }
