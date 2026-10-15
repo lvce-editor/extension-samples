@@ -1,8 +1,16 @@
+import { deleteGeneratedBundle, storeGeneratedBundle } from './GeneratedBundleStorage.ts'
 import { setupPreview } from './SetupPreview.ts'
 import { setupPreviewDivider } from './SetupPreviewDivider.ts'
 
+const relativePathPrefix = /^\.\//
+const trailingSlash = /\/$/
+
 type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
 type Files = Record<string, string>
+interface BuildOutput {
+  readonly code: string
+  readonly generated: string
+}
 interface Sample {
   readonly id: string
   readonly preview?: {
@@ -21,7 +29,7 @@ const fetchJson = async <T>(url: string): Promise<T> => {
 
 const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
   paths.map((path) => {
-    const content = files[`/${path.replace(/^\.\//, '')}`]
+    const content = files[`/${path.replace(relativePathPrefix, '')}`]
     if (typeof content !== 'string') throw new Error(`Missing icon: ${path}`)
     return content
   })
@@ -80,7 +88,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
 
   let compiler: Worker | undefined
   let nextBuild = 0
-  const pending = new Map<number, { resolve: (code: string) => void; reject: (error: Error) => void }>()
+  const pending = new Map<number, { resolve: (code: BuildOutput) => void; reject: (error: Error) => void }>()
   let compilerError: Error | undefined
   const getCompiler = (): Worker => {
     if (compiler) return compiler
@@ -90,15 +98,15 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       for (const request of pending.values()) request.reject(compilerError)
       pending.clear()
     }
-    compiler.onmessage = ({ data }: MessageEvent<{ id: number; code: string; error?: string }>): void => {
+    compiler.onmessage = ({ data }: MessageEvent<{ id: number; code: string; generated: string; error?: string }>): void => {
       const request = pending.get(data.id)
       pending.delete(data.id)
       if (data.error) request?.reject(new Error(data.error))
-      else request?.resolve(data.code)
+      else request?.resolve(data)
     }
     return compiler
   }
-  const compile = (): Promise<string> =>
+  const compile = (): Promise<BuildOutput> =>
     new Promise((resolve, reject) => {
       if (compilerError) return reject(compilerError)
       const worker = getCompiler()
@@ -107,7 +115,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       worker.postMessage({ files: { ...files }, id })
     })
 
-  const getPreviewCode = async (): Promise<string | undefined> => {
+  const getPreviewCode = async (): Promise<BuildOutput | undefined> => {
     const unchanged =
       Object.keys(files).length === Object.keys(initialFiles).length &&
       Object.entries(initialFiles).every(([path, content]) => files[path] === content)
@@ -119,7 +127,9 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     const { height, width } = root.getBoundingClientRect()
     await invoke('Application.create', {
       extensions,
-      files: Object.fromEntries(Object.entries(workspaceFiles).map(([path, content]) => [`${workspaceUri}${path}`, content])),
+      files: Object.fromEntries(
+        Object.entries(workspaceFiles).map(([path, content]) => [`${id === sourceId ? 'memfs:///sample' : workspaceUri}${path}`, content]),
+      ),
       height,
       href: location.href,
       id,
@@ -129,10 +139,30 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       workspacePath: workspaceUri,
       workspaceUri,
     })
-    for (const command of ['Layout.hideTitleBar', 'Layout.hideStatusBar', 'Layout.hideActivityBar', 'Layout.moveSideBarLeft', 'Layout.showSideBar']) {
+    const commands = ['Layout.hideTitleBar', 'Layout.hideStatusBar']
+    if (id !== previewId || sampleId !== 'source-control-provider') commands.push('Layout.hideActivityBar')
+    commands.push('Layout.moveSideBarLeft', 'Layout.showSideBar')
+    for (const command of commands) {
       await invoke('Application.execute', id, command)
     }
     await invoke('Application.execute', id, 'Layout.openSideBarViewlet', 'Explorer')
+    if (id === previewId && sampleId === 'source-control-provider') {
+      root.addEventListener(
+        'mousedown',
+        (event) => {
+          const { target } = event
+          if (!(target instanceof Element)) return
+          const item = target.closest<HTMLElement>('.ActivityBarItem')
+          const viewlet = item?.title
+          if (!item || (viewlet !== 'Explorer' && viewlet !== 'Source Control') || item.getAttribute('aria-selected') === 'true') return
+          event.preventDefault()
+          event.stopPropagation()
+          event.stopImmediatePropagation()
+          void invoke('Application.execute', id, 'Layout.openSideBarViewlet', viewlet)
+        },
+        { capture: true },
+      )
+    }
   }
 
   const observers: ResizeObserver[] = []
@@ -152,6 +182,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     }
   }
 
+  let generatedUrl: string | undefined
   let previewExists = false
   let previewExtensionId = ''
   const previewUrls = new Set<string>()
@@ -190,7 +221,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         'Application.execute',
         previewId,
         'Main.openUri',
-        `${previewWorkspace.replace(/\/$/, '')}${sample?.preview?.entry || '/README.md'}`,
+        `${previewWorkspace.replace(trailingSlash, '')}${sample?.preview?.entry || '/README.md'}`,
         false,
       )
     }
@@ -219,11 +250,27 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         requested = false
         const started = performance.now()
         status.textContent = 'Building…'
-        const code = await getPreviewCode()
+        const output = await getPreviewCode()
         if (requested) continue
         const manifest = JSON.parse(files['/extension.json'])
         const icons = readIcons(manifest['source-control-icons'] || [], files)
-        await updatePreview(code, manifest, icons)
+        await updatePreview(output?.code, manifest, icons)
+        const nextGeneratedUrl = output
+          ? await storeGeneratedBundle(output.generated)
+          : new URL(`${prefix}/samples/${sampleId}/dist/main.js`, location.href).href
+        try {
+          await invoke('Application.execute', sourceId, 'ExtensionHost.executeCommand', 'sampleSource.setGeneratedUrl', nextGeneratedUrl)
+        } catch (error) {
+          await deleteGeneratedBundle(nextGeneratedUrl)
+          throw error
+        }
+        const previousGeneratedUrl = generatedUrl
+        generatedUrl = nextGeneratedUrl
+        try {
+          await invoke('Application.execute', sourceId, 'Layout.handleWorkspaceRefresh', { changed: ['sample-source:///sample/dist/main.js'] })
+        } finally {
+          if (previousGeneratedUrl) await deleteGeneratedBundle(previousGeneratedUrl)
+        }
         document.body.dataset.previewRevision = String(++revision)
         document.body.dataset.previewBuildMs = String(Math.round(performance.now() - started))
         status.textContent = 'Preview ready'
@@ -235,9 +282,22 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       if (requested) void rebuild()
     }
   }
-  await mount(sourceId, 'memfs:///sample', { ...tooling, ...files }, sourceExtensions)
+  const sourceProvider = {
+    activation: ['onFileSystem:sample-source'],
+    browser: new URL(`${prefix}/assets/source-files.js?sample=${encodeURIComponent(sampleId)}`, location.href).href,
+    commands: [{ id: 'sampleSource.setGeneratedUrl' }],
+    contentSecurityPolicy: [],
+    fileSystemProviders: [{ id: 'sample-source' }],
+    id: 'playground.source-files',
+    isolated: true,
+    isWeb: true,
+    name: 'Sample source files',
+    path: location.origin,
+    uri: location.origin,
+  }
+  await mount(sourceId, 'sample-source:///sample', { ...tooling, ...files }, [...sourceExtensions, sourceProvider])
   await invoke('Application.execute', sourceId, 'Preferences.update', { 'eslint.ignoreHashes': ignoreHashes })
-  await invoke('Application.execute', sourceId, 'Main.openUri', 'memfs:///sample/src/main.ts')
+  await invoke('Application.execute', sourceId, 'Main.openUri', 'sample-source:///sample/src/main.ts')
   await rebuild()
   for (const id of [sourceId, previewId]) {
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
@@ -274,6 +334,9 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         }
         await visit('')
         if (readRequested) continue
+        const unchanged =
+          Object.keys(snapshot).length === Object.keys(files).length && Object.entries(files).every(([path, content]) => snapshot[path] === content)
+        if (unchanged) continue
         files = snapshot
         try {
           localStorage.setItem(storageKey, JSON.stringify(files))
@@ -291,7 +354,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   }
   globalThis.addEventListener('lvce-file-saved', (event) => {
     const { applicationId, uri } = (event as CustomEvent<{ applicationId: string; uri: string }>).detail
-    if (applicationId !== sourceId || !uri.startsWith('memfs:///sample/')) return
+    if (applicationId !== sourceId || (!uri.startsWith('sample-source:///sample/') && !uri.startsWith('memfs:///sample/'))) return
     void readWorkspace()
   })
   document.body.dataset.playgroundReady = 'true'
@@ -299,6 +362,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     'pagehide',
     () => {
       compiler?.terminate()
+      if (generatedUrl) void deleteGeneratedBundle(generatedUrl)
       for (const observer of observers) observer.disconnect()
       for (const url of previewUrls) URL.revokeObjectURL(url)
     },

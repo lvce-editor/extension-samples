@@ -11,6 +11,15 @@ interface RenameResult {
   }[]
 }
 
+export const prepareRename = (
+  document: TextDocument,
+  offset: number,
+): { readonly placeholder: string; readonly startOffset: number; readonly endOffset: number } | undefined => {
+  const word = document.text.matchAll(/\b[a-zA-Z_]\w*\b/g).find((match) => offset >= match.index && offset < match.index + match[0].length)
+  if (!word || word[0] === 'let' || word[0] === 'print') return undefined
+  return { placeholder: word[0], startOffset: word.index, endOffset: word.index + word[0].length }
+}
+
 // The sample language has no scopes, strings, or comments: identifiers match across the document.
 export const provideRename = (document: TextDocument, offset: number, newName: string): RenameResult => {
   const words = document.text.matchAll(/\b[a-zA-Z_]\w*\b/g).toArray()

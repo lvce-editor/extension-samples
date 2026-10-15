@@ -13,6 +13,7 @@ export const createHtml = (sample: Sample, nested: boolean, assetDir = '/extensi
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="${escapeAttribute(sample.description)}">
     <title>${escapeAttribute(sample.title)} · Lvce Editor Extension Samples</title>
+    <link rel="icon" href="${prefix}/runtime/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="${assetDir}/css/App.css">
     <link rel="stylesheet" href="${prefix}/assets/app.css">
   </head>

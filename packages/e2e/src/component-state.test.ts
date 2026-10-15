@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test'
 
+const sourceControlTitle = /^Source Control$/
+const explorerTitle = /^Explorer$/
+const layoutTitle = /^Layout$/
+const mainTitle = /^Main$/
+
 test('opens and edits preview component state in the preview application', async ({ page }) => {
   await page.goto('/extension-samples/source-control-provider/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
@@ -12,16 +17,16 @@ test('opens and edits preview component state in the preview application', async
     await executeCommand('Application.execute', 'preview', 'Layout.showSecondarySideBar')
     await executeCommand('Application.execute', 'preview', 'Layout.openSecondarySideBarViewlet', 'ComponentState')
   }, entry)
-  const card = preview.locator('.ComponentStateCard').filter({ has: page.locator('.ComponentStateCardTitle', { hasText: /^Source Control$/ }) })
+  const card = preview.locator('.ComponentStateCard').filter({ has: page.locator('.ComponentStateCardTitle', { hasText: sourceControlTitle }) })
   await expect(card).toBeVisible()
   const uid = await card.getAttribute('data-uid')
   await card.click()
   await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
   await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText('main.ts')
   await expect(preview.locator('.Editor')).toContainText('memfs:///preview/README.md')
-  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: /^Explorer$/ })).toHaveCount(0)
-  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: /^Layout$/ })).toHaveCount(1)
-  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: /^Main$/ })).toHaveCount(1)
+  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: explorerTitle })).toHaveCount(0)
+  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: layoutTitle })).toHaveCount(1)
+  await expect(preview.locator('.ComponentStateCardTitle').filter({ hasText: mainTitle })).toHaveCount(1)
   const content = await page.evaluate(
     async ({ componentUid, entry }) => {
       const { executeCommand } = await import(entry)
@@ -43,13 +48,13 @@ test('opens and edits preview component state in the preview application', async
     await executeCommand('Application.execute', 'source', 'Layout.showSecondarySideBar')
     await executeCommand('Application.execute', 'source', 'Layout.openSecondarySideBarViewlet', 'ComponentState')
   }, entry)
-  const sourceCard = source.locator('.ComponentStateCard').filter({ has: page.locator('.ComponentStateCardTitle', { hasText: /^Explorer$/ }) })
+  const sourceCard = source.locator('.ComponentStateCard').filter({ has: page.locator('.ComponentStateCardTitle', { hasText: explorerTitle }) })
   await expect(sourceCard).toBeVisible()
   const sourceUid = await sourceCard.getAttribute('data-uid')
   await sourceCard.click()
   await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText(`${sourceUid}.json`)
-  await expect(source.locator('.Editor')).toContainText('memfs:///sample')
-  await expect(source.locator('.ComponentStateCardTitle').filter({ hasText: /^Source Control$/ })).toHaveCount(0)
+  await expect(source.locator('.Editor')).toContainText('sample-source:///sample')
+  await expect(source.locator('.ComponentStateCardTitle').filter({ hasText: sourceControlTitle })).toHaveCount(0)
   await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
   await card.click()
   await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)

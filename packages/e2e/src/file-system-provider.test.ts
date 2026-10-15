@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+const sharedWorkerUrl = /(?:renderer|editor|mainArea)WorkerMain/
+
 test.beforeEach(async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/')
   await expect(page.locator('#source-ide .Editor')).toHaveCount(1, { timeout: 30_000 })
@@ -89,7 +91,7 @@ test('rebuilds an imported file repeatedly without replacing the source IDE or s
   await expect(source.getByRole('tab', { exact: true, name: 'instructions.ts Close' })).toBeVisible()
   const sourceUid = await source.locator('.Editor').getAttribute('data-uid')
   const previewUid = await preview.locator('.Editor').getAttribute('data-uid')
-  const sharedWorkers = page.workers().filter((worker) => /(?:renderer|editor|mainArea)WorkerMain/.test(worker.url()))
+  const sharedWorkers = page.workers().filter((worker) => sharedWorkerUrl.test(worker.url()))
   expect(sharedWorkers.length).toBeGreaterThan(0)
   const timings: number[] = []
   for (let index = 1; index <= 3; index++) {
@@ -165,4 +167,28 @@ test('reloads the currently open provider file without switching back to README'
   await expect(preview.locator('.Editor')).toContainText('Updated provider file')
   await expect(preview.locator('.Editor')).toHaveAttribute('data-uid', previewUid!)
   await expect(preview.getByRole('tab', { exact: true, name: 'example.ts Close' })).toHaveAttribute('aria-selected', 'true')
+})
+
+test('idle samples keep their tabs and preview unchanged', async ({ page }) => {
+  await page.evaluate(() => {
+    const { document } = globalThis
+    document.body.dataset.idleSaves = '0'
+    globalThis.addEventListener('lvce-file-saved', () => {
+      document.body.dataset.idleSaves = String(Number(document.body.dataset.idleSaves) + 1)
+    })
+  })
+  const tabs = await page.getByRole('tab').elementHandles()
+  await page.waitForTimeout(3500)
+  await expect(page.locator('body')).toHaveAttribute('data-idle-saves', '0')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+  for (const tab of tabs) expect(await tab.evaluate((element) => element.isConnected)).toBe(true)
+})
+
+test('unchanged source save notifications do not rebuild the preview', async ({ page }) => {
+  await page.evaluate(() => {
+    const { CustomEvent } = globalThis
+    globalThis.dispatchEvent(new CustomEvent('lvce-file-saved', { detail: { applicationId: 'source', uri: 'memfs:///sample/src/main.ts' } }))
+  })
+  await page.waitForTimeout(3500)
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
 })

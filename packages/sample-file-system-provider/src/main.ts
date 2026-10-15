@@ -1,13 +1,15 @@
 import { activate as activateExtensionApi, registerFileSystemProvider, type FileSystemProvider } from '@lvce-editor/api'
 import { instructions } from './instructions.ts'
 
+const sampleMemfsScheme = /^sample-memfs:\/\//
+
 const files = new Map<string, string>([
   ['/README.md', `# Hello from memfs\n\n${instructions}`],
   ['/src/example.ts', "export const greeting = 'Hello from an extension file system'"],
 ])
 
 const normalize = (uri: string): string => {
-  const path = uri.replace(/^sample-memfs:\/\//, '')
+  const path = uri.replace(sampleMemfsScheme, '')
   return path.startsWith('/') ? path : `/${path}`
 }
 
@@ -69,4 +71,4 @@ const main = async (): Promise<void> => {
   registerFileSystemProvider(provider)
 }
 
-main().catch(console.error)
+main()

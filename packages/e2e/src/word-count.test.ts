@@ -1,0 +1,66 @@
+import { expect, test } from '@playwright/test'
+import { runCommand } from './RunCommand.ts'
+
+test('word count reads the active preview document and includes unsaved edits', async ({ page }) => {
+  await page.goto('/extension-samples/word-count/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const preview = page.locator('#preview-ide')
+  const source = page.locator('#source-ide')
+  await runCommand(page, 'Sample: Count Words')
+  await expect(preview.getByText('There are 18 words.', { exact: true })).toBeVisible()
+  await preview.locator('.NotificationCloseButton').last().click()
+  await expect(source.locator('.NotificationMessage')).toHaveCount(0)
+
+  const previewEditor = preview.locator('.Editor')
+  await previewEditor.locator('textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText('one two\nthree')
+  await runCommand(page, 'Sample: Count Words')
+  await expect(preview.getByText('There are 3 words.', { exact: true })).toBeVisible()
+  await preview.locator('.NotificationCloseButton').last().click()
+  await expect(preview.locator('.EditorRow')).toHaveText('one two\nthree')
+  await expect(source.locator('.NotificationMessage')).toHaveCount(0)
+
+  await previewEditor.locator('textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(' \t\n  ')
+  await runCommand(page, 'Sample: Count Words')
+  await expect(preview.getByText('There are 0 words.', { exact: true })).toBeVisible()
+
+  await preview.locator('.NotificationCloseButton').last().click()
+  const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
+  const runtime = await runtimeResponse.json()
+  await page.evaluate(async (entry) => {
+    const renderer = await import(entry)
+    await renderer.executeCommand('Application.execute', 'preview', 'Main.closeAllEditors')
+    await renderer.executeCommand('Application.execute', 'preview', 'ExtensionHost.executeCommand', 'sample.countWords')
+  }, runtime.entry)
+  await expect(preview.getByText('No active editor to count.', { exact: true })).toBeVisible()
+})
+
+test('word count can be run again after rebuilding and resetting the sample', async ({ page }) => {
+  await page.goto('/extension-samples/word-count/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const preview = page.locator('#preview-ide')
+  const source = page.locator('#source-ide')
+  await runCommand(page, 'Sample: Count Words')
+  await expect(preview.getByText('There are 18 words.', { exact: true })).toBeVisible()
+  await preview.locator('.NotificationCloseButton').last().click()
+
+  const response = await page.request.get('/extension-samples/samples/word-count/files.json')
+  const files = await response.json()
+  await source.locator('.Editor textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(`${files['/src/main.ts']}\n// Rebuild the sample.\n`)
+  await page.keyboard.press('Control+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await runCommand(page, 'Sample: Count Words')
+  await expect(preview.getByText('There are 18 words.', { exact: true })).toBeVisible()
+  await preview.locator('.NotificationCloseButton').last().click()
+
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+  await runCommand(page, 'Sample: Count Words')
+  await expect(page.locator('#preview-ide').getByText('There are 18 words.', { exact: true })).toBeVisible()
+})

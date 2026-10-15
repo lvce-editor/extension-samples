@@ -1,6 +1,6 @@
 import { deepStrictEqual, equal } from 'node:assert/strict'
 import { test } from 'node:test'
-import { provideRename } from '../src/provide-rename.ts'
+import { prepareRename, provideRename } from '../src/provide-rename.ts'
 
 await test('rename uses original offsets for a longer replacement without matching identifier prefixes', () => {
   const document = { text: 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)', uri: 'memfs:///example.sample' }
@@ -18,4 +18,11 @@ await test('rename uses original offsets for a longer replacement without matchi
     deepStrictEqual(provideRename(document, 5, name), { canRename: false, edits: [] })
   }
   deepStrictEqual(provideRename(document, 0, 'shade'), { canRename: false, edits: [] })
+})
+
+await test('rename is offered only on identifiers that the provider can rename', () => {
+  const document = { text: 'let color = blue', uri: 'memfs:///example.txt' }
+  deepStrictEqual(prepareRename(document, 5), { placeholder: 'color', startOffset: 4, endOffset: 9 })
+  equal(prepareRename(document, 0), undefined)
+  equal(prepareRename(document, 3), undefined)
 })

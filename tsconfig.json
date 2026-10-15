@@ -38,6 +38,12 @@
       "path": "./packages/sample-hello-world"
     },
     {
+      "path": "./packages/sample-text-manipulation"
+    },
+    {
+      "path": "./packages/sample-word-count"
+    },
+    {
       "path": "./packages/sample-dialog"
     },
     {
@@ -50,6 +56,9 @@
       "path": "./packages/sample-output-channel"
     },
     {
+      "path": "./packages/sample-html-preview"
+    },
+    {
       "path": "./packages/sample-definition-provider"
     },
     {
@@ -57,6 +66,12 @@
     },
     {
       "path": "./packages/sample-code-actions"
+    },
+    {
+      "path": "./packages/sample-type-definition-provider"
+    },
+    {
+      "path": "./packages/sample-preferences"
     }
   ]
 }

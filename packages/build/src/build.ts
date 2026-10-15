@@ -17,7 +17,7 @@ const writeJson = async (path: string, value: unknown): Promise<void> => {
   await writeFile(path, `${JSON.stringify(value, undefined, 2)}\n`)
 }
 
-const readWorkspace = async (directory: string): Promise<Record<string, string>> => {
+export const readWorkspace = async (directory: string): Promise<Record<string, string>> => {
   const files: Record<string, string> = {}
   const visit = async (path: string): Promise<void> => {
     for (const entry of await readdir(join(directory, path), { withFileTypes: true })) {
@@ -28,9 +28,9 @@ const readWorkspace = async (directory: string): Promise<Record<string, string>>
     }
   }
   await visit('')
-  files['/eslint.samples.config.js'] = await readFile(join(root, 'eslint.samples.config.js'), 'utf8')
+  const sampleConfig = await readFile(join(root, 'eslint.samples.config.js'), 'utf8')
   files['/eslint.config.js'] =
-    "import tseslint from 'typescript-eslint'\nimport config from './eslint.samples.config.js'\n\n// Typed linting runs in CI; the browser filesystem does not yet support TypeScript projects.\nexport default [...config.map(entry => ({ ...entry, files: ['**/*.ts'] })), { ...tseslint.configs.disableTypeChecked, files: ['**/*.ts'], languageOptions: { parserOptions: { project: false, projectService: false, tsconfigRootDir: '/sample' } } }]\n"
+    `${sampleConfig}\n// Typed linting runs in CI; the browser filesystem does not yet support TypeScript projects.\nexport default [...sampleConfig.map(entry => ({ ...entry, files: ['**/*.ts'] })), { ...tseslint.configs.disableTypeChecked, files: ['**/*.ts'], languageOptions: { parserOptions: { project: false, projectService: false, tsconfigRootDir: '/sample' } } }]\n`
   return files
 }
 
@@ -104,6 +104,9 @@ export const buildStatic = async (): Promise<void> => {
   } else {
     ;({ commitHash } = await sharedProcess.exportStatic({ root, pathPrefix }))
   }
+  const settingsPath = join(root, 'dist', commitHash, 'config', 'defaultSettings.json')
+  const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
+  await writeJson(settingsPath, { ...settings, 'application.useOnLoadJson': true })
   // Ship editor fixes independently of the full server runtime release.
   await cp(dirname(require.resolve('@lvce-editor/editor-worker')), join(root, 'dist', commitHash, 'packages', 'editor-worker', 'dist'), {
     recursive: true,
@@ -119,7 +122,13 @@ export const buildStatic = async (): Promise<void> => {
     .map((extension: { id: string }) =>
       extension.id === 'builtin.language-features-typescript' ? { ...extension, diagnosticProviders: [], formattingProviders: [] } : extension,
     )
-  await writeJson(join(outputRoot, 'runtime.json'), { entry: `${assetDir}/packages/renderer-process/dist/rendererProcessMain.js`, sourceExtensions })
+  const runtimeHtml = await readFile(join(root, 'dist', 'index.html'), 'utf8')
+  const runtimeConfig = /<script id="Config" type="application\/json">([\s\S]*?)<\/script>/.exec(runtimeHtml)
+  await writeJson(join(outputRoot, 'runtime.json'), {
+    config: runtimeConfig ? JSON.parse(runtimeConfig[1]) : undefined,
+    entry: `${assetDir}/packages/renderer-process/dist/rendererProcessMain.js`,
+    sourceExtensions,
+  })
   await writeJson(join(outputRoot, 'tooling.json'), await buildTooling())
 
   const assets = join(outputRoot, 'assets')
@@ -127,10 +136,12 @@ export const buildStatic = async (): Promise<void> => {
   for (const [entry, output] of [
     ['site.ts', 'site.js'],
     ['CompilerWorker.ts', 'compiler.js'],
+    ['SourceFileSystem.ts', 'source-files.js'],
   ]) {
     await build({
       bundle: true,
       entryPoints: [join(root, 'packages/playground/src', entry)],
+      external: ['node:*', 'electron'],
       format: 'esm',
       outfile: join(assets, output),
       platform: 'browser',
@@ -164,6 +175,7 @@ export const buildStatic = async (): Promise<void> => {
       sourcemap: true,
       target: 'es2022',
     })
+    await cp(join(packageRoot, 'dist'), join(outputRoot, 'samples', sample.id, 'dist'), { recursive: true })
     await build({
       alias: { '@lvce-editor/api': join(assets, 'api.js') },
       bundle: true,
