@@ -1,0 +1,18 @@
+{
+  "id": "sample.code-actions",
+  "name": "Code Actions Sample",
+  "description": "Organize a block of imports with a source code action.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onCodeAction:plaintext"],
+  "codeActions": [
+    {
+      "kind": "source.organizeImports",
+      "name": "Organize Imports",
+      "command": "Editor.organizeImports",
+      "languageId": "plaintext"
+    }
+  ]
+}

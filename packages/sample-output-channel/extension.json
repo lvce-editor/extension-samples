@@ -1,0 +1,26 @@
+{
+  "id": "sample.output-channel",
+  "name": "Output Channel Sample",
+  "description": "Write, append, and clear simulated build logs in the Output panel.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["*"],
+  "outputChannels": [
+    {
+      "id": "sample-build",
+      "label": "Sample Build"
+    }
+  ],
+  "commands": [
+    {
+      "id": "sample.runBuild",
+      "label": "Sample: Run Build"
+    },
+    {
+      "id": "sample.clearBuildOutput",
+      "label": "Sample: Clear Build Output"
+    }
+  ]
+}
