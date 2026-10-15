@@ -33,6 +33,10 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Authentication Provider](./packages/sample-authentication-provider)
 
+- [Editor Decorations](./packages/sample-editor-decorations)
+
+- [Signature Help](./packages/sample-signature-help)
+
 ## Development
 
 ```sh

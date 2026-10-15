@@ -78,6 +78,12 @@
     },
     {
       "path": "./packages/sample-authentication-provider"
+    },
+    {
+      "path": "./packages/sample-editor-decorations"
+    },
+    {
+      "path": "./packages/sample-signature-help"
     }
   ]
 }

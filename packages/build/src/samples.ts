@@ -270,4 +270,20 @@ export const samples: readonly Sample[] = [
     route: 'authentication-provider',
     title: 'Authentication Provider',
   },
+  {
+    description: 'Decorate marker lines with gutter bars and end-of-line labels.',
+    id: 'editor-decorations',
+    packageName: 'sample-editor-decorations',
+    preview: { entry: '/markers.txt', files: { '/markers.txt': '+ added item\n~ changed item\n- removed item\nordinary line\n' } },
+    route: 'editor-decorations',
+    title: 'Editor Decorations',
+  },
+  {
+    description: 'Show signature and active-parameter documentation for a mix function.',
+    id: 'signature-help',
+    packageName: 'sample-signature-help',
+    preview: { entry: '/colors.txt', files: { '/colors.txt': 'mix(blue, green)\n' } },
+    route: 'signature-help',
+    title: 'Signature Help',
+  },
 ]
