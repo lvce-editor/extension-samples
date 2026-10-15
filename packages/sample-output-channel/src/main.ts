@@ -9,11 +9,11 @@ const main = async (): Promise<void> => {
   registerCommand({
     async execute() {
       build++
-      await openOutputView({ channel: 'sample-build' })
       await output.appendLine(`Build ${String(build)}: starting`)
       await output.append('Compiling example.sample... ')
       await output.appendLine('done')
       await output.appendLine('Build succeeded.')
+      await openOutputView({ channel: 'sample-build' })
     },
     id: 'sample.runBuild',
   })

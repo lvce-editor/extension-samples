@@ -1,6 +1,6 @@
 import { deepStrictEqual, equal } from 'node:assert/strict'
 import { test } from '@jest/globals'
-import { provideRename } from '../src/provide-rename.ts'
+import { prepareRename, provideRename } from '../src/provide-rename.ts'
 
 test('rename uses original offsets for a longer replacement without matching identifier prefixes', () => {
   const document = { text: 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)', uri: 'memfs:///example.sample' }
@@ -18,4 +18,13 @@ test('rename uses original offsets for a longer replacement without matching ide
     deepStrictEqual(provideRename(document, 5, name), { canRename: false, edits: [] })
   }
   deepStrictEqual(provideRename(document, 0, 'shade'), { canRename: false, edits: [] })
+})
+
+test('prepare rename accepts complete identifiers and rejects keywords or positions outside them', () => {
+  const document = { text: 'let color = blue\nprint(colorful)', uri: 'memfs:///example.sample' }
+  deepStrictEqual(prepareRename(document, 5), { placeholder: 'color' })
+  deepStrictEqual(prepareRename(document, 23), { placeholder: 'colorful' })
+  for (const offset of [-1, 0, 3, 9, 17, document.text.length]) {
+    equal(prepareRename(document, offset), undefined)
+  }
 })

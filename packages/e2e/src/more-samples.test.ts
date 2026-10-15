@@ -21,7 +21,7 @@ test('output channel appends successive builds and clears its logs', async ({ pa
   const output = page.locator('#preview-ide .OutputContent')
   await expect(output).toContainText('Ready.', { timeout: 30_000 })
   await runCommand(page, 'Sample: Run Build')
-  await expect(output).toContainText('Build 1: starting\nCompiling example.sample... done\nBuild succeeded.')
+  await expect(output).toContainText('Build 1: starting\nCompiling example.sample... done\nBuild succeeded.', { useInnerText: true })
   await runCommand(page, 'Sample: Run Build')
   await expect(output).toContainText('Build 1: starting')
   await expect(output).toContainText('Build 2: starting')
