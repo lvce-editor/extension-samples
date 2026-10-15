@@ -20,7 +20,7 @@ test('output channel appends successive builds and clears its logs', async ({ pa
   await page.goto('/extension-samples/output-channel/')
   const output = page.locator('#preview-ide .OutputContent')
   await runCommand(page, 'Sample: Run Build')
-  await expect(output).toContainText('Build 1: starting\nCompiling example.sample... done\nBuild succeeded.')
+  await expect(output.locator(':scope > .Line')).toContainText(['Build 1: starting', 'Compiling example.sample... done', 'Build succeeded.'])
   await runCommand(page, 'Sample: Run Build')
   await expect(output).toContainText('Build 1: starting')
   await expect(output).toContainText('Build 2: starting')
