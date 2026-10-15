@@ -127,6 +127,14 @@ export const samples: readonly Sample[] = [
     title: 'Text Manipulation',
   },
   {
+    description: 'Underline selected text with custom colors without editing the document.',
+    id: 'text-decoration',
+    packageName: 'sample-text-decoration',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'Select text and add an underline.\nAcross multiple lines, too.\n' } },
+    route: 'text-decoration',
+    title: 'Text Decoration',
+  },
+  {
     description: 'Count words in the active preview document.',
     id: 'word-count',
     packageName: 'sample-word-count',
@@ -147,11 +155,39 @@ export const samples: readonly Sample[] = [
       entry: '/README.md',
       files: {
         '/README.md':
-          '# Dialog\n\nFocus the preview editor, press F1, and run **Sample: Show Warning Dialog**. A warning dialog appears with a warning icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then run the command again.\n',
+          '# Dialog\n\nThe warning dialog appears automatically when the playground opens. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Warning Dialog** to open it again.\n',
       },
     },
     route: 'dialog',
     title: 'Dialog',
+  },
+  {
+    description: 'Show an information dialog with an info icon and dismiss button.',
+    id: 'info-dialog',
+    packageName: 'sample-info-dialog',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Information Dialog\n\nThe information dialog appears automatically with an info icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Information Dialog** to open it again.\n',
+      },
+    },
+    route: 'info-dialog',
+    title: 'Information Dialog',
+  },
+  {
+    description: 'Show an error dialog with an error icon and dismiss button.',
+    id: 'error-dialog',
+    packageName: 'sample-error-dialog',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Error Dialog\n\nThe error dialog appears automatically with an error icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Error Dialog** to open it again.\n',
+      },
+    },
+    route: 'error-dialog',
+    title: 'Error Dialog',
   },
   {
     description: 'Render a sidebar with virtual DOM and increment/decrement a counter.',
@@ -168,17 +204,18 @@ export const samples: readonly Sample[] = [
     title: 'Sidebar Counter',
   },
   {
-    description: 'Parse unsaved HTML into a live virtual DOM preview and report malformed markup.',
-    id: 'html-preview',
-    packageName: 'sample-html-preview',
+    description: 'Choose an environment from a clickable status bar item.',
+    id: 'status-bar-item',
+    packageName: 'sample-status-bar-item',
     preview: {
-      entry: '/index.html',
+      entry: '/README.md',
       files: {
-        '/index.html': '<main class="page"><h1>Hello, HTML</h1><p>Edit this document to update the preview.</p></main>\n',
+        '/README.md':
+          '# Status Bar Item\n\nClick **Environment: Development** in the preview status bar. Choose **Staging** or **Production** to update the label. Escape cancels without changing it. The command palette also offers **Sample: Select Environment**.\n',
       },
     },
-    route: 'html-preview',
-    title: 'Live HTML Preview',
+    route: 'status-bar-item',
+    title: 'Status Bar Item',
   },
   {
     description: 'Write, append, and clear simulated build logs in the Output panel.',
@@ -193,5 +230,45 @@ export const samples: readonly Sample[] = [
     },
     route: 'output-channel',
     title: 'Output Channel',
+  },
+
+  {
+    description: 'Rename every matching identifier in a document.',
+    id: 'rename-provider',
+    packageName: 'sample-rename-provider',
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)\n',
+      },
+    },
+    route: 'rename-provider',
+    title: 'Rename Provider',
+  },
+  {
+    description: 'Organize a block of imports with a source code action.',
+    id: 'code-actions',
+    packageName: 'sample-code-actions',
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'import zebra\nimport apple\n\nprint(apple)\n',
+      },
+    },
+    route: 'code-actions',
+    title: 'Code Actions',
+  },
+  {
+    description: 'Parse unsaved HTML into a live virtual DOM preview and report malformed markup.',
+    id: 'html-preview',
+    packageName: 'sample-html-preview',
+    preview: {
+      entry: '/index.html',
+      files: {
+        '/index.html': '<main class="page"><h1>Hello, HTML</h1><p>Edit this document to update the preview.</p></main>\n',
+      },
+    },
+    route: 'html-preview',
+    title: 'Live HTML Preview',
   },
 ]

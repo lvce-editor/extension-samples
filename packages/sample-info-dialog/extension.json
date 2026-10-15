@@ -1,0 +1,16 @@
+{
+  "id": "sample.info-dialog",
+  "name": "Information Dialog Sample",
+  "description": "Show an information dialog with a title, message, and dismiss button.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.showInformationDialog"],
+  "commands": [
+    {
+      "id": "sample.showInformationDialog",
+      "label": "Sample: Show Information Dialog"
+    }
+  ]
+}

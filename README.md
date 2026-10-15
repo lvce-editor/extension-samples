@@ -10,9 +10,12 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Sidebar counter](./packages/sample-sidebar-counter)
 - [Hello World](./packages/sample-hello-world)
+- [Text Decoration](./packages/sample-text-decoration)
 - [Text Manipulation](./packages/sample-text-manipulation)
 - [Word Count](./packages/sample-word-count)
 - [Dialog](./packages/sample-dialog)
+- [Information dialog](./packages/sample-info-dialog)
+- [Error dialog](./packages/sample-error-dialog)
 - [File system provider](./packages/sample-file-system-provider)
 - [Source control provider](./packages/sample-source-control-provider)
 - [Diagnostic Provider](./packages/sample-diagnostic-provider)
@@ -24,7 +27,11 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)
 
-- [Output Channel](packages/sample-output-channel) — append simulated build logs to a named Output channel.
+- [Status Bar Item](./packages/sample-status-bar-item)
+- [Output Channel](./packages/sample-output-channel)
+- [Definition Provider](./packages/sample-definition-provider)
+- [Rename Provider](./packages/sample-rename-provider)
+- [Code Actions](./packages/sample-code-actions)
 
 ## Development
 
@@ -83,6 +90,8 @@ The supplied helpers operate on the preview IDE:
 | `showHover()`             | Show documentation at the cursor.                             |
 | `openSideBar(name)`       | Open a sidebar view, such as `Source Control`.                |
 | `openPanel(name)`         | Open a panel view, such as `Problems`.                        |
+
+`showStatusBar()` reveals the preview status bar for samples that contribute status bar items.
 
 Await each helper so actions run in order. Setup modules are standalone browser JavaScript; relative imports and extension API imports are not supported. They run in the playground page, separately from the extension.
 

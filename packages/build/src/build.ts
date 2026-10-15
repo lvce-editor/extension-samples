@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url'
 import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
 import { createIgnoreHashes } from './CreateIgnoreHashes.ts'
-import { createHtml, getRuntimeConfigScript } from './html.ts'
+import { createHtml } from './html.ts'
 import { samples } from './samples.ts'
 
 const root = resolve(import.meta.dirname, '../../..')
@@ -104,7 +104,6 @@ export const buildStatic = async (): Promise<void> => {
   } else {
     ;({ commitHash } = await sharedProcess.exportStatic({ root, pathPrefix }))
   }
-  const runtimeConfigScript = getRuntimeConfigScript(await readFile(join(root, 'dist', 'index.html'), 'utf8'))
   const settingsPath = join(root, 'dist', commitHash, 'config', 'defaultSettings.json')
   const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
   await writeJson(settingsPath, { ...settings, 'application.useOnLoadJson': true })
@@ -112,10 +111,20 @@ export const buildStatic = async (): Promise<void> => {
   await cp(dirname(require.resolve('@lvce-editor/editor-worker')), join(root, 'dist', commitHash, 'packages', 'editor-worker', 'dist'), {
     recursive: true,
   })
+  // Keep application-scoped diagnostic streaming compatible with the editor worker.
+  await cp(
+    dirname(require.resolve('@lvce-editor/extension-management-worker')),
+    join(root, 'dist', commitHash, 'packages', 'extension-management-worker', 'dist'),
+    { recursive: true },
+  )
   await installExtension('eslint', '1.20.0', commitHash, pathPrefix)
   await installExtension('prettier', '2.23.1', commitHash, pathPrefix)
   await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })
   const assetDir = `${pathPrefix}/${commitHash}`
+  const runtimeHtml = await readFile(join(outputRoot, 'runtime', 'index.html'), 'utf8')
+  const runtimeConfigText = runtimeHtml.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)?.[1]
+  if (!runtimeConfigText) throw new Error('Runtime config not found in exported index.html')
+  const runtimeConfig = JSON.parse(runtimeConfigText)
   const webExtensions = JSON.parse(await readFile(join(root, 'dist', commitHash, 'config', 'webExtensions.json'), 'utf8'))
   // ESLint owns diagnostics and Prettier owns formatting; retain TypeScript's other language features.
   const sourceExtensions = webExtensions
@@ -182,10 +191,10 @@ export const buildStatic = async (): Promise<void> => {
     })
     const route = join(outputRoot, sample.route)
     await mkdir(route, { recursive: true })
-    await writeFile(join(route, 'index.html'), createHtml(sample, true, assetDir, runtimeConfigScript))
+    await writeFile(join(route, 'index.html'), createHtml(sample, true, assetDir, runtimeConfig))
   }
-  await writeFile(join(outputRoot, 'index.html'), createHtml(samples[0], false, assetDir, runtimeConfigScript))
-  await writeFile(join(outputRoot, '404.html'), createHtml(samples[0], false, assetDir, runtimeConfigScript))
+  await writeFile(join(outputRoot, 'index.html'), createHtml(samples[0], false, assetDir, runtimeConfig))
+  await writeFile(join(outputRoot, '404.html'), createHtml(samples[0], false, assetDir, runtimeConfig))
   await writeJson(join(outputRoot, 'samples.json'), samples)
   await writeFile(join(outputRoot, '.nojekyll'), '')
 }

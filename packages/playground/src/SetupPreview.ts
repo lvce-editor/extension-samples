@@ -4,12 +4,14 @@ const trailingSlash = /\/$/
 const leadingSlash = /^\//
 
 interface PreviewContext {
+  readonly executeCommand: (command: string, ...args: readonly unknown[]) => Promise<unknown>
   readonly openFile: (path: string) => Promise<unknown>
   readonly openPanel: (name: string) => Promise<unknown>
   readonly openSideBar: (name: string) => Promise<unknown>
   readonly setCursor: (line: number, column: number) => Promise<unknown>
   readonly showCompletions: () => Promise<unknown>
   readonly showHover: () => Promise<unknown>
+  readonly showStatusBar: () => Promise<unknown>
 }
 
 export const setupPreview = async (source: string | undefined, workspace: string, execute: Execute): Promise<void> => {
@@ -19,12 +21,17 @@ export const setupPreview = async (source: string | undefined, workspace: string
     const module = await import(url)
     if (typeof module.setupPreview !== 'function') throw new Error('Export a setupPreview function from .lvce/setup-preview.js')
     const context: PreviewContext = {
+      executeCommand: (command, ...args) => execute('ExtensionHost.executeCommand', command, ...args),
       openFile: (path) => execute('Main.openUri', `${workspace.replace(trailingSlash, '')}/${path.replace(leadingSlash, '')}`),
       openPanel: (name) => execute('Layout.showPanel', name),
       openSideBar: (name) => execute('Layout.openSideBarViewlet', name),
       setCursor: (line, column) => execute('Editor.cursorSet', line, column),
       showCompletions: () => execute('Editor.openCompletion'),
       showHover: () => execute('Editor.showHover'),
+      showStatusBar: async () => {
+        await execute('Preferences.update', { 'statusBar.itemsVisible': true })
+        await execute('Layout.showStatusBar')
+      },
     }
     await module.setupPreview(context)
   } catch (error) {

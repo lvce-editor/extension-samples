@@ -10,6 +10,8 @@ Edit the TypeScript source or `extension.json` and save with Ctrl+S to rebuild t
 
 ## API
 
+The manifest activates eagerly for the welcome line and on each command so commands reactivate the extension after a source reload.
+
 `extension.json` contributes the `sample-build` channel with the label **Sample Build**. The extension creates that channel once with `createOutputChannel()` before `activate()`, then writes only after activation. Commands register immediately and await the shared activation promise before writing, so the first command after a source reload also works. Repeated command runs reuse the same channel.
 
 `appendLine()` adds a line, `append()` continues the current line, and `clear()` removes the log. After writing, `openOutputView({ channel: 'sample-build' })` shows the channel with its latest contents.
