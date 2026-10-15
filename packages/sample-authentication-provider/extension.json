@@ -1,0 +1,30 @@
+{
+  "id": "sample.authentication-provider",
+  "name": "Authentication Provider Sample",
+  "description": "Create, list, and remove in-memory demonstration sessions.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.signIn", "onCommand:sample.listSessions", "onCommand:sample.signOut"],
+  "commands": [
+    {
+      "id": "sample.signIn",
+      "label": "Sample: Sign In Locally"
+    },
+    {
+      "id": "sample.listSessions",
+      "label": "Sample: List Local Sessions"
+    },
+    {
+      "id": "sample.signOut",
+      "label": "Sample: Sign Out Locally"
+    }
+  ],
+  "outputChannels": [
+    {
+      "id": "sample-authentication",
+      "label": "Local Authentication"
+    }
+  ]
+}

@@ -31,6 +31,8 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Preferences](./packages/sample-preferences)
 - [Document Symbols](./packages/sample-document-symbol-provider)
 
+- [Authentication Provider](./packages/sample-authentication-provider)
+
 ## Development
 
 ```sh

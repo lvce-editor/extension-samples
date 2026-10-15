@@ -75,6 +75,9 @@
     },
     {
       "path": "./packages/sample-document-symbol-provider"
+    },
+    {
+      "path": "./packages/sample-authentication-provider"
     }
   ]
 }

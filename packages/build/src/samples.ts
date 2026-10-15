@@ -256,4 +256,18 @@ export const samples: readonly Sample[] = [
     route: 'document-symbol-provider',
     title: 'Document Symbols',
   },
+  {
+    description: 'Create, list, and remove local authentication-provider sessions.',
+    id: 'authentication-provider',
+    packageName: 'sample-authentication-provider',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Local Authentication\n\nRun Sample: Sign In Locally, Sample: List Local Sessions, or Sample: Sign Out Locally from F1. Escape cancels sign-in. Sessions are in-memory demonstration data.\n',
+      },
+    },
+    route: 'authentication-provider',
+    title: 'Authentication Provider',
+  },
 ]
