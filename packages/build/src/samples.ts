@@ -155,7 +155,7 @@ export const samples: readonly Sample[] = [
       entry: '/README.md',
       files: {
         '/README.md':
-          '# Dialog\n\nFocus the preview editor, press F1, and run **Sample: Show Warning Dialog**. A warning dialog appears with a warning icon, title, message, and **OK** button. Dismiss it with **OK** or the close button, then run the command again.\n',
+          '# Dialog\n\nThe warning dialog appears automatically when the playground opens. Dismiss it with **OK** or the close button, then press F1 and run **Sample: Show Warning Dialog** to open it again.\n',
       },
     },
     route: 'dialog',
