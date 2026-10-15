@@ -50,9 +50,9 @@ The legacy extension-host-worker facade additionally exposes process/environment
 
 ## Validation status
 
-The reconciled sample source passes 47 unit tests. Published runtime 0.123.8/editor 19.74.2 passes signature documentation; editor 19.74.3 contains the merged application-scoped preference reader. The matching renderer isolation change is tracked in LVCE #16007 and still needs its complete current-head matrix, merge and published runtime integration.
+The reconciled samples pass 47 unit tests using published server/shared-process/static-server 0.123.11 and editor-worker 19.74.3. Type-check, lint, formatting and Knip also pass. The served renderer and editor bundles were checked against the installed npm artifacts.
 
-Source-built diagnostic acceptance now passes preference cancellation/update/reset with source isolation and a 24px font/row-height check, document-symbol updates, reference results/click ranges, file-change callback disposal, configuration/theme queries and preview tab navigation. Language-editing and preference scenarios passed three repeated runs after adding observable selection readiness checks. Status save/rebuild/reset, output reload, rename/undo/cancel, cache cleanup, authentication and decorations also passed. These diagnostic bundles are not release acceptance: a clean build from final published dependencies, full Chromium suite and Ubuntu/macOS/Windows quality matrix remain required.
+Published browser coverage includes preference cancellation/update/reset with source isolation and row geometry, document symbols after unsaved edits, reference result navigation, signature documentation, language editing and undo, local authentication lifecycle, cache cleanup, watcher disposal, and preview tab navigation. Save/rebuild/reset, failed-build recovery, reload and generated output are exercised by the full suite. Formatting scenarios wait for the actual editor selection before typing, and all nine targeted repetitions pass. The sample PR must pass its full Chromium suite and Ubuntu, macOS and Windows quality jobs before merging.
 
 ## Verified application-runtime restrictions
 

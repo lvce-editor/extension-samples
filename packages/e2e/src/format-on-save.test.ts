@@ -1,4 +1,13 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+const sourceSelections = async (page: Page): Promise<unknown> => {
+  const response = await page.request.get('/extension-samples/runtime.json')
+  const { entry } = await response.json()
+  return page.evaluate(async (entry) => {
+    const renderer = await import(entry)
+    return renderer.executeCommand('Application.execute', 'source', 'GetActiveEditor.getSelections')
+  }, entry)
+}
 
 for (const restoredDraft of [false, true]) {
   test(`formats saved sample TypeScript with Prettier and persists it (restored draft: ${restoredDraft})`, async ({ page }) => {
@@ -17,9 +26,12 @@ for (const restoredDraft of [false, true]) {
     await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
     const source = page.locator('#source-ide')
     const editor = source.locator('.Editor')
+    await editor.locator('.EditorRow').first().click()
     await editor.locator('textarea').focus()
     await page.keyboard.press('Control+Home')
+    await expect.poll(() => sourceSelections(page)).toEqual([0, 0, 0, 0])
     await page.keyboard.insertText('const message={text:"formatted on save"};')
+    await expect.poll(() => sourceSelections(page)).toEqual([0, 41, 0, 41])
     await page.keyboard.press('Enter')
     await expect(editor.locator('.EditorRow').first()).toHaveText('const message={text:"formatted on save"};')
     await page.keyboard.press('Control+s')
