@@ -1,0 +1,16 @@
+{
+  "id": "sample.error-dialog",
+  "name": "Error Dialog Sample",
+  "description": "Show an error dialog with a title, message, and dismiss button.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.showErrorDialog"],
+  "commands": [
+    {
+      "id": "sample.showErrorDialog",
+      "label": "Sample: Show Error Dialog"
+    }
+  ]
+}
