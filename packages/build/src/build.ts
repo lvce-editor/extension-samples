@@ -116,13 +116,21 @@ export const buildStatic = async (): Promise<void> => {
   await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })
   const assetDir = `${pathPrefix}/${commitHash}`
   const webExtensions = JSON.parse(await readFile(join(root, 'dist', commitHash, 'config', 'webExtensions.json'), 'utf8'))
+  const runtimeHtml = await readFile(join(root, 'dist', 'index.html'), 'utf8')
+  const runtimeConfigElement = runtimeHtml.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)
+  if (!runtimeConfigElement) throw new Error('Runtime config not found in exported index.html')
+  const runtimeConfig = JSON.parse(runtimeConfigElement[1])
   // ESLint owns diagnostics and Prettier owns formatting; retain TypeScript's other language features.
   const sourceExtensions = webExtensions
     .filter((extension: { id: string }) => ['builtin.language-features-typescript', 'builtin.prettier'].includes(extension.id))
     .map((extension: { id: string }) =>
       extension.id === 'builtin.language-features-typescript' ? { ...extension, diagnosticProviders: [], formattingProviders: [] } : extension,
     )
-  await writeJson(join(outputRoot, 'runtime.json'), { entry: `${assetDir}/packages/renderer-process/dist/rendererProcessMain.js`, sourceExtensions })
+  await writeJson(join(outputRoot, 'runtime.json'), {
+    entry: `${assetDir}/packages/renderer-process/dist/rendererProcessMain.js`,
+    sourceExtensions,
+    config: runtimeConfig,
+  })
   await writeJson(join(outputRoot, 'tooling.json'), await buildTooling())
 
   const assets = join(outputRoot, 'assets')
