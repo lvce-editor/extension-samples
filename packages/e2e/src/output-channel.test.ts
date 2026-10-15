@@ -17,6 +17,13 @@ test('output channel appends successive builds and clears only preview output', 
   await runCommand(page, 'Sample: Clear Build Output')
   await expect(output).toHaveText('')
   await expect(page.locator('#source-ide .OutputContent')).toHaveCount(0)
+  await page.reload()
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await expect(output).toContainText('Ready.')
+  await runCommand(page, 'Sample: Run Build')
+  await expect(output).toContainText('Build 1: starting')
+  await expect(output).toContainText('Build succeeded.')
+  await expect(page.locator('#source-ide .OutputContent')).toHaveCount(0)
 })
 
 test('output channel reloads edited source and reset restores the original build message', async ({ page }) => {
