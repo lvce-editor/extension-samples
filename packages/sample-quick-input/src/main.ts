@@ -1,4 +1,4 @@
-import { activate, executeCommand, getWorkspaceUri, path, registerCommand, showQuickInput, writeFile } from '@lvce-editor/api'
+import { activate, getWorkspaceUri, openUri, path, registerCommand, showQuickInput, writeFile } from '@lvce-editor/api'
 
 const main = async (): Promise<void> => {
   await activate()
@@ -11,7 +11,7 @@ const main = async (): Promise<void> => {
       const workspaceUri = await getWorkspaceUri()
       const uri = path.join(workspaceUri, 'greeting.txt')
       await writeFile(uri, `Hello, ${name.trim()}!\n`)
-      await executeCommand('Main.openUri', uri)
+      await openUri(uri)
     },
     id: 'sample.createGreeting',
   })

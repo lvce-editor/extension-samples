@@ -204,17 +204,18 @@ export const samples: readonly Sample[] = [
     title: 'Sidebar Counter',
   },
   {
-    description: 'Parse unsaved HTML into a live virtual DOM preview and report malformed markup.',
-    id: 'html-preview',
-    packageName: 'sample-html-preview',
+    description: 'Choose an environment from a clickable status bar item.',
+    id: 'status-bar-item',
+    packageName: 'sample-status-bar-item',
     preview: {
-      entry: '/index.html',
+      entry: '/README.md',
       files: {
-        '/index.html': '<main class="page"><h1>Hello, HTML</h1><p>Edit this document to update the preview.</p></main>\n',
+        '/README.md':
+          '# Status Bar Item\n\nClick **Environment: Development** in the preview status bar. Choose **Staging** or **Production** to update the label. Escape cancels without changing it. The command palette also offers **Sample: Select Environment**.\n',
       },
     },
-    route: 'html-preview',
-    title: 'Live HTML Preview',
+    route: 'status-bar-item',
+    title: 'Status Bar Item',
   },
   {
     description: 'Write, append, and clear simulated build logs in the Output panel.',
@@ -229,5 +230,45 @@ export const samples: readonly Sample[] = [
     },
     route: 'output-channel',
     title: 'Output Channel',
+  },
+
+  {
+    description: 'Rename every matching identifier in a document.',
+    id: 'rename-provider',
+    packageName: 'sample-rename-provider',
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)\n',
+      },
+    },
+    route: 'rename-provider',
+    title: 'Rename Provider',
+  },
+  {
+    description: 'Organize a block of imports with a source code action.',
+    id: 'code-actions',
+    packageName: 'sample-code-actions',
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'import zebra\nimport apple\n\nprint(apple)\n',
+      },
+    },
+    route: 'code-actions',
+    title: 'Code Actions',
+  },
+  {
+    description: 'Parse unsaved HTML into a live virtual DOM preview and report malformed markup.',
+    id: 'html-preview',
+    packageName: 'sample-html-preview',
+    preview: {
+      entry: '/index.html',
+      files: {
+        '/index.html': '<main class="page"><h1>Hello, HTML</h1><p>Edit this document to update the preview.</p></main>\n',
+      },
+    },
+    route: 'html-preview',
+    title: 'Live HTML Preview',
   },
 ]
