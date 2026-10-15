@@ -1,8 +1,8 @@
 import { deepStrictEqual, equal } from 'node:assert/strict'
-import { test } from 'node:test'
+import { test } from '@jest/globals'
 import { provideRename } from '../src/provide-rename.ts'
 
-await test('rename uses original offsets for a longer replacement without matching identifier prefixes', () => {
+test('rename uses original offsets for a longer replacement without matching identifier prefixes', () => {
   const document = { text: 'let color = blue\nlet colorful = green\nprint(color)\nprint(color)', uri: 'memfs:///example.sample' }
   const result = provideRename(document, 5, 'backgroundColor')
   equal(result.canRename, true)

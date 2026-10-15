@@ -1,8 +1,8 @@
 import { deepStrictEqual } from 'node:assert/strict'
-import { test } from 'node:test'
+import { test } from '@jest/globals'
 import { organizeImports } from '../src/organize-imports.ts'
 
-await test('organize imports preserves the body and line endings and becomes a no-op', () => {
+test('organize imports preserves the body and line endings and becomes a no-op', () => {
   const body = '\r\nprint(apple)\r\n'
   const text = 'import zebra\r\nimport apple\r\n' + body
   const edits = organizeImports({ text })
