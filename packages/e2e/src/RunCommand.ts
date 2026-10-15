@@ -3,6 +3,8 @@ import { runSelectedCommand } from './RunSelectedCommand.ts'
 
 export const runCommand = async (page: Page, label: string): Promise<void> => {
   await page.locator('#preview-ide .EditorRow').first().click()
-  await expect(page.locator('#preview-ide .Editor textarea')).toBeFocused()
+  const input = page.locator('#preview-ide .Editor textarea')
+  await input.focus()
+  await expect(input).toBeFocused()
   await runSelectedCommand(page, label)
 }

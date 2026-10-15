@@ -62,7 +62,7 @@ Inspected extension-management-worker source at merged prerequisite `7704caeb775
 - `CreateExtensionCommandMap.ts` deliberately forwards application callbacks to that router instead of using legacy secret callbacks.
 - `CommandMap.ts`'s `invokeForApplication` only accepts state-wrapped commands, an explicit set of shared theme commands, and its switch cases. `Extensions.getSecret`, `Extensions.storeSecret`, and `Extensions.deleteSecret` are absent; they reach `Extension command does not support application context`. `Extensions.getAccessToken` exists only as an unwrapped global command, so it reaches the same rejection.
 
-These are specific preview blockers, not claims that the legacy host lacks secret storage or authentication. A secret sample must first have an ownership-aware implementation and an isolation/cleanup acceptance scenario. An authentication-provider lifecycle sample can still be added independently of `getAccessToken`.
+These are specific preview blockers, not claims that the legacy host lacks secret storage or authentication. A secret sample must first have an ownership-aware implementation and an isolation/cleanup acceptance scenario. The Authentication Provider sample demonstrates its local session lifecycle independently of `getAccessToken`.
 
 The same prerequisite's `ExtensionFileWatcher.ts:create` requires every root to start with `file://`, then explicitly throws `Disk watchers are unavailable for application filesystem providers` when an application is present. A disk-watcher extension cannot run in this static playground; a native sample needs a disk workspace and must await/dispose its watcher. This restriction does not exclude the separate `registerFileChangeHandler` API.
 
