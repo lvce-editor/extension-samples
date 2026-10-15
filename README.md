@@ -26,12 +26,16 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Quick Pick](./packages/sample-quick-pick)
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)
-
 - [Status Bar Item](./packages/sample-status-bar-item)
 - [Output Channel](./packages/sample-output-channel)
-- [Definition Provider](./packages/sample-definition-provider)
 - [Rename Provider](./packages/sample-rename-provider)
 - [Code Actions](./packages/sample-code-actions)
+- [Preferences](./packages/sample-preferences)
+- [Document Symbols](./packages/sample-document-symbol-provider)
+- [Authentication Provider](./packages/sample-authentication-provider)
+- [Editor Decorations](./packages/sample-editor-decorations)
+- [Signature Help](./packages/sample-signature-help)
+- [Language Editing](./packages/sample-language-editing)
 
 ## Development
 

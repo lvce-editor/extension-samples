@@ -1,0 +1,37 @@
+{
+  "id": "sample.preferences",
+  "name": "Preferences Sample",
+  "description": "Read and update an editor preference with cancellation and reset.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.setFontSize", "onCommand:sample.resetFontSize", "onCommand:sample.inspectConfiguration"],
+  "commands": [
+    {
+      "id": "sample.setFontSize",
+      "label": "Sample: Set Font Size"
+    },
+    {
+      "id": "sample.resetFontSize",
+      "label": "Sample: Reset Font Size"
+    },
+    {
+      "id": "sample.inspectConfiguration",
+      "label": "Sample: Inspect Configuration"
+    }
+  ],
+  "outputChannels": [
+    {
+      "id": "sample-preferences",
+      "label": "Sample Preferences"
+    }
+  ],
+  "configuration": {
+    "sample.fontSize": {
+      "type": "number",
+      "default": 18,
+      "description": "Example extension configuration definition, shown by Sample: Inspect Configuration."
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "sample.signature-help",
+  "name": "Signature Help Sample",
+  "description": "Show parameter help for a small mix function.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onSignatureHelp:plaintext", "onCommand:sample.showSignatureHelp"],
+  "commands": [
+    {
+      "id": "sample.showSignatureHelp",
+      "label": "Sample: Show Parameter Help"
+    }
+  ],
+  "signatureHelpProviders": [
+    {
+      "languageId": "plaintext"
+    }
+  ]
+}

@@ -6,7 +6,7 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["*", "onStatusBarItem", "onCommand:sample.selectEnvironment"],
+  "activation": ["*", "onStatusBarItem", "onCommand:sample.selectEnvironment", "onCommand:sample.initializeStatusBar"],
   "statusBarItems": [
     {
       "id": "sample-environment"
@@ -16,6 +16,10 @@
     {
       "id": "sample.selectEnvironment",
       "label": "Sample: Select Environment"
+    },
+    {
+      "id": "sample.initializeStatusBar",
+      "internal": true
     }
   ]
 }

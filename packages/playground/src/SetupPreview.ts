@@ -14,12 +14,14 @@ interface PreviewContext {
   readonly showStatusBar: () => Promise<unknown>
 }
 
-export const setupPreview = async (source: string | undefined, workspace: string, execute: Execute): Promise<void> => {
+export const setupPreview = async (source: string | undefined, workspace: string, execute: Execute, reload = false): Promise<void> => {
   if (source === undefined) return
   const url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }))
   try {
     const module = await import(url)
-    if (typeof module.setupPreview !== 'function') throw new Error('Export a setupPreview function from .lvce/setup-preview.js')
+    const setup = reload ? module.reloadPreview : module.setupPreview
+    if (reload && setup === undefined) return
+    if (typeof setup !== 'function') throw new Error('Export a setupPreview function from .lvce/setup-preview.js')
     const context: PreviewContext = {
       executeCommand: (command, ...args) => execute('ExtensionHost.executeCommand', command, ...args),
       openFile: (path) => execute('Main.openUri', `${workspace.replace(trailingSlash, '')}/${path.replace(leadingSlash, '')}`),
@@ -31,9 +33,10 @@ export const setupPreview = async (source: string | undefined, workspace: string
       showStatusBar: async () => {
         await execute('Preferences.update', { 'statusBar.itemsVisible': true })
         await execute('Layout.showStatusBar')
+        await execute('StatusBar.handleChange')
       },
     }
-    await module.setupPreview(context)
+    await setup(context)
   } catch (error) {
     throw new Error(`Preview setup failed: ${String(error)}`, { cause: error })
   } finally {

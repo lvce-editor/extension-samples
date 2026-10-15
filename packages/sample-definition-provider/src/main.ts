@@ -1,5 +1,6 @@
-import { activate, registerDefinitionProvider } from '@lvce-editor/api'
+import { activate, registerDefinitionProvider, registerReferenceProvider } from '@lvce-editor/api'
 import { provideDefinition } from './provide-definition.ts'
+import { provideReferences } from './provide-references.ts'
 
 const main = async (): Promise<void> => {
   await activate()
@@ -8,6 +9,7 @@ const main = async (): Promise<void> => {
     languageId: 'plaintext',
     provideDefinition,
   })
+  registerReferenceProvider({ id: 'sample-references', languageId: 'plaintext', provideReferences })
 }
 
 main().catch(console.error)

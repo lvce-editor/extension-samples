@@ -1,5 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
+const sizeSymbol = /^size$/
+
 const formatDocument = async (page: Page, editor: Locator): Promise<void> => {
   await editor.locator('.EditorRow').first().click({ button: 'right' })
   await page.getByRole('menuitem', { exact: true, name: 'Format Document' }).click()
@@ -66,4 +68,26 @@ test('formatting normalizes settings and can be undone', async ({ page }) => {
   await editor.locator('textarea').focus()
   await page.keyboard.press('Control+z')
   await expect(editor.locator('.EditorRow')).toHaveText(['  color=blue  ', 'size =large', ''])
+})
+
+test('document symbols follow the preview cursor and unsaved declarations', async ({ page }) => {
+  await page.goto('/extension-samples/document-symbol-provider/')
+  const editor = page.locator('#preview-ide .Editor')
+  const breadcrumb = page.locator('#preview-ide .EditorBreadcrumbSymbol')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await editor.locator('.EditorRow').first().click()
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('Control+Home')
+  await page.keyboard.press('ArrowRight')
+  await expect(breadcrumb).toHaveText('color')
+  await page.keyboard.press('Home')
+  await page.keyboard.insertText('new_')
+  await expect(breadcrumb).toHaveText('new_color')
+  await page.keyboard.press('ArrowDown')
+  await page.keyboard.press('Home')
+  await page.keyboard.press('ArrowRight')
+  await expect(breadcrumb).toHaveText('size')
+  await page.keyboard.press('End')
+  await expect(breadcrumb).toHaveCount(0)
+  await expect(page.locator('#source-ide .EditorBreadcrumbSymbol').filter({ hasText: sizeSymbol })).toHaveCount(0)
 })

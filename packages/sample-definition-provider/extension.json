@@ -6,5 +6,5 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onLanguage:plaintext", "onDefinition:plaintext"]
+  "activation": ["onLanguage:plaintext", "onDefinition:plaintext", "onReferences:plaintext"]
 }

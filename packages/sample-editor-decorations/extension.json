@@ -1,0 +1,10 @@
+{
+  "id": "sample.editor-decorations",
+  "name": "Editor Decorations Sample",
+  "description": "Show marker lines with gutter bars and end-of-line labels.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onEditorLineDecoration", "onEditorGutterDecoration"]
+}

@@ -231,7 +231,6 @@ export const samples: readonly Sample[] = [
     route: 'output-channel',
     title: 'Output Channel',
   },
-
   {
     description: 'Rename every matching identifier in a document.',
     id: 'rename-provider',
@@ -270,5 +269,65 @@ export const samples: readonly Sample[] = [
     },
     route: 'html-preview',
     title: 'Live HTML Preview',
+  },
+  {
+    description: 'Read and update an editor preference with cancellation and reset.',
+    id: 'preferences',
+    packageName: 'sample-preferences',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Preferences\n\nFocus the preview editor, press F1, and run **Sample: Set Font Size**. Escape cancels without changing `editor.fontSize`. Choose a size to update it, then run **Sample: Reset Font Size** to restore the value captured when the sample activated. The Output panel reports the value read through `getPreference`.\n',
+      },
+    },
+    route: 'preferences',
+    title: 'Preferences',
+  },
+  {
+    description: 'Expose setting declarations as document symbols in editor breadcrumbs.',
+    id: 'document-symbol-provider',
+    packageName: 'sample-document-symbol-provider',
+    preview: { entry: '/settings.txt', files: { '/settings.txt': 'color=blue\nsize=large\n' } },
+    route: 'document-symbol-provider',
+    title: 'Document Symbols',
+  },
+  {
+    description: 'Create, list, and remove local authentication-provider sessions.',
+    id: 'authentication-provider',
+    packageName: 'sample-authentication-provider',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Local Authentication\n\nRun Sample: Sign In Locally, Sample: List Local Sessions, or Sample: Sign Out Locally from F1. Escape cancels sign-in. Sessions are in-memory demonstration data.\n',
+      },
+    },
+    route: 'authentication-provider',
+    title: 'Authentication Provider',
+  },
+  {
+    description: 'Decorate marker lines with gutter bars and end-of-line labels.',
+    id: 'editor-decorations',
+    packageName: 'sample-editor-decorations',
+    preview: { entry: '/markers.txt', files: { '/markers.txt': '+ added item\n~ changed item\n- removed item\nordinary line\n' } },
+    route: 'editor-decorations',
+    title: 'Editor Decorations',
+  },
+  {
+    description: 'Show signature and active-parameter documentation for a mix function.',
+    id: 'signature-help',
+    packageName: 'sample-signature-help',
+    preview: { entry: '/colors.txt', files: { '/colors.txt': 'mix(blue, green)\n' } },
+    route: 'signature-help',
+    title: 'Signature Help',
+  },
+  {
+    description: 'Provide paired braces, closing tags, comments, selections, and log snippets.',
+    id: 'language-editing',
+    packageName: 'sample-language-editing',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'word\n<demo><\nlog\n' } },
+    route: 'language-editing',
+    title: 'Language Editing',
   },
 ]

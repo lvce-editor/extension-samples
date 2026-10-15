@@ -72,6 +72,24 @@
     },
     {
       "path": "./packages/sample-text-decoration"
+    },
+    {
+      "path": "./packages/sample-preferences"
+    },
+    {
+      "path": "./packages/sample-document-symbol-provider"
+    },
+    {
+      "path": "./packages/sample-authentication-provider"
+    },
+    {
+      "path": "./packages/sample-editor-decorations"
+    },
+    {
+      "path": "./packages/sample-signature-help"
+    },
+    {
+      "path": "./packages/sample-language-editing"
     }
   ]
 }

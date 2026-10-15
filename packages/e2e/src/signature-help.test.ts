@@ -1,0 +1,26 @@
+import { expect, test } from '@playwright/test'
+import { runSelectedCommand } from './RunSelectedCommand.ts'
+
+test('signature help changes its active parameter and disappears outside a call', async ({ page }) => {
+  await page.goto('/extension-samples/signature-help/')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  const editor = page.locator('#preview-ide .Editor')
+  await editor.locator('.EditorRow').first().click()
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('Control+Home')
+  for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowRight')
+  await runSelectedCommand(page, 'Sample: Show Parameter Help')
+  const hover = page.locator('#preview-ide .EditorHover')
+  await expect(hover).toContainText('mix(first, second)')
+  await expect(hover).toContainText('The first color to mix.')
+  await page.keyboard.press('Escape')
+  await editor.locator('textarea').focus()
+  for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowRight')
+  await runSelectedCommand(page, 'Sample: Show Parameter Help')
+  await expect(hover).toContainText('The second color to mix.')
+  await page.keyboard.press('Escape')
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('End')
+  await runSelectedCommand(page, 'Sample: Show Parameter Help')
+  await expect(hover).toBeHidden()
+})

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { runCommand } from './RunCommand.ts'
 
-const firstRowTranslatePattern = /^[-\d.]+px(?: 0px)?$/
+const horizontalCursorTranslation = /^[-\d.]+px(?: 0px)?$/
 
 test('status bar item updates after selection and preserves its value on cancellation', async ({ page }) => {
   await page.goto('/extension-samples/status-bar-item/')
@@ -16,6 +16,20 @@ test('status bar item updates after selection and preserves its value on cancell
   await page.keyboard.press('Escape')
   await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
   await expect(item).toHaveText('Environment: Staging')
+
+  const response = await page.request.get('/extension-samples/samples/status-bar-item/files.json')
+  const files = await response.json()
+  const source = page.locator('#source-ide .Editor textarea')
+  await source.focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace("let environment = 'Development'", "let environment = 'Production'"))
+  await page.keyboard.press('Control+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(item).toHaveText('Environment: Production')
+  await expect(item).toHaveCount(1)
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(item).toHaveText('Environment: Development', { timeout: 30_000 })
+  await expect(item).toHaveCount(1)
 })
 
 test('output channel appends successive builds and clears its logs', async ({ page }) => {
@@ -23,13 +37,17 @@ test('output channel appends successive builds and clears its logs', async ({ pa
   const output = page.locator('#preview-ide .OutputContent')
   await expect(output).toContainText('Ready.', { timeout: 30_000 })
   await runCommand(page, 'Sample: Run Build')
-  await expect(output).toContainText('Build 1: starting\nCompiling example.sample... done\nBuild succeeded.', { useInnerText: true })
+  await expect(output.locator(':scope > .Line')).toContainText(['Build 1: starting', 'Compiling example.sample... done', 'Build succeeded.'])
   await runCommand(page, 'Sample: Run Build')
   await expect(output).toContainText('Build 1: starting')
   await expect(output).toContainText('Build 2: starting')
   await runCommand(page, 'Sample: Clear Build Output')
   await expect(output).toHaveText('')
   await expect(page.locator('#source-ide .OutputContent')).toHaveCount(0)
+  await page.reload()
+  await runCommand(page, 'Sample: Run Build')
+  await expect(output).toContainText('Build 1: starting')
+  await expect(output).not.toContainText('Build 2: starting')
 })
 
 test('definition navigation moves to the declaration and reports missing symbols', async ({ page }) => {
@@ -38,7 +56,7 @@ test('definition navigation moves to the declaration and reports missing symbols
   const editor = page.locator('#preview-ide .Editor')
   await editor.locator('textarea').focus()
   await page.keyboard.press('F12')
-  await expect(editor.locator('.EditorCursor')).toHaveCSS('translate', firstRowTranslatePattern)
+  await expect(editor.locator('.EditorCursor')).toHaveCSS('translate', horizontalCursorTranslation)
   // Inserting at the resulting cursor proves that navigation reached the declaration.
   await page.keyboard.insertText('new_')
   await expect(editor.locator('.EditorRow').first()).toHaveText('let new_color = blue')
@@ -57,7 +75,7 @@ test('definition navigation moves to the declaration and reports missing symbols
   await expect(page.locator('#preview-ide .EditorMessage')).toContainText('No definition found')
 })
 
-test('find all references includes the definition in the preview application', async ({ page }) => {
+test('find all references includes the declaration and uses in the preview application', async ({ page }) => {
   await page.goto('/extension-samples/definition-provider/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
@@ -82,9 +100,9 @@ test('find all references includes the definition in the preview application', a
   )
   const locations = page.locator('#preview-ide .Locations')
   await expect(locations).toBeVisible()
-  await expect(locations.locator('.LocationsMessage')).toHaveText('1 result in 1 file')
+  await expect(locations.locator('.LocationsMessage')).toHaveText('2 results in 1 file')
   const items = locations.locator('.TreeItem')
-  await expect(items).toHaveCount(2)
+  await expect(items).toHaveCount(3)
   const declaration = items.nth(1)
   await expect(declaration).toHaveText('let color = blue')
   await declaration.click()
@@ -97,6 +115,9 @@ test('find all references includes the definition in the preview application', a
       { entry },
     )
   await expect.poll(getSelections).toEqual([0, 4, 0, 9])
+  await items.nth(2).click()
+  await expect.poll(getSelections).toEqual([2, 6, 2, 11])
+  await expect(page.locator('#source-ide .Locations')).toHaveCount(0)
 })
 
 test('rename changes complete identifiers, supports undo, and can be cancelled', async ({ page }) => {

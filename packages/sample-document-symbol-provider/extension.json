@@ -1,0 +1,16 @@
+{
+  "id": "sample.document-symbol-provider",
+  "name": "Document Symbol Provider Sample",
+  "description": "Show setting declarations in editor breadcrumbs.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onDocumentSymbol:plaintext", "onCommand:sample.initializeDocumentSymbols"],
+  "commands": [
+    {
+      "id": "sample.initializeDocumentSymbols",
+      "internal": true
+    }
+  ]
+}

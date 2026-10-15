@@ -1,0 +1,42 @@
+{
+  "id": "sample.language-editing",
+  "name": "Language Editing Sample",
+  "description": "Supply brace, closing-tag, comment, selection, and snippet providers.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": [
+    "onLanguage:plaintext",
+    "onBraceCompletion:plaintext",
+    "onClosingTag:plaintext",
+    "onTabCompletion:plaintext",
+    "onCommand:sample.completeBrace",
+    "onCommand:sample.closeTag",
+    "onCommand:sample.commentSelection",
+    "onCommand:sample.expandSelection",
+    "onCommand:sample.completeLog"
+  ],
+  "commands": [
+    {
+      "id": "sample.completeBrace",
+      "label": "Sample: Complete Brace"
+    },
+    {
+      "id": "sample.closeTag",
+      "label": "Sample: Complete Closing Tag"
+    },
+    {
+      "id": "sample.commentSelection",
+      "label": "Sample: Toggle Sample Comment"
+    },
+    {
+      "id": "sample.expandSelection",
+      "label": "Sample: Select Current Line"
+    },
+    {
+      "id": "sample.completeLog",
+      "label": "Sample: Expand Log Snippet"
+    }
+  ]
+}
