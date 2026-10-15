@@ -2,6 +2,9 @@ import { deleteGeneratedBundle, storeGeneratedBundle } from './GeneratedBundleSt
 import { setupPreview } from './SetupPreview.ts'
 import { setupPreviewDivider } from './SetupPreviewDivider.ts'
 
+const relativePathPrefix = /^\.\//
+const trailingSlash = /\/$/
+
 type Invoke = (command: string, ...args: readonly unknown[]) => Promise<any>
 type Files = Record<string, string>
 interface BuildOutput {
@@ -26,7 +29,7 @@ const fetchJson = async <T>(url: string): Promise<T> => {
 
 const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
   paths.map((path) => {
-    const content = files[`/${path.replace(/^\.\//, '')}`]
+    const content = files[`/${path.replace(relativePathPrefix, '')}`]
     if (typeof content !== 'string') throw new Error(`Missing icon: ${path}`)
     return content
   })
@@ -136,10 +139,30 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       workspacePath: workspaceUri,
       workspaceUri,
     })
-    for (const command of ['Layout.hideTitleBar', 'Layout.hideStatusBar', 'Layout.hideActivityBar', 'Layout.moveSideBarLeft', 'Layout.showSideBar']) {
+    const commands = ['Layout.hideTitleBar', 'Layout.hideStatusBar']
+    if (id !== previewId || sampleId !== 'source-control-provider') commands.push('Layout.hideActivityBar')
+    commands.push('Layout.moveSideBarLeft', 'Layout.showSideBar')
+    for (const command of commands) {
       await invoke('Application.execute', id, command)
     }
     await invoke('Application.execute', id, 'Layout.openSideBarViewlet', 'Explorer')
+    if (id === previewId && sampleId === 'source-control-provider') {
+      root.addEventListener(
+        'mousedown',
+        (event) => {
+          const { target } = event
+          if (!(target instanceof Element)) return
+          const item = target.closest<HTMLElement>('.ActivityBarItem')
+          const viewlet = item?.title
+          if (!item || (viewlet !== 'Explorer' && viewlet !== 'Source Control') || item.getAttribute('aria-selected') === 'true') return
+          event.preventDefault()
+          event.stopPropagation()
+          event.stopImmediatePropagation()
+          void invoke('Application.execute', id, 'Layout.openSideBarViewlet', viewlet)
+        },
+        { capture: true },
+      )
+    }
   }
 
   const observers: ResizeObserver[] = []
@@ -198,7 +221,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         'Application.execute',
         previewId,
         'Main.openUri',
-        `${previewWorkspace.replace(/\/$/, '')}${sample?.preview?.entry || '/README.md'}`,
+        `${previewWorkspace.replace(trailingSlash, '')}${sample?.preview?.entry || '/README.md'}`,
         false,
       )
     }

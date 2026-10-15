@@ -18,6 +18,8 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Diagnostic Provider](./packages/sample-diagnostic-provider)
 - [Completion Provider](./packages/sample-completion-provider)
 - [Hover Provider](./packages/sample-hover-provider)
+- [Definition Provider](./packages/sample-definition-provider)
+- [Type Definition Provider](./packages/sample-type-definition-provider)
 - [Quick Pick](./packages/sample-quick-pick)
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)

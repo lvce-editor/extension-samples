@@ -31,6 +31,7 @@ const elementTypes: Readonly<Record<string, number>> = {
 }
 
 const allowedAttributes = new Set(['alt', 'class', 'href', 'id', 'src', 'title'])
+const javascriptUrl = /^\s*javascript:/i
 interface ConvertedChildren {
   readonly childCount: number
   readonly nodes: VirtualDomNode[]
@@ -39,7 +40,7 @@ interface ConvertedChildren {
 const toAttributes = (attributes: ElementNode['attrs']): Record<string, unknown> => {
   const result: Record<string, unknown> = {}
   for (const attribute of attributes) {
-    const isSafeUrl = (attribute.name !== 'href' && attribute.name !== 'src') || !/^\s*javascript:/i.test(attribute.value)
+    const isSafeUrl = (attribute.name !== 'href' && attribute.name !== 'src') || !javascriptUrl.test(attribute.value)
     if (allowedAttributes.has(attribute.name) && isSafeUrl) {
       result[attribute.name === 'class' ? 'className' : attribute.name] = attribute.value
     }

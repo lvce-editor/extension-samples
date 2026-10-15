@@ -7,6 +7,7 @@ export default defineConfig([
     ignores: ['.tmp/**', 'dist/**', '**/playwright-report/**', '**/test-results/**'],
   },
   ...config.default,
+  ...config.recommendedRegex,
   ...config.recommendedTsconfig,
   {
     files: ['**/*.ts'],

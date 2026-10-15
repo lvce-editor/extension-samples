@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+const htmlPreviewUrl = /\/extension-samples\/html-preview\/$/
+
 test('removes the legacy applicationHost parameter after startup and preserves the rest of the URL', async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/?applicationHost=1&campaign=trello#readme')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
@@ -16,7 +18,7 @@ test('removes the legacy applicationHost parameter after startup and preserves t
   await expect(page.locator('#source-ide .Editor')).toHaveCount(1)
 
   await page.getByLabel('Extension sample', { exact: true }).selectOption('html-preview')
-  await expect(page).toHaveURL(/\/extension-samples\/html-preview\/$/)
+  await expect(page).toHaveURL(htmlPreviewUrl)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await page.getByRole('button', { name: 'Reset sample' }).click()
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
