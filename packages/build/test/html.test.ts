@@ -17,3 +17,27 @@ test('creates a root route with root-relative sample assets', () => {
   expect(html).toMatch(/rel="icon" href="\.\/runtime\/favicon\.ico" type="image\/x-icon"/)
   expect(html).toMatch(/src="\.\/assets\/site\.js"/)
 })
+
+test('passes exported worker configuration to the runtime before startup', () => {
+  const config = {
+    assetDir: '/extension-samples/runtime/abc1234',
+    platform: 'web',
+    rendererWorkerUrl: '/extension-samples/runtime/abc1234/packages/renderer-worker/dist/rendererWorkerMain.js',
+    workerUrls: { 'develop.editorWorkerPath': '/extension-samples/runtime/abc1234/packages/editor-worker/dist/editorWorkerMain.js' },
+  }
+  for (const nested of [false, true]) {
+    const html = createHtml(samples[0], nested, config.assetDir, config)
+    const match = html.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)
+    expect(match).not.toBeNull()
+    expect(JSON.parse(match![1])).toEqual(config)
+    expect(html.indexOf('id="Config"')).toBeLessThan(html.indexOf('type="module"'))
+  }
+})
+
+test('escapes HTML inside runtime configuration', () => {
+  const config = { assetDir: '</script><script>alert(1)</script>' }
+  const html = createHtml(samples[0], false, undefined, config)
+  const match = html.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)!
+  expect(match[1]).not.toContain('<')
+  expect(JSON.parse(match[1])).toEqual(config)
+})

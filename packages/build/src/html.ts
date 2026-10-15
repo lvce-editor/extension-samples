@@ -4,7 +4,12 @@ const escapeAttribute = (value: string): string => {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 }
 
-export const createHtml = (sample: Sample, nested: boolean, assetDir = '/extension-samples/runtime/test'): string => {
+export const createHtml = (
+  sample: Sample,
+  nested: boolean,
+  assetDir = '/extension-samples/runtime/test',
+  runtimeConfig?: Record<string, unknown>,
+): string => {
   const prefix = nested ? '..' : '.'
   return `<!doctype html>
 <html lang="en">
@@ -33,6 +38,7 @@ export const createHtml = (sample: Sample, nested: boolean, assetDir = '/extensi
         <section class="IdePane" aria-label="Preview IDE"><header>Preview <span id="preview-status" role="status">Loading…</span></header><div id="preview-ide" class="IdeRoot"></div></section>
       </div>
     </main>
+    ${runtimeConfig ? `<script id="Config" type="application/json">${JSON.stringify(runtimeConfig).replaceAll('<', '\\u003c')}</script>` : ''}
     <script type="module" src="${prefix}/assets/site.js"></script>
   </body>
 </html>
