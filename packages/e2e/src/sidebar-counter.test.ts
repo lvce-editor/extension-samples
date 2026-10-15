@@ -6,6 +6,7 @@ test('sidebar counter renders virtual DOM and responds to mouse and keyboard', a
   const counter = preview.locator('.SidebarCounter')
   const value = counter.getByRole('status')
   await expect(value).toHaveText('Count: 0', { timeout: 30_000 })
+  await expect(preview.locator('.ActivityBar')).toBeVisible()
   await expect(preview.locator('.SideBar')).toContainText('Counter')
   await expect(page.locator('#source-ide .SidebarCounter')).toHaveCount(0)
 
@@ -19,6 +20,11 @@ test('sidebar counter renders virtual DOM and responds to mouse and keyboard', a
   await expect(value).toHaveText('Count: 0')
   await counter.getByRole('button', { name: 'Decrement' }).press('Space')
   await expect(value).toHaveText('Count: -1')
+
+  await page.reload()
+  await expect(preview.locator('.ActivityBar')).toBeVisible()
+  await expect(preview.locator('.SideBar')).toContainText('Counter')
+  await expect(preview.locator('.SidebarCounter').getByRole('status')).toHaveText('Count: 0')
 })
 
 test('editing the counter updates the preview and reset restores the sample', async ({ page }) => {
@@ -26,6 +32,7 @@ test('editing the counter updates the preview and reset restores the sample', as
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const source = page.locator('#source-ide')
   const counter = page.locator('#preview-ide .SidebarCounter')
+  await expect(page.locator('#preview-ide .ActivityBar')).toBeVisible()
   await counter.getByRole('button', { name: 'Increment' }).click()
   await expect(counter.getByRole('status')).toHaveText('Count: 1')
 
@@ -37,12 +44,14 @@ test('editing the counter updates the preview and reset restores the sample', as
   await expect(source.locator('.Editor')).toContainText('count += 2')
   await page.keyboard.press('Control+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(page.locator('#preview-ide .ActivityBar')).toBeVisible()
   await expect(counter.getByRole('status')).toHaveText('Count: 0')
   await counter.getByRole('button', { name: 'Increment' }).click()
   await expect(counter.getByRole('status')).toHaveText('Count: 2')
 
   await page.getByRole('button', { name: 'Reset sample' }).click()
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+  await expect(page.locator('#preview-ide .ActivityBar')).toBeVisible()
   await expect(counter.getByRole('status')).toHaveText('Count: 0')
   await counter.getByRole('button', { name: 'Increment' }).click()
   await expect(counter.getByRole('status')).toHaveText('Count: 1')
