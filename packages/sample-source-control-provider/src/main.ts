@@ -6,7 +6,6 @@ const changedFiles = [
   { file: `${workspaceRoot}/README.md`, icon: 0, iconTitle: 'Modified', status: 1 },
   { file: `${workspaceRoot}/src/main.ts`, icon: 0, iconTitle: 'Modified', status: 2 },
 ]
-let previewRoot = ''
 
 const provider: SourceControlProvider = {
   acceptInput(value) {
@@ -17,7 +16,7 @@ const provider: SourceControlProvider = {
     return `Staged ${path}`
   },
   discard(path) {
-    const index = changedFiles.findIndex(({ file }) => `${previewRoot}${file.slice(workspaceRoot.length)}` === path)
+    const index = changedFiles.findIndex(({ file }) => path.endsWith(file.slice(workspaceRoot.length)))
     if (index !== -1) {
       changedFiles.splice(index, 1)
     }
@@ -44,7 +43,6 @@ const provider: SourceControlProvider = {
     return uris.map((uri) => ({ badge: 'M', uri }))
   },
   getGroups(cwd) {
-    previewRoot = cwd
     return [
       {
         id: 'changes',
@@ -63,8 +61,8 @@ const main = async (): Promise<void> => {
   await activateExtensionApi()
   registerSourceControlProvider(provider)
   registerCommand({
-    id: 'sampleSourceControl.discard',
     execute: provider.discard,
+    id: 'sampleSourceControl.discard',
   })
 }
 
