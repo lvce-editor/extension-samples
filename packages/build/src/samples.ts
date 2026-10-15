@@ -50,6 +50,22 @@ export const samples: readonly Sample[] = [
     title: 'Hover Provider',
   },
   {
+    description: 'Jump from a variable reference to its declaration.',
+    id: 'definition-provider',
+    packageName: 'sample-definition-provider',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'let color = blue\n\nprint(color)\nprint(missing)\n' } },
+    route: 'definition-provider',
+    title: 'Definition Provider',
+  },
+  {
+    description: 'Jump from a variable reference to its annotated type declaration.',
+    id: 'type-definition-provider',
+    packageName: 'sample-type-definition-provider',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'type Color = string\nlet color: Color = blue\n\nprint(color)\nprint(missing)\n' } },
+    route: 'type-definition-provider',
+    title: 'Type Definition Provider',
+  },
+  {
     description: 'Choose custom items with labels, descriptions, icons, and distinct values.',
     id: 'quick-pick',
     packageName: 'sample-quick-pick',
