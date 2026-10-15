@@ -53,6 +53,7 @@ test('quick input starts with a default and writes the entered greeting', async 
   await page.keyboard.press('Enter')
   await expect(page.locator('.QuickPick')).toBeHidden()
   await expect(page.locator('#preview-ide .Editor')).toContainText('Hello, Ada!')
+  await expect(page.locator('#preview-ide').getByRole('tab', { name: 'greeting.txt' })).toBeVisible()
 })
 
 for (const [description, value] of [
