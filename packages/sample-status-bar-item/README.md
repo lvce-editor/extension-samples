@@ -10,4 +10,4 @@ Edit the TypeScript source or `extension.json` and save with Ctrl+S to rebuild t
 
 ## API
 
-The isolated extension awaits `activate()` before registering its providers and commands. Its manifest declares the contributions and activation events.
+The isolated extension registers its commands immediately and awaits `activate()` before registering its provider. The preview waits for provider initialization before opening the status bar. Its manifest declares the contributions and activation events.
