@@ -13,3 +13,5 @@ Edit `src/main.ts` or `extension.json` in the source editor and save with Ctrl+S
 ## API
 
 The isolated extension awaits `activate()` before calling `registerCommand()`. The command calls the existing renderer command bridge's `Editor.type` command, so the insertion participates in the editor's undo history and follows the editor's normal selection behavior.
+
+Run **Sample: Collapse Selections** to read each selection with `getEditorSelections` and move its anchor to the selection end with `setEditorSelections`. The text is preserved. Running **Sample: Insert Text** afterwards inserts at that position instead of replacing the previous selection. Multiple cursors are preserved.

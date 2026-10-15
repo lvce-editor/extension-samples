@@ -72,6 +72,9 @@
     },
     {
       "path": "./packages/sample-preferences"
+    },
+    {
+      "path": "./packages/sample-document-symbol-provider"
     }
   ]
 }

@@ -72,3 +72,18 @@ test('text insertion survives a sample rebuild and inserts at an empty selection
   await runCommand(page, 'Sample: Insert Text')
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello again!')
 })
+
+test('selection API collapses a selection without replacing its text', async ({ page }) => {
+  await page.goto('/extension-samples/text-manipulation/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const preview = page.locator('#preview-ide .Editor')
+  await preview.locator('textarea').focus()
+  await selectFirstLine(page)
+  await runSelectedCommand(page, 'Sample: Collapse Selections')
+  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!')
+  await runSelectedCommand(page, 'Sample: Insert Text')
+  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!Hello, World!')
+  await preview.locator('textarea').focus()
+  await page.keyboard.press('Control+z')
+  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!')
+})

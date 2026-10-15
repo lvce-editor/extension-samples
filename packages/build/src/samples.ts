@@ -248,4 +248,12 @@ export const samples: readonly Sample[] = [
     route: 'preferences',
     title: 'Preferences',
   },
+  {
+    description: 'Expose setting declarations as document symbols in editor breadcrumbs.',
+    id: 'document-symbol-provider',
+    packageName: 'sample-document-symbol-provider',
+    preview: { entry: '/settings.txt', files: { '/settings.txt': 'color=blue\nsize=large\n' } },
+    route: 'document-symbol-provider',
+    title: 'Document Symbols',
+  },
 ]

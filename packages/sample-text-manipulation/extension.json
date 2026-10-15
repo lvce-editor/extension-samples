@@ -6,11 +6,15 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onCommand:sample.insertText"],
+  "activation": ["onCommand:sample.insertText", "onCommand:sample.collapseSelections"],
   "commands": [
     {
       "id": "sample.insertText",
       "label": "Sample: Insert Text"
+    },
+    {
+      "id": "sample.collapseSelections",
+      "label": "Sample: Collapse Selections"
     }
   ]
 }
