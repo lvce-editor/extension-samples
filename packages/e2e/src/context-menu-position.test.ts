@@ -60,7 +60,8 @@ test('anchors Explorer menus to the owning embedded IDE after resizing and page 
   await page.keyboard.press('Escape')
   await expect(menu).toHaveCount(0)
 
-  await target.click({ position: { x: 60, y: 11 } })
+  await tree.focus()
+  await expect(tree).toBeFocused()
   await page.keyboard.press('Shift+F10')
   await expect(menu).toBeVisible()
   const keyboardBox = (await menu.boundingBox())!
