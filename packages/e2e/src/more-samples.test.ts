@@ -75,6 +75,48 @@ test('definition navigation moves to the declaration and reports missing symbols
   await expect(page.locator('#preview-ide .EditorMessage')).toContainText('No definition found')
 })
 
+test('find all references includes the definition in the preview application', async ({ page }) => {
+  await page.goto('/extension-samples/definition-provider/')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  const editor = page.locator('#preview-ide .Editor')
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('Control+Home')
+  await page.keyboard.press('ArrowDown')
+  await page.keyboard.press('ArrowDown')
+  await page.keyboard.press('ArrowRight')
+  await page.keyboard.press('ArrowRight')
+  await page.keyboard.press('ArrowRight')
+  await page.keyboard.press('ArrowRight')
+  await page.keyboard.press('ArrowRight')
+  await page.keyboard.press('ArrowRight')
+  const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
+  const { entry } = await runtimeResponse.json()
+  await page.evaluate(
+    async ({ entry }) => {
+      const renderer = await import(entry)
+      return renderer.executeCommand('Application.execute', 'preview', 'SideBar.show', 'References', true)
+    },
+    { entry },
+  )
+  const locations = page.locator('#preview-ide .Locations')
+  await expect(locations).toBeVisible()
+  await expect(locations.locator('.LocationsMessage')).toHaveText('1 result in 1 file')
+  const items = locations.locator('.TreeItem')
+  await expect(items).toHaveCount(2)
+  const declaration = items.nth(1)
+  await expect(declaration).toHaveText('let color = blue')
+  await declaration.click()
+  const getSelections = async (): Promise<readonly number[]> =>
+    page.evaluate(
+      async ({ entry }) => {
+        const renderer = await import(entry)
+        return renderer.executeCommand('Application.execute', 'preview', 'GetActiveEditor.getSelections')
+      },
+      { entry },
+    )
+  await expect.poll(getSelections).toEqual([0, 4, 0, 9])
+})
+
 test('rename changes complete identifiers, supports undo, and can be cancelled', async ({ page }) => {
   await page.goto('/extension-samples/rename-provider/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
