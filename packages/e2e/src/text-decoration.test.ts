@@ -9,6 +9,7 @@ const command = async (page: Page, label: string): Promise<void> => {
   const option = page.locator('#preview-ide .QuickPick').getByRole('option', { exact: true, name: label })
   await expect(option).toBeVisible()
   await option.click()
+  await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
 }
 
 const focusPreview = async (page: Page): Promise<void> => {
