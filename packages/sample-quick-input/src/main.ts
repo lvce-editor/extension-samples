@@ -1,6 +1,4 @@
-import { activate, executeCommand, getWorkspaceUri, registerCommand, showQuickInput, writeFile } from '@lvce-editor/api'
-
-const trailingSlash = /\/$/
+import { activate, executeCommand, getWorkspaceUri, path, registerCommand, showQuickInput, writeFile } from '@lvce-editor/api'
 
 const main = async (): Promise<void> => {
   await activate()
@@ -11,7 +9,7 @@ const main = async (): Promise<void> => {
       // Cancellation and an empty name leave the workspace unchanged.
       if (name === undefined || !name.trim()) return
       const workspaceUri = await getWorkspaceUri()
-      const uri = `${workspaceUri.replace(trailingSlash, '')}/greeting.txt`
+      const uri = path.join(workspaceUri, 'greeting.txt')
       await writeFile(uri, `Hello, ${name.trim()}!\n`)
       await executeCommand('Main.openUri', uri)
     },
