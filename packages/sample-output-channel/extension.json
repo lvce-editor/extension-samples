@@ -6,7 +6,16 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["*", "onCommand:sample.runBuild", "onCommand:sample.clearBuildOutput", "onCommand:sample.cacheBuildArtifact"],
+  "activation": [
+    "*",
+    "onCommand:sample.runBuild",
+    "onCommand:sample.clearBuildOutput",
+    "onCommand:sample.cacheBuildArtifact",
+    "onCommand:sample.watchFileChanges",
+    "onCommand:sample.writeWatchedFile",
+    "onCommand:sample.stopWatchingFileChanges",
+    "onCommand:sample.reportBuildError"
+  ],
   "outputChannels": [
     {
       "id": "sample-build",
@@ -25,6 +34,22 @@
     {
       "id": "sample.cacheBuildArtifact",
       "label": "Sample: Cache Build Artifact"
+    },
+    {
+      "id": "sample.watchFileChanges",
+      "label": "Sample: Watch File Changes"
+    },
+    {
+      "id": "sample.writeWatchedFile",
+      "label": "Sample: Write Watched File"
+    },
+    {
+      "id": "sample.stopWatchingFileChanges",
+      "label": "Sample: Stop Watching File Changes"
+    },
+    {
+      "id": "sample.reportBuildError",
+      "label": "Sample: Report Build Error"
     }
   ]
 }

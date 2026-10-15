@@ -75,7 +75,7 @@ test('definition navigation moves to the declaration and reports missing symbols
   await expect(page.locator('#preview-ide .EditorMessage')).toContainText('No definition found')
 })
 
-test('find all references includes the definition in the preview application', async ({ page }) => {
+test('find all references includes the declaration and uses in the preview application', async ({ page }) => {
   await page.goto('/extension-samples/definition-provider/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
@@ -100,9 +100,9 @@ test('find all references includes the definition in the preview application', a
   )
   const locations = page.locator('#preview-ide .Locations')
   await expect(locations).toBeVisible()
-  await expect(locations.locator('.LocationsMessage')).toHaveText('1 result in 1 file')
+  await expect(locations.locator('.LocationsMessage')).toHaveText('2 results in 1 file')
   const items = locations.locator('.TreeItem')
-  await expect(items).toHaveCount(2)
+  await expect(items).toHaveCount(3)
   const declaration = items.nth(1)
   await expect(declaration).toHaveText('let color = blue')
   await declaration.click()
@@ -115,6 +115,9 @@ test('find all references includes the definition in the preview application', a
       { entry },
     )
   await expect.poll(getSelections).toEqual([0, 4, 0, 9])
+  await items.nth(2).click()
+  await expect.poll(getSelections).toEqual([2, 6, 2, 11])
+  await expect(page.locator('#source-ide .Locations')).toHaveCount(0)
 })
 
 test('rename changes complete identifiers, supports undo, and can be cancelled', async ({ page }) => {

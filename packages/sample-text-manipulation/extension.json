@@ -6,7 +6,14 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onCommand:sample.insertText", "onCommand:sample.collapseSelections"],
+  "activation": [
+    "onCommand:sample.insertText",
+    "onCommand:sample.collapseSelections",
+    "onCommand:sample.openExampleTabs",
+    "onCommand:sample.focusPreviousExampleTab",
+    "onCommand:sample.focusNextExampleTab",
+    "onCommand:sample.closeExampleTabs"
+  ],
   "commands": [
     {
       "id": "sample.insertText",
@@ -15,6 +22,22 @@
     {
       "id": "sample.collapseSelections",
       "label": "Sample: Collapse Selections"
+    },
+    {
+      "id": "sample.openExampleTabs",
+      "label": "Sample: Open Example Tabs"
+    },
+    {
+      "id": "sample.focusPreviousExampleTab",
+      "label": "Sample: Focus Previous Tab"
+    },
+    {
+      "id": "sample.focusNextExampleTab",
+      "label": "Sample: Focus Next Tab"
+    },
+    {
+      "id": "sample.closeExampleTabs",
+      "label": "Sample: Close Example Tabs"
     }
   ]
 }

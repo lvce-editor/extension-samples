@@ -15,3 +15,5 @@ Edit `src/main.ts` or `extension.json` in the source editor and save with Ctrl+S
 The isolated extension awaits `activate()` before calling `registerCommand()`. The command calls the existing renderer command bridge's `Editor.type` command, so the insertion participates in the editor's undo history and follows the editor's normal selection behavior.
 
 Run **Sample: Collapse Selections** to read each selection with `getEditorSelections` and move its anchor to the selection end with `setEditorSelections`. The text is preserved. Running **Sample: Insert Text** afterwards inserts at that position instead of replacing the previous selection. Multiple cursors are preserved.
+
+**Sample: Open Example Tabs** writes and opens two preview files using `getWorkspaceUri`, `writeFile`, and `openUri`. **Sample: Focus Previous Tab** and **Sample: Focus Next Tab** use the public tab-navigation helpers. **Sample: Close Example Tabs** calls `closeUri` for those two files and returns to the original example. Source IDE tabs are independent.

@@ -11,3 +11,5 @@ Edit the TypeScript source or `extension.json` and save with Ctrl+S to rebuild t
 ## API
 
 The sample reads the user's current `editor.fontSize` before making changes and provides a reset command. It changes no preference when the picker is cancelled. In the playground test, Chromium's isolated browser profile keeps sample settings separate from the user's editor profile.
+
+**Sample: Inspect Configuration** reads the extension's declared `sample.fontSize` metadata through `getConfigurationDefinitions` and counts the visible theme catalog with `getColorThemeNames`. It prints the declaration and theme count without changing the selected theme.

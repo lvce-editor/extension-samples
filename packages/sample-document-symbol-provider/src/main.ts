@@ -1,10 +1,16 @@
-import { activate, registerDocumentSymbolProvider, setPreference } from '@lvce-editor/api'
+import { activate, registerCommand, registerDocumentSymbolProvider, setPreference } from '@lvce-editor/api'
 import { provideDocumentSymbols } from './provide-document-symbols.ts'
 
-const main = async (): Promise<void> => {
-  await activate()
+const ready = activate().then(async () => {
   registerDocumentSymbolProvider({ id: 'sample-document-symbols', languageId: 'plaintext', provideDocumentSymbols })
   await setPreference('breadcrumbs.enabled', true)
-}
+})
 
-main().catch(console.error)
+registerCommand({
+  async execute() {
+    await ready
+  },
+  id: 'sample.initializeDocumentSymbols',
+})
+
+ready.catch(console.error)

@@ -47,3 +47,28 @@ test('output channel reloads edited source and reset restores the original build
   await expect(output).toContainText('Build succeeded.')
   await expect(output).not.toContainText('Edited build succeeded.')
 })
+
+test('file change handlers observe their workspace and stop after disposal', async ({ page }) => {
+  await page.goto('/extension-samples/output-channel/')
+  const output = page.locator('#preview-ide .OutputContent')
+  await expect(output).toContainText('Ready.', { timeout: 30_000 })
+  await runCommand(page, 'Sample: Watch File Changes')
+  await expect(output).toContainText('Watching watched.txt')
+  await runCommand(page, 'Sample: Write Watched File')
+  await expect(output).toContainText('Wrote watched.txt: 1')
+  await expect(output.locator('.Line').filter({ hasText: 'Changed watched.txt' })).toHaveCount(1)
+  await runCommand(page, 'Sample: Stop Watching File Changes')
+  await expect(output).toContainText('Stopped watching watched.txt')
+  await runCommand(page, 'Sample: Write Watched File')
+  await expect(output).toContainText('Wrote watched.txt: 2')
+  await expect(output.locator('.Line').filter({ hasText: 'Changed watched.txt' })).toHaveCount(1)
+  await expect(output.locator('.OutputRepeatCount')).toHaveCount(0)
+  await expect(page.locator('#source-ide .OutputContent')).toHaveCount(0)
+})
+
+test('pretty errors retain their message in preview output', async ({ page }) => {
+  await page.goto('/extension-samples/output-channel/')
+  await runCommand(page, 'Sample: Report Build Error')
+  await expect(page.locator('#preview-ide .OutputContent')).toContainText('Build error: Example build failure')
+  await expect(page.locator('#source-ide .OutputContent')).toHaveCount(0)
+})

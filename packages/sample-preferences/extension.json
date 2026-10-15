@@ -6,7 +6,7 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onCommand:sample.setFontSize", "onCommand:sample.resetFontSize"],
+  "activation": ["onCommand:sample.setFontSize", "onCommand:sample.resetFontSize", "onCommand:sample.inspectConfiguration"],
   "commands": [
     {
       "id": "sample.setFontSize",
@@ -15,6 +15,10 @@
     {
       "id": "sample.resetFontSize",
       "label": "Sample: Reset Font Size"
+    },
+    {
+      "id": "sample.inspectConfiguration",
+      "label": "Sample: Inspect Configuration"
     }
   ],
   "outputChannels": [
@@ -22,5 +26,12 @@
       "id": "sample-preferences",
       "label": "Sample Preferences"
     }
-  ]
+  ],
+  "configuration": {
+    "sample.fontSize": {
+      "type": "number",
+      "default": 18,
+      "description": "Example extension configuration definition, shown by Sample: Inspect Configuration."
+    }
+  }
 }
