@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-for (const sample of ['source-control-provider', 'file-system-provider']) {
+for (const sample of ['source-control-provider', 'sidebar-counter', 'file-system-provider']) {
   test(`resizes the ${sample} preview without closing either sidebar`, async ({ page }) => {
     await page.goto(`/extension-samples/${sample}/`)
     await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
