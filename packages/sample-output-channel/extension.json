@@ -5,8 +5,14 @@
   "version": "0.0.0",
   "browser": "dist/main.js",
   "isolated": true,
-  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["*"],
+  "contentSecurityPolicy": [
+    "default-src 'none'",
+    "script-src 'self'"
+  ],
+  "activation": [
+    "onCommand:sample.runBuild",
+    "onCommand:sample.clearBuildOutput"
+  ],
   "outputChannels": [
     {
       "id": "sample-build",
