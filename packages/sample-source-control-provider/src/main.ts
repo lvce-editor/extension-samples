@@ -7,6 +7,14 @@ const changedFiles = [
   { file: `${workspaceRoot}/src/main.ts`, icon: 0, iconTitle: 'Modified', status: 2 },
 ]
 
+const discardFile = (path: string): string => {
+  const index = changedFiles.findIndex(({ file }) => path.endsWith(file.slice(workspaceRoot.length)))
+  if (index !== -1) {
+    changedFiles.splice(index, 1)
+  }
+  return `Discarded ${path}`
+}
+
 const provider: SourceControlProvider = {
   acceptInput(value) {
     changedFiles.length = 0
@@ -15,13 +23,7 @@ const provider: SourceControlProvider = {
   add(path) {
     return `Staged ${path}`
   },
-  discard(path) {
-    const index = changedFiles.findIndex(({ file }) => path.endsWith(file.slice(workspaceRoot.length)))
-    if (index !== -1) {
-      changedFiles.splice(index, 1)
-    }
-    return `Discarded ${path}`
-  },
+  discard: discardFile,
   generateCommitMessage() {
     return 'feat: update extension sample'
   },
@@ -61,7 +63,7 @@ const main = async (): Promise<void> => {
   await activateExtensionApi()
   registerSourceControlProvider(provider)
   registerCommand({
-    execute: provider.discard,
+    execute: discardFile,
     id: 'sampleSourceControl.discard',
   })
 }
