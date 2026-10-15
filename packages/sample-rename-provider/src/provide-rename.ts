@@ -1,3 +1,6 @@
+const identifierPattern = /\b[a-zA-Z_]\w*\b/g
+const validNamePattern = /^[a-zA-Z_]\w*$/
+
 interface TextDocument {
   readonly text: string
   readonly uri: string
@@ -15,16 +18,16 @@ export const prepareRename = (
   document: TextDocument,
   offset: number,
 ): { readonly placeholder: string; readonly startOffset: number; readonly endOffset: number } | undefined => {
-  const word = document.text.matchAll(/\b[a-zA-Z_]\w*\b/g).find((match) => offset >= match.index && offset < match.index + match[0].length)
+  const word = document.text.matchAll(identifierPattern).find((match) => offset >= match.index && offset < match.index + match[0].length)
   if (!word || word[0] === 'let' || word[0] === 'print') return undefined
-  return { placeholder: word[0], startOffset: word.index, endOffset: word.index + word[0].length }
+  return { endOffset: word.index + word[0].length, placeholder: word[0], startOffset: word.index }
 }
 
 // The sample language has no scopes, strings, or comments: identifiers match across the document.
 export const provideRename = (document: TextDocument, offset: number, newName: string): RenameResult => {
-  const words = document.text.matchAll(/\b[a-zA-Z_]\w*\b/g).toArray()
+  const words = document.text.matchAll(identifierPattern).toArray()
   const word = words.find((match) => offset >= match.index && offset < match.index + match[0].length)?.[0]
-  if (!word || word === 'let' || word === 'print' || !/^[a-zA-Z_]\w*$/.test(newName) || newName === 'let' || newName === 'print') {
+  if (!word || word === 'let' || word === 'print' || !validNamePattern.test(newName) || newName === 'let' || newName === 'print') {
     return { canRename: false, edits: [] }
   }
   return {
