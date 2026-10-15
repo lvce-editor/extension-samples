@@ -50,6 +50,22 @@ export const samples: readonly Sample[] = [
     title: 'Hover Provider',
   },
   {
+    description: 'Jump from a variable reference to its declaration.',
+    id: 'definition-provider',
+    packageName: 'sample-definition-provider',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'let color = blue\n\nprint(color)\nprint(missing)\n' } },
+    route: 'definition-provider',
+    title: 'Definition Provider',
+  },
+  {
+    description: 'Jump from a variable reference to its annotated type declaration.',
+    id: 'type-definition-provider',
+    packageName: 'sample-type-definition-provider',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'type Color = string\nlet color: Color = blue\n\nprint(color)\nprint(missing)\n' } },
+    route: 'type-definition-provider',
+    title: 'Type Definition Provider',
+  },
+  {
     description: 'Choose custom items with labels, descriptions, icons, and distinct values.',
     id: 'quick-pick',
     packageName: 'sample-quick-pick',
@@ -98,6 +114,30 @@ export const samples: readonly Sample[] = [
     },
     route: 'hello-world',
     title: 'Hello World',
+  },
+  {
+    description: 'Insert text at the cursor or replace the current selection.',
+    id: 'text-manipulation',
+    packageName: 'sample-text-manipulation',
+    preview: {
+      entry: '/example.txt',
+      files: { '/example.txt': 'Hello, Lvce!\nKeep this line unchanged.\n' },
+    },
+    route: 'text-manipulation',
+    title: 'Text Manipulation',
+  },
+  {
+    description: 'Count words in the active preview document.',
+    id: 'word-count',
+    packageName: 'sample-word-count',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md': '# Word Count\n\nCount words in the active document. Edit this text and run **Sample: Count Words** again.\n',
+      },
+    },
+    route: 'word-count',
+    title: 'Word Count',
   },
   {
     description: 'Show a warning dialog with a title, message, and dismiss button.',
@@ -155,19 +195,7 @@ export const samples: readonly Sample[] = [
     route: 'output-channel',
     title: 'Output Channel',
   },
-  {
-    description: 'Jump from a variable reference to its declaration.',
-    id: 'definition-provider',
-    packageName: 'sample-definition-provider',
-    preview: {
-      entry: '/example.txt',
-      files: {
-        '/example.txt': 'let color = blue\n\nprint(color)\nprint(missing)\n',
-      },
-    },
-    route: 'definition-provider',
-    title: 'Definition Provider',
-  },
+
   {
     description: 'Rename every matching identifier in a document.',
     id: 'rename-provider',
@@ -193,5 +221,18 @@ export const samples: readonly Sample[] = [
     },
     route: 'code-actions',
     title: 'Code Actions',
+  },
+  {
+    description: 'Parse unsaved HTML into a live virtual DOM preview and report malformed markup.',
+    id: 'html-preview',
+    packageName: 'sample-html-preview',
+    preview: {
+      entry: '/index.html',
+      files: {
+        '/index.html': '<main class="page"><h1>Hello, HTML</h1><p>Edit this document to update the preview.</p></main>\n',
+      },
+    },
+    route: 'html-preview',
+    title: 'Live HTML Preview',
   },
 ]

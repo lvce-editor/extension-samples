@@ -1,5 +1,8 @@
 type Execute = (command: string, ...args: readonly unknown[]) => Promise<unknown>
 
+const trailingSlash = /\/$/
+const leadingSlash = /^\//
+
 interface PreviewContext {
   readonly openFile: (path: string) => Promise<unknown>
   readonly openPanel: (name: string) => Promise<unknown>
@@ -17,7 +20,7 @@ export const setupPreview = async (source: string | undefined, workspace: string
     const module = await import(url)
     if (typeof module.setupPreview !== 'function') throw new Error('Export a setupPreview function from .lvce/setup-preview.js')
     const context: PreviewContext = {
-      openFile: (path) => execute('Main.openUri', `${workspace.replace(/\/$/, '')}/${path.replace(/^\//, '')}`),
+      openFile: (path) => execute('Main.openUri', `${workspace.replace(trailingSlash, '')}/${path.replace(leadingSlash, '')}`),
       openPanel: (name) => execute('Layout.showPanel', name),
       openSideBar: (name) => execute('Layout.openSideBarViewlet', name),
       setCursor: (line, column) => execute('Editor.cursorSet', line, column),

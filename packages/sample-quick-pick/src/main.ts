@@ -1,5 +1,7 @@
 import { activate, executeCommand, getWorkspaceUri, registerCommand, showQuickPick, writeFile } from '@lvce-editor/api'
 
+const trailingSlash = /\/$/
+
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
@@ -16,7 +18,7 @@ const main = async (): Promise<void> => {
       // Escape returns undefined: do not write a file when the picker is cancelled.
       if (typeof value !== 'string') return
       const workspaceUri = await getWorkspaceUri()
-      const uri = `${workspaceUri.replace(/\/$/, '')}/environment.txt`
+      const uri = `${workspaceUri.replace(trailingSlash, '')}/environment.txt`
       await writeFile(uri, `Selected environment: ${value}\n`)
       await executeCommand('Main.openUri', uri)
     },
@@ -24,4 +26,4 @@ const main = async (): Promise<void> => {
   })
 }
 
-main().catch(console.error)
+main()

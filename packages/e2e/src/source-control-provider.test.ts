@@ -12,7 +12,38 @@ test('opens the real LVCE source-control view beside the sample source', async (
   await expect(workbench.locator('.SourceControlBadge')).toHaveText('2')
   await expect(workbench.locator('.DecorationIcon')).toHaveCount(2)
   await expect(workbench.locator('.DecorationIcon').first()).toHaveJSProperty('naturalWidth', 16)
-  await expect(workbench.locator('.TitleBar:visible, .ActivityBar:visible, .StatusBar:visible')).toHaveCount(0)
+  await expect(workbench.locator('.ActivityBar')).toBeVisible()
+  await expect(workbench.locator('.TitleBar:visible, .StatusBar:visible')).toHaveCount(0)
+  await expect(page.locator('#source-ide .ActivityBar:visible')).toHaveCount(0)
+  const explorerTab = workbench.getByRole('tab', { name: 'Explorer' })
+  const sourceControlTab = workbench.getByRole('tab', { name: 'Source Control' })
+  await explorerTab.click()
+  await expect(explorerTab).toHaveAttribute('aria-selected', 'true')
+  await expect(workbench.getByRole('tree', { name: 'Files Explorer' })).toBeVisible()
+  await expect(workbench.locator('.SourceControl')).toBeHidden()
+  await sourceControlTab.click()
+  await expect(sourceControlTab).toHaveAttribute('aria-selected', 'true')
+  await expect(workbench.locator('.SourceControl')).toBeVisible()
+  await expect(workbench.getByRole('tree', { name: 'Files Explorer' })).toBeHidden()
+})
+
+test('keeps the source-control preview activity bar visible after resize, reload, and reset', async ({ page }) => {
+  await page.goto('/extension-samples/source-control-provider/')
+  const preview = page.locator('#preview-ide')
+  await expect(preview.locator('.ActivityBar')).toBeVisible()
+
+  const divider = page.getByRole('separator', { name: 'Resize source and preview' })
+  await divider.focus()
+  await page.keyboard.press('ArrowLeft')
+  await expect(preview.locator('.ActivityBar')).toBeVisible()
+
+  await page.reload()
+  await expect(preview.locator('.SourceControl')).toBeVisible()
+  await expect(preview.locator('.ActivityBar')).toBeVisible()
+
+  await page.locator('#reset-button').click()
+  await expect(preview.locator('.SourceControl')).toBeVisible()
+  await expect(preview.locator('.ActivityBar')).toBeVisible()
 })
 
 test('opens the manifest from Explorer and recovers from a missing decoration icon', async ({ page }) => {
@@ -39,6 +70,7 @@ test('opens the manifest from Explorer and recovers from a missing decoration ic
   await page.keyboard.press('Control+s')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(preview.locator('.ActivityBar')).toBeVisible()
   await expect(source.getByRole('tab', { exact: true, name: 'extension.json Close' })).toBeVisible()
 })
 

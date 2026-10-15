@@ -55,6 +55,31 @@ test('quick input starts with a default and writes the entered greeting', async 
   await expect(page.locator('#preview-ide .Editor')).toContainText('Hello, Ada!')
 })
 
+for (const [description, value] of [
+  ['empty', ''],
+  ['whitespace-only', ' '.repeat(3)],
+]) {
+  test(`submitting ${description} quick input leaves the workspace unchanged`, async ({ page }) => {
+    await page.goto('/extension-samples/quick-input/')
+    await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+    const editor = page.locator('#preview-ide .Editor')
+    const originalDocumentRows = await editor.locator('.EditorRow').allTextContents()
+
+    await runCommand(page, 'Sample: Create Greeting')
+    await page.getByPlaceholder('Who should we greet?').fill(value)
+    await page.keyboard.press('Enter')
+
+    await expect(page.locator('.QuickPick')).toBeHidden()
+    await expect(page.locator('#preview-ide').getByRole('tab', { name: 'README.md' })).toBeVisible()
+    await expect(page.locator('#preview-ide').getByRole('tab', { name: 'greeting.txt' })).toHaveCount(0)
+    await expect(editor.locator('.EditorRow')).toHaveText(originalDocumentRows)
+
+    await runCommand(page, 'Sample: Create Greeting')
+    await expect(page.getByPlaceholder('Who should we greet?')).toBeVisible()
+    await page.keyboard.press('Escape')
+  })
+}
+
 test('cancelling quick input does not create a greeting', async ({ page }) => {
   await page.goto('/extension-samples/quick-input/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })

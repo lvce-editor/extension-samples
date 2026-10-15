@@ -1,11 +1,12 @@
-import { deepStrictEqual, equal } from 'node:assert/strict'
-import { test } from 'node:test'
+import { expect, test } from '@jest/globals'
 import { provideDefinition } from '../src/provide-definition.ts'
 
-await test('definition computes the declaration offset after the document changes', () => {
+test('definition computes the declaration offset after the document changes', () => {
   const document = { text: '\nlet colorful = red\nlet color = blue\nprint(color)', uri: 'memfs:///example.sample' }
   const startOffset = document.text.indexOf('color =')
-  deepStrictEqual(provideDefinition(document, document.text.lastIndexOf('color') + 2), { endOffset: startOffset + 5, startOffset, uri: document.uri })
-  equal(provideDefinition(document, document.text.indexOf('print')), undefined)
-  equal(provideDefinition(document, 0), undefined)
+  expect(provideDefinition(document, document.text.lastIndexOf('color') + 2)).toEqual({ endOffset: startOffset + 5, startOffset, uri: document.uri })
+  expect(provideDefinition(document, document.text.indexOf('print'))).toBeUndefined()
+  expect(provideDefinition(document, 0)).toBeUndefined()
+  expect(provideDefinition(document, document.text.indexOf('blue'))).toBeUndefined()
+  expect(provideDefinition(document, document.text.length)).toBeUndefined()
 })

@@ -1,0 +1,10 @@
+{
+  "id": "sample.type-definition-provider",
+  "name": "Type Definition Provider Sample",
+  "description": "Jump from a variable reference to its annotated type declaration.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onTypeDefinition:plaintext"]
+}

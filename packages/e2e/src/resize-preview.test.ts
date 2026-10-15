@@ -43,7 +43,9 @@ for (const sample of ['source-control-provider', 'file-system-provider']) {
     for (const root of [source, preview]) {
       const sidebar = (await root.locator('.SideBar').boundingBox())!
       const sash = (await root.locator('.SashSideBar').boundingBox())!
-      expect(Math.abs(sash.x - sidebar.x - sidebar.width)).toBeLessThan(3)
+      const activityBar = root.locator('.ActivityBar:visible')
+      const activityBarWidth = (await activityBar.count()) ? (await activityBar.boundingBox())!.width : 0
+      expect(Math.abs(sash.x - sidebar.x - sidebar.width + activityBarWidth)).toBeLessThan(3)
     }
   })
 }

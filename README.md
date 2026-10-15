@@ -10,12 +10,16 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 
 - [Sidebar counter](./packages/sample-sidebar-counter)
 - [Hello World](./packages/sample-hello-world)
+- [Text Manipulation](./packages/sample-text-manipulation)
+- [Word Count](./packages/sample-word-count)
 - [Dialog](./packages/sample-dialog)
 - [File system provider](./packages/sample-file-system-provider)
 - [Source control provider](./packages/sample-source-control-provider)
 - [Diagnostic Provider](./packages/sample-diagnostic-provider)
 - [Completion Provider](./packages/sample-completion-provider)
 - [Hover Provider](./packages/sample-hover-provider)
+- [Definition Provider](./packages/sample-definition-provider)
+- [Type Definition Provider](./packages/sample-type-definition-provider)
 - [Quick Pick](./packages/sample-quick-pick)
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)
@@ -52,6 +56,8 @@ Both IDEs share one renderer and the UI workers; neither IDE is an iframe. Each 
 The source Explorer includes the complete sample, including `extension.json`, imported TypeScript files, and SVG decoration icons. TypeScript syntax highlighting and the released `builtin.eslint` web extension use normal LVCE editor paths. The build includes browser-compatible ESLint tooling in the source workspace; ESLint supplies diagnostics, while TypeScript retains its other language features. No package installation server is needed in the browser.
 
 The build generates SHA-256 hashes of each sample’s shipped files and configures `eslint.ignoreHashes` before opening the source editor. Browsing unchanged samples does not start ESLint’s evaluation worker. Editing source, including restoring an edited draft, resumes normal linting; undoing back to the shipped content clears diagnostics. Hashes are regenerated from the shipped files on every build, never from saved drafts.
+
+The source Explorer also exposes read-only `dist/main.js` through a filesystem provider. It delegates editable files to the application’s memory filesystem and fetches generated JavaScript only when read. Successful builds refresh the package bundle (with `@lvce-editor/api` kept external), including open generated editors; failed builds keep the last successful output. Generated content is excluded from source snapshots and browser storage. Reset restores the shipped bundle without starting the compiler.
 
 The compiler resolves relative workspace imports and `@lvce-editor/api`. Saving code, manifests, or SVG icons rebuilds the preview. Compile and missing-icon errors leave the last working preview visible. The file-system preview reads its workspace from the sample's registered provider; the source-control preview shows its real source-control view and decoration icons.
 

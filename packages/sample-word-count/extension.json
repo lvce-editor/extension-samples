@@ -1,0 +1,16 @@
+{
+  "id": "sample.word-count",
+  "name": "Word Count Sample",
+  "description": "Count words in the active preview document.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.countWords"],
+  "commands": [
+    {
+      "id": "sample.countWords",
+      "label": "Sample: Count Words"
+    }
+  ]
+}
