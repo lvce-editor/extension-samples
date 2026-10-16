@@ -25,12 +25,40 @@ const selectColumns = async (page: Page, start: number, end: number): Promise<vo
   for (let index = start; index < end; index++) await page.keyboard.press('Shift+ArrowRight')
 }
 
+test('shows live TODO, keyword, and repeated-word decorations in the preview', async ({ page }) => {
+  await page.goto('/extension-samples/text-decoration/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const preview = page.locator('#preview-ide .Editor')
+  const decorations = preview.locator('.EditorTextDecoration')
+
+  await command(page, 'Sample: Highlight TODO Markers')
+  await expect(decorations).toHaveCount(1)
+  await expect(decorations.first()).toHaveCSS('background-color', 'rgb(224, 90, 51)')
+  await expect(page.locator('#source-ide .EditorTextDecoration')).toHaveCount(0)
+
+  await command(page, 'Sample: Color Code Keywords')
+  await expect(decorations).toHaveCount(2)
+  const declaration = decorations.nth(0)
+  const flowKeyword = decorations.nth(1)
+  await expect(declaration).toHaveCSS('background-color', 'rgb(139, 92, 246)')
+  await expect(flowKeyword).toHaveCSS('background-color', 'rgb(22, 139, 120)')
+
+  await command(page, 'Sample: Find Repeated Words')
+  await expect(decorations).toHaveCount(1)
+  await expect(decorations.first()).toHaveCSS('background-color', 'rgb(212, 155, 22)')
+  const textarea = preview.locator('textarea')
+  await textarea.focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText('Return the finished preview.\n')
+  await expect(decorations).toHaveCount(0)
+})
+
 test('underlines empty, repeated, overlapping and multiline selections without editing text', async ({ page }) => {
   await page.goto('/extension-samples/text-decoration/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const preview = page.locator('#preview-ide .Editor')
   const underlines = preview.locator('.EditorTextDecoration')
-  const original = ['Select text and add an underline.', 'Across multiple lines, too.', '']
+  const original = ['TODO: choose a bright color', 'const plan = "small samples"', 'return the the finished preview.', '']
   await expect(preview.locator('.EditorRow')).toHaveText(original)
   await focusPreview(page)
   await command(page, 'Sample: Underline Selection')
@@ -109,6 +137,7 @@ test('keeps underlines after appending and follows text when lines are inserted 
   const editor = page.locator('#preview-ide .Editor')
   const textarea = editor.locator('textarea')
   const underlines = editor.locator('.EditorTextDecoration')
+  const initialRowCount = await editor.locator('.EditorRow').count()
   await selectColumns(page, 0, 6)
   await command(page, 'Sample: Underline Selection')
   await expect(underlines).toHaveCount(1)
@@ -122,12 +151,12 @@ test('keeps underlines after appending and follows text when lines are inserted 
   await textarea.focus()
   await page.keyboard.press('Control+End')
   await page.keyboard.press('Enter')
-  await expect(editor.locator('.EditorRow')).toHaveCount(4)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 1)
   await expect(underlines).toHaveCount(1)
 
   await page.keyboard.press('Control+Home')
   await page.keyboard.press('Enter')
-  await expect(editor.locator('.EditorRow')).toHaveCount(5)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 2)
   await expect(underlines).toHaveCount(1)
   const expectUnderlineOnRow = async (rowIndex: number): Promise<void> => {
     await expect
@@ -145,15 +174,15 @@ test('keeps underlines after appending and follows text when lines are inserted 
 
   await page.keyboard.press('Control+Home')
   await page.keyboard.press('Delete')
-  await expect(editor.locator('.EditorRow')).toHaveCount(4)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 1)
   await expect(underlines).toHaveCount(1)
   await expectUnderlineOnRow(0)
   await page.keyboard.press('Control+z')
-  await expect(editor.locator('.EditorRow')).toHaveCount(5)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 2)
   await expect(underlines).toHaveCount(1)
   await expectUnderlineOnRow(1)
   await page.keyboard.press('Control+Shift+z')
-  await expect(editor.locator('.EditorRow')).toHaveCount(4)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 1)
   await expect(underlines).toHaveCount(1)
   await expectUnderlineOnRow(0)
 })

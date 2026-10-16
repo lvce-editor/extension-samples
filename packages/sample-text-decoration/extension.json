@@ -1,7 +1,7 @@
 {
   "id": "sample.text-decoration",
   "name": "Text Decoration Sample",
-  "description": "Underline selected text without editing the document.",
+  "description": "Underline selections, highlight TODO markers, color-code keywords, and find repeated words.",
   "version": "0.0.0",
   "browser": "dist/main.js",
   "isolated": true,
@@ -10,7 +10,10 @@
     "onEditorTextDecoration",
     "onCommand:sample.underlineSelection",
     "onCommand:sample.clearUnderlines",
-    "onCommand:sample.disposeUnderlines"
+    "onCommand:sample.disposeUnderlines",
+    "onCommand:sample.highlightTodos",
+    "onCommand:sample.colorKeywords",
+    "onCommand:sample.findRepeatedWords"
   ],
   "commands": [
     {
@@ -24,6 +27,18 @@
     {
       "id": "sample.disposeUnderlines",
       "label": "Sample: Dispose Underlines"
+    },
+    {
+      "id": "sample.highlightTodos",
+      "label": "Sample: Highlight TODO Markers"
+    },
+    {
+      "id": "sample.colorKeywords",
+      "label": "Sample: Color Code Keywords"
+    },
+    {
+      "id": "sample.findRepeatedWords",
+      "label": "Sample: Find Repeated Words"
     }
   ]
 }
