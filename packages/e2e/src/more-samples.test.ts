@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 
 const horizontalCursorTranslation = /^[-\d.]+px(?: 0px)?$/
@@ -19,8 +20,7 @@ test('status bar item updates after selection and preserves its value on cancell
 
   const response = await page.request.get('/extension-samples/samples/status-bar-item/files.json')
   const files = await response.json()
-  const source = page.locator('#source-ide .Editor textarea')
-  await source.focus()
+  await focusEditor(page, 'source')
   await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText(files['/src/main.ts'].replace("let environment = 'Development'", "let environment = 'Production'"))
   await page.keyboard.press('ControlOrMeta+s')
@@ -54,7 +54,7 @@ test('definition navigation moves to the declaration and reports missing symbols
   await page.goto('/extension-samples/definition-provider/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
-  await editor.locator('textarea').focus()
+  await focusEditor(page)
   await page.keyboard.press('F12')
   await expect(editor.locator('.EditorCursor')).toHaveCSS('translate', horizontalCursorTranslation)
   // Inserting at the resulting cursor proves that navigation reached the declaration.
@@ -78,8 +78,7 @@ test('definition navigation moves to the declaration and reports missing symbols
 test('find all references includes the declaration and uses in the preview application', async ({ page }) => {
   await page.goto('/extension-samples/definition-provider/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
-  const editor = page.locator('#preview-ide .Editor')
-  await editor.locator('textarea').focus()
+  await focusEditor(page)
   await page.keyboard.press('ControlOrMeta+Home')
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('ArrowDown')
@@ -91,6 +90,15 @@ test('find all references includes the declaration and uses in the preview appli
   await page.keyboard.press('ArrowRight')
   const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
   const { entry } = await runtimeResponse.json()
+  // Cursor input is handled asynchronously in the editor worker.
+  await expect
+    .poll(() =>
+      page.evaluate(async (entry) => {
+        const renderer = await import(entry)
+        return renderer.executeCommand('Application.execute', 'preview', 'GetActiveEditor.getSelections')
+      }, entry),
+    )
+    .toEqual([2, 6, 2, 6])
   await page.evaluate(
     async ({ entry }) => {
       const renderer = await import(entry)
@@ -131,7 +139,7 @@ test('rename opens automatically, changes complete identifiers, and can be cance
   await page.keyboard.press('Enter')
   await expect(input).toBeHidden()
   await expect(editor.locator('.EditorRow')).toHaveText(['let shade = blue', 'let colorful = green', 'print(shade)', 'print(shade)', ''])
-  await editor.locator('textarea').focus()
+  await focusEditor(page)
   await page.keyboard.press('ControlOrMeta+z')
   await expect(editor.locator('.EditorRow')).toHaveText(['let color = blue', 'let colorful = green', 'print(color)', 'print(color)', ''])
   await page.reload()
@@ -148,10 +156,10 @@ test('organize imports sorts the import block and supports undo', async ({ page 
   await page.goto('/extension-samples/code-actions/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
-  await editor.locator('textarea').focus()
+  await focusEditor(page)
   await page.keyboard.press('Shift+Alt+o')
   await expect(editor.locator('.EditorRow')).toHaveText(['import apple', 'import zebra', '', 'print(apple)', ''])
-  await editor.locator('textarea').focus()
+  await focusEditor(page)
   await page.keyboard.press('ControlOrMeta+z')
   await expect(editor.locator('.EditorRow')).toHaveText(['import zebra', 'import apple', '', 'print(apple)', ''])
 })

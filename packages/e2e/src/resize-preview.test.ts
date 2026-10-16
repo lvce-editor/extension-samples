@@ -41,11 +41,16 @@ for (const sample of ['source-control-provider', 'sidebar-counter', 'file-system
     await expect(source.locator('.SideBar')).toBeVisible()
 
     for (const root of [source, preview]) {
-      const sidebar = (await root.locator('.SideBar').boundingBox())!
-      const sash = (await root.locator('.SashSideBar').boundingBox())!
-      const activityBar = root.locator('.ActivityBar:visible')
-      const activityBarWidth = (await activityBar.count()) ? (await activityBar.boundingBox())!.width : 0
-      expect(Math.abs(sash.x - sidebar.x - sidebar.width + activityBarWidth)).toBeLessThan(3)
+      // The divider updates immediately; embedded layout follows via ResizeObserver.
+      await expect
+        .poll(async () => {
+          const sidebar = (await root.locator('.SideBar').boundingBox())!
+          const sash = (await root.locator('.SashSideBar').boundingBox())!
+          const activityBar = root.locator('.ActivityBar:visible')
+          const activityBarWidth = (await activityBar.count()) ? (await activityBar.boundingBox())!.width : 0
+          return Math.abs(sash.x - sidebar.x - sidebar.width + activityBarWidth)
+        })
+        .toBeLessThan(3)
     }
   })
 }
