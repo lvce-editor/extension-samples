@@ -11,9 +11,10 @@ test('positions empty source actions next to the cursor in the embedded editor',
     await editor.locator('textarea').focus()
     await page.keyboard.press('Control+.')
 
-    const message = root.locator('.EditorMessageText')
-    await expect(message).toHaveText('No code actions available')
-    const popupBox = await root.locator('.EditorMessage').boundingBox()
+    const actions = root.getByRole('listbox')
+    if (rootId === 'source') await expect(actions).toContainText('Organize Imports')
+    else await expect(root.locator('.EditorMessageText')).toHaveText('No code actions available')
+    const popupBox = await root.locator('.EditorMessage, .EditorSourceActions').boundingBox()
     const cursorBox = await editor.locator('.EditorCursor').boundingBox()
     expect(cursorBox).not.toBeNull()
     expect(popupBox).not.toBeNull()
