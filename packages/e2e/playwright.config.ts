@@ -29,5 +29,5 @@ export default defineConfig({
     timeout: 120_000,
     url: `http://127.0.0.1:${process.env.PORT || '3000'}/extension-samples/file-system-provider/`,
   },
-  workers: process.env.CI ? 2 : '50%',
+  workers: process.env.CI ? (process.platform === 'darwin' ? 1 : 2) : '50%',
 })
