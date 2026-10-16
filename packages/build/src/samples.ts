@@ -156,10 +156,15 @@ export const samples: readonly Sample[] = [
     title: 'Text Manipulation',
   },
   {
-    description: 'Underline selected text with custom colors without editing the document.',
+    description: 'Underline selections, flag TODO markers, color-code keywords, and spot repeated words.',
     id: 'text-decoration',
     packageName: 'sample-text-decoration',
-    preview: { entry: '/example.txt', files: { '/example.txt': 'Select text and add an underline.\nAcross multiple lines, too.\n' } },
+    preview: {
+      entry: '/example.txt',
+      files: {
+        '/example.txt': 'TODO: choose a bright color\nconst plan = "small samples"\nreturn the the finished preview.\n',
+      },
+    },
     route: 'text-decoration',
     title: 'Text Decoration',
   },

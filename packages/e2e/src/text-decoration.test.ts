@@ -25,6 +25,34 @@ const selectColumns = async (page: Page, start: number, end: number): Promise<vo
   for (let index = start; index < end; index++) await page.keyboard.press('Shift+ArrowRight')
 }
 
+test('shows live TODO, keyword, and repeated-word decorations in the preview', async ({ page }) => {
+  await page.goto('/extension-samples/text-decoration/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const preview = page.locator('#preview-ide .Editor')
+  const decorations = preview.locator('.EditorTextDecoration')
+
+  await command(page, 'Sample: Highlight TODO Markers')
+  await expect(decorations).toHaveCount(1)
+  await expect(decorations.first()).toHaveCSS('background-color', 'rgb(224, 90, 51)')
+  await expect(page.locator('#source-ide .EditorTextDecoration')).toHaveCount(0)
+
+  await command(page, 'Sample: Color Code Keywords')
+  await expect(decorations).toHaveCount(2)
+  const declaration = decorations.nth(0)
+  const flowKeyword = decorations.nth(1)
+  await expect(declaration).toHaveCSS('background-color', 'rgb(139, 92, 246)')
+  await expect(flowKeyword).toHaveCSS('background-color', 'rgb(22, 139, 120)')
+
+  await command(page, 'Sample: Find Repeated Words')
+  await expect(decorations).toHaveCount(1)
+  await expect(decorations.first()).toHaveCSS('background-color', 'rgb(212, 155, 22)')
+  const textarea = preview.locator('textarea')
+  await textarea.focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText('Return the finished preview.\n')
+  await expect(decorations).toHaveCount(0)
+})
+
 test('underlines empty, repeated, overlapping and multiline selections without editing text', async ({ page }) => {
   await page.goto('/extension-samples/text-decoration/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
