@@ -1,0 +1,20 @@
+{
+  "id": "sample.file-view-counter",
+  "name": "File View Counter Sample",
+  "description": "Show an interactive counter for .count files.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onView:sample.file-view-counter"],
+  "views": [
+    {
+      "id": "sample.file-view-counter",
+      "title": "File Counter",
+      "kind": "virtualDom",
+      "type": "preview",
+      "selector": [".count"],
+      "showSideBarHeader": false
+    }
+  ]
+}

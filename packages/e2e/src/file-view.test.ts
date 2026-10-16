@@ -1,0 +1,71 @@
+import { expect, test } from '@playwright/test'
+
+test('file extension selects a custom view and unrelated files stay in the editor', async ({ page }) => {
+  await page.goto('/extension-samples/file-view/')
+  const preview = page.locator('#preview-ide')
+  await expect(preview.locator('.FileViewGreeting')).toHaveText('Hello from a custom file view!', { timeout: 30_000 })
+
+  await preview.getByRole('treeitem', { exact: true, name: 'notes.txt' }).click()
+  await expect(preview.locator('.Editor')).toContainText('This file stays in the text editor.')
+  await expect(preview.locator('.FileViewGreeting')).toHaveCount(0)
+})
+
+test('file view counter keeps independent state for each open file', async ({ page }) => {
+  await page.goto('/extension-samples/file-view-counter/')
+  const preview = page.locator('#preview-ide')
+  const counter = preview.locator('.FileViewCounter')
+  await expect(counter.getByRole('status')).toHaveText('Count: 0', { timeout: 30_000 })
+  await counter.getByRole('button', { name: 'Increment' }).click()
+  await expect(counter.getByRole('status')).toHaveText('Count: 1')
+
+  await preview.getByRole('treeitem', { exact: true, name: 'second.count' }).click()
+  await expect(preview.locator('.FileViewCounter').getByRole('status')).toHaveText('Count: 0')
+  await preview.getByRole('treeitem', { exact: true, name: 'first.count' }).click()
+  await expect(preview.locator('.FileViewCounter').getByRole('status')).toHaveText('Count: 1')
+
+  await preview.locator('.FileViewCounter').getByRole('button', { name: 'Increment' }).press('Enter')
+  await expect(preview.locator('.FileViewCounter').getByRole('status')).toHaveText('Count: 2')
+  await preview.locator('.FileViewCounter').getByRole('button', { name: 'Increment' }).press('Space')
+  await expect(preview.locator('.FileViewCounter').getByRole('status')).toHaveText('Count: 3')
+  await preview.getByRole('tab', { exact: true, name: 'first.count Close' }).getByRole('button', { name: 'Close' }).click()
+  await preview.getByRole('treeitem', { exact: true, name: 'first.count' }).click()
+  await expect(preview.locator('.FileViewCounter').getByRole('status')).toHaveText('Count: 0')
+  await preview.getByRole('treeitem', { exact: true, name: 'notes.txt' }).click()
+  await expect(preview.locator('.Editor')).toContainText('This file stays in the text editor.')
+  await expect(preview.locator('.FileViewCounter')).toHaveCount(0)
+})
+
+test('file view counter source rebuilds and reset restores the sample', async ({ page }) => {
+  await page.goto('/extension-samples/file-view-counter/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const response = await page.request.get('/extension-samples/samples/file-view-counter/files.json')
+  const files = await response.json()
+  const source = page.locator('#source-ide')
+  await source.locator('.Editor textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace('count += 1', 'count += 2'))
+  await page.keyboard.press('Control+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await page.locator('#preview-ide .FileViewCounter').getByRole('button', { name: 'Increment' }).click()
+  await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 2')
+
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+  await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 0')
+})
+
+test('greeting source rebuilds and reset restores the sample', async ({ page }) => {
+  await page.goto('/extension-samples/file-view/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const response = await page.request.get('/extension-samples/samples/file-view/files.json')
+  const files = await response.json()
+  const source = page.locator('#source-ide')
+  await source.locator('.Editor textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from a custom file view!', 'Updated greeting!'))
+  await page.keyboard.press('Control+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(page.locator('#preview-ide .FileViewGreeting')).toHaveText('Updated greeting!')
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(page.locator('#preview-ide .FileViewGreeting')).toHaveText('Hello from a custom file view!')
+})
