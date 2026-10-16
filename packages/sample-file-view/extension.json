@@ -1,0 +1,20 @@
+{
+  "id": "sample.file-view",
+  "name": "File View Sample",
+  "description": "Show a custom virtual DOM view for .hello files.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onView:sample.file-view"],
+  "views": [
+    {
+      "id": "sample.file-view",
+      "title": "Hello File",
+      "kind": "virtualDom",
+      "type": "preview",
+      "selector": [".hello"],
+      "showSideBarHeader": false
+    }
+  ]
+}

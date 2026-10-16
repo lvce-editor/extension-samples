@@ -12,4 +12,4 @@ const main = async (): Promise<void> => {
   registerReferenceProvider({ id: 'sample-references', languageId: 'plaintext', provideReferences })
 }
 
-main().catch(console.error)
+main()

@@ -12,6 +12,35 @@ export interface Sample {
 
 export const samples: readonly Sample[] = [
   {
+    description: 'Replace matching files with a custom virtual DOM greeting view.',
+    id: 'file-view',
+    packageName: 'sample-file-view',
+    preview: {
+      entry: '/welcome.hello',
+      files: {
+        '/notes.txt': 'This file stays in the text editor.\n',
+        '/welcome.hello': 'Welcome to custom file views!\n',
+      },
+    },
+    route: 'file-view',
+    title: 'File View',
+  },
+  {
+    description: 'Render an interactive, per-file counter for files with the .count extension.',
+    id: 'file-view-counter',
+    packageName: 'sample-file-view-counter',
+    preview: {
+      entry: '/first.count',
+      files: {
+        '/first.count': 'First counter\n',
+        '/notes.txt': 'This file stays in the text editor.\n',
+        '/second.count': 'Second counter\n',
+      },
+    },
+    route: 'file-view-counter',
+    title: 'File View Counter',
+  },
+  {
     description: 'Build a writable in-memory workspace with files and folders.',
     id: 'file-system-provider',
     packageName: 'sample-file-system-provider',
@@ -78,6 +107,17 @@ export const samples: readonly Sample[] = [
     },
     route: 'quick-pick',
     title: 'Quick Pick',
+  },
+  {
+    description: 'Open the editor color picker with an initial color and edit the document.',
+    id: 'color-picker',
+    packageName: 'sample-color-picker',
+    preview: {
+      entry: '/example.txt',
+      files: { '/example.txt': '#112233\n' },
+    },
+    route: 'color-picker',
+    title: 'Color Picker',
   },
   {
     description: 'Format key-value settings using document edits.',

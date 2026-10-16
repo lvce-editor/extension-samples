@@ -29,6 +29,9 @@
       "path": "./packages/sample-quick-pick"
     },
     {
+      "path": "./packages/sample-color-picker"
+    },
+    {
       "path": "./packages/sample-formatting-provider"
     },
     {
