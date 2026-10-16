@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@lvce-editor/api": "^9.48.0",
-    "@lvce-editor/editor-worker": "19.74.3",
+    "@lvce-editor/api": "^9.48.1",
+    "@lvce-editor/editor-worker": "19.74.7",
     "@lvce-editor/extension-management-worker": "4.91.0",
     "@lvce-editor/shared-process": "0.123.15",
     "esbuild": "^0.28.2",

@@ -109,6 +109,17 @@ export const samples: readonly Sample[] = [
     title: 'Quick Pick',
   },
   {
+    description: 'Open the editor color picker with an initial color and edit the document.',
+    id: 'color-picker',
+    packageName: 'sample-color-picker',
+    preview: {
+      entry: '/example.txt',
+      files: { '/example.txt': '#112233\n' },
+    },
+    route: 'color-picker',
+    title: 'Color Picker',
+  },
+  {
     description: 'Format key-value settings using document edits.',
     id: 'formatting-provider',
     packageName: 'sample-formatting-provider',

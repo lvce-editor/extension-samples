@@ -1,0 +1,16 @@
+{
+  "id": "sample.color-picker",
+  "name": "Color Picker Sample",
+  "description": "Open the editor color picker with an initial color and edit the document.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.openColorPicker"],
+  "commands": [
+    {
+      "id": "sample.openColorPicker",
+      "label": "Sample: Open Color Picker"
+    }
+  ]
+}
