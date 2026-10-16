@@ -44,6 +44,8 @@ const buildTooling = async (): Promise<Record<string, string>> => {
     const result = await build({
       entryPoints: [require.resolve(entry)],
       bundle: true,
+      minify: true,
+      keepNames: true,
       platform: 'browser',
       format: 'cjs',
       external: ['node:*', ...builtinModules],
