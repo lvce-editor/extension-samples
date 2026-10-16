@@ -8,6 +8,17 @@ export const captureInputDiagnostics = async (page: Page): Promise<void> => {
   })
   page.on('pageerror', (error) => console.warn('[DEBUG-e2e-focus] pageerror', error.message))
   await page.addInitScript(() => {
+    const observedWorkers = new WeakSet<Worker>()
+    const workerPostMessage = Worker.prototype.postMessage
+    // Include the root renderer RPC, which uses Worker rather than MessagePort.
+    Worker.prototype.postMessage = function (this: Worker, ...args: any[]): void {
+      if (!observedWorkers.has(this)) {
+        observedWorkers.add(this)
+        this.addEventListener('message', (event) => capture('worker-receive', 0, event.data))
+      }
+      capture('worker-send', 0, args[0])
+      Reflect.apply(workerPostMessage, this, args)
+    }
     const originalPostMessage = MessagePort.prototype.postMessage
     let portSequence = 0
     const ports = new WeakMap<MessagePort, number>()
