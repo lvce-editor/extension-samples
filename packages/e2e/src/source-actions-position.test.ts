@@ -1,9 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { captureInputDiagnostics } from './CaptureInputDiagnostics.ts'
-
-test.beforeEach(async ({ page }) => {
-  await captureInputDiagnostics(page)
-})
+import { focusEditor } from './FocusEditor.ts'
 
 test('positions empty source actions next to the cursor in the embedded editor', async ({ page }) => {
   await page.goto('/extension-samples/hello-world/')
@@ -13,7 +9,7 @@ test('positions empty source actions next to the cursor in the embedded editor',
     const root = page.locator(`#${rootId}-ide`)
     const editor = root.locator('.Editor')
     if (clickEditor) await editor.locator('.EditorRow').first().click()
-    await editor.locator('textarea').focus()
+    await focusEditor(page, rootId)
     await page.keyboard.press('ControlOrMeta+.')
 
     const actions = root.getByRole('listbox')

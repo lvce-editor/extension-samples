@@ -1,12 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
-import { captureInputDiagnostics } from './CaptureInputDiagnostics.ts'
-
-test.beforeEach(async ({ page }) => {
-  await captureInputDiagnostics(page)
-})
+import { focusEditor } from './FocusEditor.ts'
 
 const command = async (page: Page, label: string): Promise<void> => {
-  await page.locator('#preview-ide .Editor textarea').focus()
+  await focusEditor(page)
   await page.keyboard.press('F1')
   const input = page.locator('#preview-ide .QuickPick input')
   await expect(input).toBeVisible()
@@ -20,7 +16,7 @@ const command = async (page: Page, label: string): Promise<void> => {
 const focusPreview = async (page: Page): Promise<void> => {
   const editor = page.locator('#preview-ide .Editor')
   await editor.locator('.EditorRow').first().click()
-  await editor.locator('textarea').focus()
+  await focusEditor(page)
   await page.keyboard.press('ControlOrMeta+Home')
 }
 
@@ -86,9 +82,8 @@ test('disposal clears output and rebuilding resets registrations and stale under
 
   const response = await page.request.get('/extension-samples/samples/text-decoration/files.json')
   const files = await response.json()
-  const source = page.locator('#source-ide .Editor textarea')
   const rebuild = async (color: string, revision: string): Promise<void> => {
-    await source.focus()
+    await focusEditor(page, 'source')
     await page.keyboard.press('ControlOrMeta+a')
     await page.keyboard.insertText(files['/src/main.ts'].replace('#ff0000', () => color))
     await page.keyboard.press('ControlOrMeta+s')

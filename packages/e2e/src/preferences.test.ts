@@ -1,10 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { captureInputDiagnostics } from './CaptureInputDiagnostics.ts'
 import { runCommand } from './RunCommand.ts'
-
-test.beforeEach(async ({ page }) => {
-  await captureInputDiagnostics(page)
-})
 
 test('preference sample reads, updates, cancels, and restores an editor setting', async ({ page }) => {
   await page.goto('/extension-samples/preferences/')
