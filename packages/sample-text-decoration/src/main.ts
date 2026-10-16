@@ -5,6 +5,7 @@ import {
   registerEditorTextDecorationProvider,
   type EditorTextDecoration,
 } from '@lvce-editor/api'
+import { mapEditorTextDecorations } from './map-decorations.js'
 
 const main = async (): Promise<void> => {
   await activate()
@@ -14,8 +15,7 @@ const main = async (): Promise<void> => {
     id: 'sample.underlines',
     provideEditorTextDecorations(document) {
       const previous = documents.get(document.uri)
-      // Clear after edits instead of leaving underlines at stale positions.
-      let decorations = previous?.text === document.text ? previous.decorations : []
+      let decorations = previous ? mapEditorTextDecorations(previous.text, document.text, previous.decorations) : []
       if (isAddSelection) {
         isAddSelection = false
         const selected = document.selections.filter(
