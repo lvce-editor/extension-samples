@@ -28,13 +28,13 @@ for (const restoredDraft of [false, true]) {
     const editor = source.locator('.Editor')
     await editor.locator('.EditorRow').first().click()
     await editor.locator('textarea').focus()
-    await page.keyboard.press('Control+Home')
+    await page.keyboard.press('ControlOrMeta+Home')
     await expect.poll(() => sourceSelections(page)).toEqual([0, 0, 0, 0])
     await page.keyboard.insertText('const message={text:"formatted on save"};')
     await expect.poll(() => sourceSelections(page)).toEqual([0, 41, 0, 41])
     await page.keyboard.press('Enter')
     await expect(editor.locator('.EditorRow').first()).toHaveText('const message={text:"formatted on save"};')
-    await page.keyboard.press('Control+s')
+    await page.keyboard.press('ControlOrMeta+s')
     await expect(editor.locator('.EditorRow').first()).toHaveText("const message = { text: 'formatted on save' }")
     await expect
       .poll(() =>
@@ -62,9 +62,9 @@ test('uses edited package settings for the next save', async ({ page }) => {
   const packageJson = JSON.parse(files['/package.json'])
   packageJson.prettier = { semi: true, singleQuote: false }
   await source.locator('.Editor textarea').focus()
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText(JSON.stringify(packageJson))
-  await page.keyboard.press('Control+s')
+  await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   expect(
     await page.evaluate(
@@ -74,10 +74,10 @@ test('uses edited package settings for the next save', async ({ page }) => {
   await source.getByRole('tab', { exact: false, name: 'main.ts' }).click()
   await expect(source.getByRole('tab', { exact: true, name: 'main.ts Close' })).toHaveAttribute('aria-selected', 'true')
   await source.locator('.Editor textarea').focus()
-  await page.keyboard.press('Control+Home')
+  await page.keyboard.press('ControlOrMeta+Home')
   await page.keyboard.insertText("const message={text:'custom settings'}")
   await page.keyboard.press('Enter')
-  await page.keyboard.press('Control+s')
+  await page.keyboard.press('ControlOrMeta+s')
   await expect(source.locator('.EditorRow').first()).toHaveText('const message = { text: "custom settings" };')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '3')
 })

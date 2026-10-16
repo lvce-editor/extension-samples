@@ -32,11 +32,11 @@ test('diagnostic sample skips evaluation until editing and clears diagnostics on
   expect(requests).toEqual([])
   expect(page.workers().filter((worker) => evaluationWorker.test(worker.url()))).toHaveLength(0)
   await source.locator('textarea').focus()
-  await page.keyboard.press('Control+End')
+  await page.keyboard.press('ControlOrMeta+End')
   await page.keyboard.insertText('\nexport type Unsafe = any\n')
   await expect(diagnostics).toHaveCount(1, { timeout: 30_000 })
   expect(requests.length).toBeGreaterThan(0)
-  await page.keyboard.press('Control+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await expect(diagnostics).toHaveCount(0)
 })
 

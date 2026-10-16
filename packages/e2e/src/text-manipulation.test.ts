@@ -3,7 +3,7 @@ import { runCommand } from './RunCommand.ts'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
 
 const selectFirstLine = async (page: Page): Promise<void> => {
-  await page.keyboard.press('Control+Home')
+  await page.keyboard.press('ControlOrMeta+Home')
   for (let index = 0; index < 12; index++) {
     await page.keyboard.press('Shift+ArrowRight')
   }
@@ -27,7 +27,7 @@ test('text insertion changes only the preview selection and supports undo', asyn
   await preview.locator('.EditorRow').first().click()
   await preview.locator('textarea').focus()
   await expect(preview.locator('textarea')).toBeFocused()
-  await page.keyboard.press('Control+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await expect(preview.locator('.EditorRow')).toHaveText(['Hello, Lvce!', 'Keep this line unchanged.', ''])
 })
 
@@ -46,9 +46,9 @@ test('text insertion survives a sample rebuild and inserts at an empty selection
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, World!')
 
   await source.locator('textarea').focus()
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText(files['/src/main.ts'].replace('Hello, World!', 'Hello again!'))
-  await page.keyboard.press('Control+s')
+  await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(page.getByRole('status')).toHaveText('Preview ready')
 
@@ -58,7 +58,7 @@ test('text insertion survives a sample rebuild and inserts at an empty selection
   await runSelectedCommand(page, 'Sample: Insert Text')
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello again!')
 
-  await page.keyboard.press('Control+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await page.keyboard.press('ArrowRight')
   await runCommand(page, 'Sample: Insert Text')
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello again!')
@@ -77,7 +77,7 @@ test('selection API collapses a selection without replacing its text', async ({ 
   await runSelectedCommand(page, 'Sample: Insert Text')
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!Hello, World!')
   await preview.locator('textarea').focus()
-  await page.keyboard.press('Control+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!')
 })
 

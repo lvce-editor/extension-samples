@@ -10,7 +10,7 @@ test('marker decorations stay in the preview and follow unsaved edits', async ({
   await editor.locator('.EditorRow').first().click()
   await expect(editor.locator('.EditorLineDecoration')).toHaveText(' — added')
   await editor.locator('textarea').focus()
-  await page.keyboard.press('Control+Home')
+  await page.keyboard.press('ControlOrMeta+Home')
   await page.keyboard.press('Delete')
   await editor.locator('.EditorRow').first().click()
   await expect(editor.locator('.EditorLineDecoration')).toHaveCount(0)

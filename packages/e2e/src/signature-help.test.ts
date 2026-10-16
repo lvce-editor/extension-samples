@@ -7,7 +7,7 @@ test('signature help changes its active parameter and disappears outside a call'
   const editor = page.locator('#preview-ide .Editor')
   await editor.locator('.EditorRow').first().click()
   await editor.locator('textarea').focus()
-  await page.keyboard.press('Control+Home')
+  await page.keyboard.press('ControlOrMeta+Home')
   for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowRight')
   await runSelectedCommand(page, 'Sample: Show Parameter Help')
   const hover = page.locator('#preview-ide .EditorHover')

@@ -77,13 +77,13 @@ test('word count editors keep passive wheel listeners and scroll after rebuild a
   const filesResponse = await page.request.get('/extension-samples/samples/word-count/files.json')
   const files = await filesResponse.json()
   await source.locator('.Editor textarea').focus()
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText(`${files['/src/main.ts']}\n// Rebuild the sample.\n`)
-  await page.keyboard.press('Control+s')
+  await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expectPassiveWheelListeners(page)
   await source.locator('.Editor textarea').focus()
-  await page.keyboard.press('Control+End')
+  await page.keyboard.press('ControlOrMeta+End')
   for (let index = 0; index < 25; index++) {
     await page.keyboard.press('Enter')
   }

@@ -22,11 +22,11 @@ for (const sample of ['file-system-provider', 'source-control-provider']) {
       const diagnostics = sourceEditor.locator('.LayerDiagnostics .DiagnosticError')
       await expect(diagnostics).toHaveCount(0)
       await sourceEditor.locator('textarea').focus()
-      await page.keyboard.press('Control+End')
+      await page.keyboard.press('ControlOrMeta+End')
       await page.keyboard.insertText(`\n${code}\n`)
       await expect(diagnostics).toHaveCount(1, { timeout: 20_000 })
       await expect(page.locator('#preview-ide .DiagnosticError')).toHaveCount(0)
-      await page.keyboard.press('Control+z')
+      await page.keyboard.press('ControlOrMeta+z')
       await expect(diagnostics).toHaveCount(0)
     })
   }

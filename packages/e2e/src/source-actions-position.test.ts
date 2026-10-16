@@ -9,7 +9,7 @@ test('positions empty source actions next to the cursor in the embedded editor',
     const editor = root.locator('.Editor')
     if (clickEditor) await editor.locator('.EditorRow').first().click()
     await editor.locator('textarea').focus()
-    await page.keyboard.press('Control+.')
+    await page.keyboard.press('ControlOrMeta+.')
 
     const actions = root.getByRole('listbox')
     if (rootId === 'source') await expect(actions).toContainText('Organize Imports')

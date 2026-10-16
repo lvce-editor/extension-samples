@@ -16,7 +16,7 @@ const focusPreview = async (page: Page): Promise<void> => {
   const editor = page.locator('#preview-ide .Editor')
   await editor.locator('.EditorRow').first().click()
   await editor.locator('textarea').focus()
-  await page.keyboard.press('Control+Home')
+  await page.keyboard.press('ControlOrMeta+Home')
 }
 
 const selectColumns = async (page: Page, start: number, end: number): Promise<void> => {
@@ -84,9 +84,9 @@ test('disposal clears output and rebuilding resets registrations and stale under
   const source = page.locator('#source-ide .Editor textarea')
   const rebuild = async (color: string, revision: string): Promise<void> => {
     await source.focus()
-    await page.keyboard.press('Control+a')
+    await page.keyboard.press('ControlOrMeta+a')
     await page.keyboard.insertText(files['/src/main.ts'].replace('#ff0000', () => color))
-    await page.keyboard.press('Control+s')
+    await page.keyboard.press('ControlOrMeta+s')
     await expect(page.locator('body')).toHaveAttribute('data-preview-revision', revision)
     await expect(page.getByRole('status')).toHaveText('Preview ready')
   }
@@ -132,7 +132,7 @@ test('custom underlines coexist with links, diagnostics, line and gutter decorat
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const preview = page.locator('#preview-ide .Editor')
   await preview.locator('textarea').focus()
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText('https://example.com\nsecond line\n')
   await focusPreview(page)
   await expect(preview.locator('.DiagnosticError')).toHaveCount(1)
