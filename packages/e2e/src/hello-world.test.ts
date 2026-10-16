@@ -5,7 +5,6 @@ test('hello world notifications stay within their applications and dismiss indep
   await page.goto('/extension-samples/hello-world/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const preview = page.locator('#preview-ide')
-  await runCommand(page, 'Sample: Hello World')
   await expect(preview.locator('.NotificationMessage')).toHaveText('Hello World!')
   await expect(page.locator('#source-ide .NotificationMessage')).toHaveCount(0)
   const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
