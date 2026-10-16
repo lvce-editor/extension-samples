@@ -1,5 +1,6 @@
 import { activate, registerView, type VirtualDomViewInstance } from '@lvce-editor/api'
 
+// LVCE virtual DOM element IDs; text nodes are separate children.
 const Div = 4
 const Text = 12
 

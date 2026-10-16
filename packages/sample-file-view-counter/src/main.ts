@@ -1,5 +1,6 @@
 import { activate, registerView, type VirtualDomViewInstance } from '@lvce-editor/api'
 
+// LVCE virtual DOM element IDs; text nodes are separate children.
 const Button = 1
 const Div = 4
 const Text = 12
@@ -8,6 +9,7 @@ const main = async (): Promise<void> => {
   await activate()
   registerView({
     create(): VirtualDomViewInstance {
+      // Each open file creates its own instance. Closing its tab discards this state.
       let count = 0
       return {
         getCss(): string {
