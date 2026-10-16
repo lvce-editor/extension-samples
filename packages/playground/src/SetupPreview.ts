@@ -11,6 +11,7 @@ interface PreviewContext {
   readonly setCursor: (line: number, column: number) => Promise<unknown>
   readonly showCompletions: () => Promise<unknown>
   readonly showHover: () => Promise<unknown>
+  readonly showRename: () => Promise<unknown>
   readonly showStatusBar: () => Promise<unknown>
 }
 
@@ -30,6 +31,7 @@ export const setupPreview = async (source: string | undefined, workspace: string
       setCursor: (line, column) => execute('Editor.cursorSet', line, column),
       showCompletions: () => execute('Editor.openCompletion'),
       showHover: () => execute('Editor.showHover'),
+      showRename: () => execute('Editor.openRename'),
       showStatusBar: async () => {
         await execute('Preferences.update', { 'statusBar.itemsVisible': true })
         await execute('Layout.showStatusBar')

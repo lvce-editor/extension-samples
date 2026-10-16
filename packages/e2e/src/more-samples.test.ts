@@ -120,14 +120,13 @@ test('find all references includes the declaration and uses in the preview appli
   await expect(page.locator('#source-ide .Locations')).toHaveCount(0)
 })
 
-test('rename changes complete identifiers, supports undo, and can be cancelled', async ({ page }) => {
+test('rename opens automatically, changes complete identifiers, and can be cancelled', async ({ page }) => {
   await page.goto('/extension-samples/rename-provider/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
-  await editor.locator('textarea').focus()
-  await page.keyboard.press('F2')
   const input = page.locator('#preview-ide .RenameInputBox')
   await expect(input).toBeVisible()
+  await expect(input).toHaveValue('color')
   await input.fill('shade')
   await page.keyboard.press('Enter')
   await expect(input).toBeHidden()
@@ -135,12 +134,14 @@ test('rename changes complete identifiers, supports undo, and can be cancelled',
   await editor.locator('textarea').focus()
   await page.keyboard.press('Control+z')
   await expect(editor.locator('.EditorRow')).toHaveText(['let color = blue', 'let colorful = green', 'print(color)', 'print(color)', ''])
-  await page.keyboard.press('F2')
+  await page.reload()
   await expect(input).toBeVisible()
-  await input.fill('cancelled')
   await page.keyboard.press('Escape')
   await expect(input).toBeHidden()
-  await expect(editor).not.toContainText('cancelled')
+  await expect(editor.locator('.EditorRow')).toHaveText(['let color = blue', 'let colorful = green', 'print(color)', 'print(color)', ''])
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(input).toBeVisible()
+  await expect(input).toHaveValue('color')
 })
 
 test('organize imports sorts the import block and supports undo', async ({ page }) => {
