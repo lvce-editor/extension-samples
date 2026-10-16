@@ -43,6 +43,22 @@ test('completion filters a typed prefix and inserts the selected color', async (
   await expect(page.locator('.EditorCompletion')).toBeHidden()
 })
 
+test('source editor provides TypeScript completions for the sample files', async ({ page }) => {
+  await page.goto('/extension-samples/file-system-provider/')
+  const editor = page.locator('#source-ide .Editor')
+  const textarea = editor.locator('textarea')
+  await expect(editor).toContainText('const fileStore', { timeout: 30_000 })
+  await textarea.focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText('const fileStore = {}\nfileSto')
+  await expect(editor.locator('.EditorRow').last()).toHaveText('fileSto')
+  await page.keyboard.press('Control+Space')
+  const completion = page.getByRole('option', { exact: true, name: 'fileStore' })
+  await expect(completion).toBeVisible({ timeout: 30_000 })
+  await page.keyboard.press('Enter')
+  await expect(editor.locator('.EditorRow').last()).toHaveText('fileStore')
+})
+
 test('hover shows documentation only for a recognized word', async ({ page }) => {
   await page.goto('/extension-samples/hover-provider/')
   const editor = page.locator('#preview-ide .Editor')
