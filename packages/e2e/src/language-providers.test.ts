@@ -45,6 +45,7 @@ test('completion filters a typed prefix and inserts the selected color', async (
 
 test('source editor provides TypeScript completions for the sample files', async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const editor = page.locator('#source-ide .Editor')
   const textarea = editor.locator('textarea')
   await expect(editor).toContainText('const fileStore', { timeout: 30_000 })
