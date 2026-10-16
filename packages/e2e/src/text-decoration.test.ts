@@ -58,7 +58,7 @@ test('underlines empty, repeated, overlapping and multiline selections without e
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const preview = page.locator('#preview-ide .Editor')
   const underlines = preview.locator('.EditorTextDecoration')
-  const original = ['Select text and add an underline.', 'Across multiple lines, too.', '']
+  const original = ['TODO: choose a bright color', 'const plan = "small samples"', 'return the the finished preview.', '']
   await expect(preview.locator('.EditorRow')).toHaveText(original)
   await focusPreview(page)
   await command(page, 'Sample: Underline Selection')
@@ -137,6 +137,7 @@ test('keeps underlines after appending and follows text when lines are inserted 
   const editor = page.locator('#preview-ide .Editor')
   const textarea = editor.locator('textarea')
   const underlines = editor.locator('.EditorTextDecoration')
+  const initialRowCount = await editor.locator('.EditorRow').count()
   await selectColumns(page, 0, 6)
   await command(page, 'Sample: Underline Selection')
   await expect(underlines).toHaveCount(1)
@@ -150,12 +151,12 @@ test('keeps underlines after appending and follows text when lines are inserted 
   await textarea.focus()
   await page.keyboard.press('Control+End')
   await page.keyboard.press('Enter')
-  await expect(editor.locator('.EditorRow')).toHaveCount(4)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 1)
   await expect(underlines).toHaveCount(1)
 
   await page.keyboard.press('Control+Home')
   await page.keyboard.press('Enter')
-  await expect(editor.locator('.EditorRow')).toHaveCount(5)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 2)
   await expect(underlines).toHaveCount(1)
   const expectUnderlineOnRow = async (rowIndex: number): Promise<void> => {
     await expect
@@ -173,15 +174,15 @@ test('keeps underlines after appending and follows text when lines are inserted 
 
   await page.keyboard.press('Control+Home')
   await page.keyboard.press('Delete')
-  await expect(editor.locator('.EditorRow')).toHaveCount(4)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 1)
   await expect(underlines).toHaveCount(1)
   await expectUnderlineOnRow(0)
   await page.keyboard.press('Control+z')
-  await expect(editor.locator('.EditorRow')).toHaveCount(5)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 2)
   await expect(underlines).toHaveCount(1)
   await expectUnderlineOnRow(1)
   await page.keyboard.press('Control+Shift+z')
-  await expect(editor.locator('.EditorRow')).toHaveCount(4)
+  await expect(editor.locator('.EditorRow')).toHaveCount(initialRowCount + 1)
   await expect(underlines).toHaveCount(1)
   await expectUnderlineOnRow(0)
 })
