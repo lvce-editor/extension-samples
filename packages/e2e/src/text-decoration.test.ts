@@ -122,25 +122,40 @@ test('keeps underlines after appending and follows text when lines are inserted 
   await textarea.focus()
   await page.keyboard.press('Control+End')
   await page.keyboard.press('Enter')
+  await expect(editor.locator('.EditorRow')).toHaveCount(4)
   await expect(underlines).toHaveCount(1)
 
   await page.keyboard.press('Control+Home')
   await page.keyboard.press('Enter')
+  await expect(editor.locator('.EditorRow')).toHaveCount(5)
   await expect(underlines).toHaveCount(1)
-  const movedUnderlineTop = await underlines.first().evaluate((element) => element.getBoundingClientRect().top)
-  const secondRowTop = await editor
-    .locator('.EditorRow')
-    .nth(1)
-    .evaluate((element) => element.getBoundingClientRect().top)
-  expect(Math.abs(movedUnderlineTop - secondRowTop - underlineOffset)).toBeLessThan(2)
+  const expectUnderlineOnRow = async (rowIndex: number): Promise<void> => {
+    await expect
+      .poll(async () => {
+        const underlineTop = await underlines.first().evaluate((element) => element.getBoundingClientRect().top)
+        const rowTop = await editor
+          .locator('.EditorRow')
+          .nth(rowIndex)
+          .evaluate((element) => element.getBoundingClientRect().top)
+        return Math.abs(underlineTop - rowTop - underlineOffset)
+      })
+      .toBeLessThan(2)
+  }
+  await expectUnderlineOnRow(1)
 
   await page.keyboard.press('Control+Home')
   await page.keyboard.press('Delete')
+  await expect(editor.locator('.EditorRow')).toHaveCount(4)
   await expect(underlines).toHaveCount(1)
+  await expectUnderlineOnRow(0)
   await page.keyboard.press('Control+z')
+  await expect(editor.locator('.EditorRow')).toHaveCount(5)
   await expect(underlines).toHaveCount(1)
+  await expectUnderlineOnRow(1)
   await page.keyboard.press('Control+Shift+z')
+  await expect(editor.locator('.EditorRow')).toHaveCount(4)
   await expect(underlines).toHaveCount(1)
+  await expectUnderlineOnRow(0)
 })
 
 test('custom underlines coexist with links, diagnostics, line and gutter decorations', async ({ page }) => {

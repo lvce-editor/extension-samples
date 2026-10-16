@@ -5,7 +5,7 @@ import {
   registerEditorTextDecorationProvider,
   type EditorTextDecoration,
 } from '@lvce-editor/api'
-import { mapEditorTextDecorations } from './map-decorations.js'
+import { mapEditorTextDecorations } from './map-decorations.ts'
 
 const main = async (): Promise<void> => {
   await activate()
