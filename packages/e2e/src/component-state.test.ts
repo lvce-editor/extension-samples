@@ -36,10 +36,10 @@ test('opens and edits preview component state in the preview application', async
   )
   const state = JSON.parse(content)
   await preview.locator('.Editor textarea').focus()
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText(`${JSON.stringify({ ...state, inputSource: 2, inputValue: 'preview component edit' }, null, 2)}\n`)
   await expect(preview.getByRole('textbox', { name: 'Source Control Input' })).toHaveValue('preview component edit')
-  await page.keyboard.press('Control+s')
+  await page.keyboard.press('ControlOrMeta+s')
   await expect(preview.locator('.MainTabSelected .TabTitle')).toHaveText(`${uid}.json`)
   await expect(source.locator('.MainTabSelected .TabTitle')).toHaveText('main.ts')
 

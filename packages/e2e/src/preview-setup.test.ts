@@ -10,11 +10,11 @@ test('saved setup edits apply on page load without interrupting hot reload', asy
   const editor = source.locator('.Editor')
   await expect(editor).toContainText('showCompletions')
   await editor.locator('textarea').focus()
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText(
     "export const setupPreview = async ({ openFile, setCursor, showCompletions }) => {\n  await openFile('example.txt')\n  await setCursor(0, 0)\n  await showCompletions()\n}\n",
   )
-  await page.keyboard.press('Control+s')
+  await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2', { timeout: 30_000 })
   await expect(page.locator('.EditorCompletion')).toBeHidden()
   await expect(editor.locator('textarea')).toBeFocused()

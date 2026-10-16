@@ -10,10 +10,10 @@ test('opens a live HTML preview and reports parse errors until the source is cor
   await expect(preview.locator('.SideBar')).toContainText('Hello, HTML')
 
   await preview.locator('.Editor textarea').focus()
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText('<main><h1>Updated</h1><p>Live edit</p></main><div')
   await expect(preview.locator('.HtmlPreviewError')).toContainText('Invalid or unsupported HTML')
-  await page.keyboard.press('Control+a')
+  await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText('<main><h1>Updated</h1><p>Live edit</p></main>')
   await expect(preview.locator('.HtmlPreviewError')).toHaveCount(0)
   await expect(preview.locator('.SideBar')).toContainText('Updated')

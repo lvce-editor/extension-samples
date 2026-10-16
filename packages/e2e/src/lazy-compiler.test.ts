@@ -50,12 +50,12 @@ test('loads the compiler on the first saved edit and restores edited drafts', as
   for (let revision = 1; revision <= 2; revision++) {
     const existingCompiler = compilerWorkers()[0]
     await source.locator('textarea').focus()
-    await page.keyboard.press('Control+a')
+    await page.keyboard.press('ControlOrMeta+a')
     await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from memfs', () => `Lazy compiler revision ${revision}`))
-    await page.keyboard.press('Control+Home')
+    await page.keyboard.press('ControlOrMeta+Home')
     await expect(source).toContainText(`Lazy compiler revision ${revision}`)
     if (revision === 1) expect(compilerWorkers()).toHaveLength(0)
-    await page.keyboard.press('Control+s')
+    await page.keyboard.press('ControlOrMeta+s')
     await expect(preview).toContainText(`Lazy compiler revision ${revision}`, { timeout: 30_000 })
     expect(compilerWorkers()).toHaveLength(1)
     if (existingCompiler) expect(compilerWorkers()[0]).toBe(existingCompiler)
