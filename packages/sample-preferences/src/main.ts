@@ -58,4 +58,4 @@ const main = async (): Promise<void> => {
   await ready
 }
 
-main().catch(console.error)
+main()
