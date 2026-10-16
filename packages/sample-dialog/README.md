@@ -10,4 +10,4 @@ Edit `src/main.ts` or `extension.json` in the source editor and save with Ctrl+S
 
 ## API
 
-The isolated extension awaits `activate()` before calling `registerCommand()`. The command ID matches the activation event and command contribution in `extension.json`. `executeCommand('Dialog.showWarning', options)` opens the editor's warning dialog. Customize `title`, `message`, and `confirmMessage` to change its contents.
+The isolated extension awaits `activate()` before calling `registerCommand()`. The command ID matches the activation event and command contribution in `extension.json`. `showDialog(options)` opens the dialog in the preview. Set `type` to `warning` for a warning icon, and customize `title`, `message`, `confirmMessage`, and `closeMessage` to change its contents.
