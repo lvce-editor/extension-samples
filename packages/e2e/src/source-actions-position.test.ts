@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test'
+import { captureInputDiagnostics } from './CaptureInputDiagnostics.ts'
+
+test.beforeEach(async ({ page }) => {
+  await captureInputDiagnostics(page)
+})
 
 test('positions empty source actions next to the cursor in the embedded editor', async ({ page }) => {
   await page.goto('/extension-samples/hello-world/')

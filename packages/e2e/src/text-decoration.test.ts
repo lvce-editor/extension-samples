@@ -1,4 +1,9 @@
 import { expect, test, type Page } from '@playwright/test'
+import { captureInputDiagnostics } from './CaptureInputDiagnostics.ts'
+
+test.beforeEach(async ({ page }) => {
+  await captureInputDiagnostics(page)
+})
 
 const command = async (page: Page, label: string): Promise<void> => {
   await page.locator('#preview-ide .Editor textarea').focus()
