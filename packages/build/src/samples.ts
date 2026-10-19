@@ -235,6 +235,20 @@ export const samples: readonly Sample[] = [
     title: 'Error Dialog',
   },
   {
+    description: 'Type a CSS color to change the background of a preview view.',
+    id: 'color-view',
+    packageName: 'sample-color-view',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Color View\n\nOpen the **Color** sidebar and type a named or hexadecimal CSS color. Valid colors update the view background as you type. Empty or invalid values leave the last valid background in place. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
+      },
+    },
+    route: 'color-view',
+    title: 'Color View',
+  },
+  {
     description: 'Render a sidebar with virtual DOM and increment/decrement a counter.',
     id: 'sidebar-counter',
     packageName: 'sample-sidebar-counter',
