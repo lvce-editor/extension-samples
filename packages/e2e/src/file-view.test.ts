@@ -36,7 +36,7 @@ test('file view counter keeps independent state for each open file', async ({ pa
 })
 
 test('file view counter stays within a narrow preview and shows keyboard focus', async ({ page }) => {
-  await page.setViewportSize({ width: 900, height: 700 })
+  await page.setViewportSize({ height: 700, width: 900 })
   await page.goto('/extension-samples/file-view-counter/')
   const preview = page.locator('#preview-ide')
   const counter = preview.locator('.FileViewCounter')
@@ -51,7 +51,7 @@ test('file view counter stays within a narrow preview and shows keyboard focus',
   })
   const fitsNarrowPreview = await counter.evaluate((element) => {
     const bounds = element.getBoundingClientRect()
-    const children = [...element.children].map((child) => child.getBoundingClientRect())
+    const children = Array.from(element.children, (child) => child.getBoundingClientRect())
     return element.scrollWidth <= element.clientWidth && children.every((child) => child.left >= bounds.left && child.right <= bounds.right)
   })
   expect(fitsNarrowPreview).toBe(true)
@@ -72,7 +72,7 @@ test('file view counter source rebuilds and reset restores the sample', async ({
   await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 2')
 
   const srcFolder = source.getByRole('treeitem', { exact: true, name: 'src' })
-  await srcFolder.click()
+  await srcFolder.press('ArrowRight')
   await source.getByRole('treeitem', { exact: true, name: 'main.css' }).click()
   await source.locator('.Editor textarea').focus()
   await page.keyboard.press('Control+a')
