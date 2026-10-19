@@ -11,5 +11,7 @@ export const runSelectedCommand = async (page: Page, label: string): Promise<voi
   const command = page.locator('#preview-ide .QuickPick').getByRole('option', { exact: true, name: label })
   await expect(command).toBeVisible()
   await command.click()
-  await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
+  // The command may immediately open another QuickPick (for example a text input).
+  // Wait for the command palette entry to disappear, rather than its reused container.
+  await expect(command).toBeHidden()
 }
