@@ -62,3 +62,16 @@ test('esbuild package and CLI entries are visible, authentic, and lazy', async (
   expect(page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))).toHaveLength(0)
   expect(await page.evaluate(() => globalThis.localStorage.getItem('extension-samples:workspace:file-view-counter'))).toBeNull()
 })
+
+test('playground packages declarations for the API virtual DOM exports', async ({ page }) => {
+  await page.goto('/extension-samples/file-view-counter/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+
+  const apiDeclaration = await execute(page, 'FileSystem.readFile', `${root}/@lvce-editor/api/dist/index.d.ts`)
+  const virtualDomWorkerDeclaration = await execute(page, 'FileSystem.readFile', `${root}/@lvce-editor/virtual-dom-worker/dist/parts/Main/Main.d.ts`)
+  const constantsDeclaration = await execute(page, 'FileSystem.readFile', `${root}/@lvce-editor/constants/dist/parts/Main/Main.d.ts`)
+
+  expect(apiDeclaration).toContain('VirtualDomElements')
+  expect(virtualDomWorkerDeclaration).toContain('@lvce-editor/constants')
+  expect(constantsDeclaration).toContain('VirtualDomElements')
+})
