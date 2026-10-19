@@ -93,6 +93,9 @@
     },
     {
       "path": "./packages/sample-language-editing"
+    },
+    {
+      "path": "./packages/sample-find-widget"
     }
   ]
 }
