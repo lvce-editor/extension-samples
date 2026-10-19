@@ -1,0 +1,16 @@
+{
+  "id": "sample.find-widget",
+  "name": "Find Widget Sample",
+  "description": "Open the find widget and search the preview document.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.findPhrase"],
+  "commands": [
+    {
+      "id": "sample.findPhrase",
+      "label": "Sample: Find Phrase"
+    }
+  ]
+}
