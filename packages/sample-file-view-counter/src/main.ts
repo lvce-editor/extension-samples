@@ -1,4 +1,5 @@
 import { activate, registerView, type VirtualDomViewInstance } from '@lvce-editor/api'
+import css from './main.css'
 
 // LVCE virtual DOM element IDs; text nodes are separate children.
 const Button = 1
@@ -13,7 +14,7 @@ const main = async (): Promise<void> => {
       let count = 0
       return {
         getCss(): string {
-          return '.FileViewCounter { display: flex; align-items: center; gap: 12px; padding: 16px; } .FileViewCounter button { cursor: pointer; padding: 6px 12px; }'
+          return css
         },
         handleEvent(event): void {
           if (event.type === 'click' && event.name === 'increment') count += 1
