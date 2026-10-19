@@ -1,9 +1,6 @@
-import { activate as activateExtensionApi, registerView, type VirtualDomViewInstance } from '@lvce-editor/api'
+import { activate as activateExtensionApi, registerView, type VirtualDomViewInstance, VirtualDomElements } from '@lvce-editor/api'
 
-// LVCE virtual DOM element IDs. Text nodes are separate from their parent elements.
-const Button = 1
-const Div = 4
-const Text = 12
+const { Button, Div, Text } = VirtualDomElements
 
 const main = async (): Promise<void> => {
   await activateExtensionApi()
