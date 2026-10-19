@@ -71,9 +71,22 @@ test('file view counter source rebuilds and reset restores the sample', async ({
   await page.locator('#preview-ide .FileViewCounter').getByRole('button', { name: 'Increment' }).click()
   await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 2')
 
+  const srcFolder = source.getByRole('treeitem', { exact: true, name: 'src' })
+  await srcFolder.click()
+  await expect(source.getByRole('treeitem', { exact: true, name: 'main.css' })).toBeVisible()
+  await source.getByRole('treeitem', { exact: true, name: 'main.css' }).click()
+  await expect(source.locator('.Editor')).toContainText('gap: 12px')
+  await source.locator('.Editor textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(files['/src/main.css'].replace('gap: 12px', 'gap: 24px'))
+  await page.keyboard.press('Control+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '3')
+  await expect(page.locator('#preview-ide .FileViewCounter')).toHaveCSS('gap', '24px')
+
   await page.getByRole('button', { name: 'Reset sample' }).click()
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 0')
+  await expect(page.locator('#preview-ide .FileViewCounter')).toHaveCSS('gap', '12px')
 })
 
 test('greeting source rebuilds and reset restores the sample', async ({ page }) => {
