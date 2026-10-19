@@ -12,10 +12,10 @@ import {
   writeFile,
 } from '@lvce-editor/api'
 
-const output = createOutputChannel('sample-build')
-
 const main = async (): Promise<void> => {
-  const ready = activate().then(() => output.appendLine('Ready. Run Sample: Run Build from the command palette.'))
+  await activate()
+  const output = createOutputChannel('sample-build')
+  const ready = output.appendLine('Ready. Run Sample: Run Build from the command palette.')
   let build = 0
   let changeHandler: ReturnType<typeof registerFileChangeHandler> | undefined
   let fileRevision = 0
