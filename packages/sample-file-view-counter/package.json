@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --format=esm --external:node:* --external:electron --loader:.css=text --outfile=dist/main.js",
+    "build": "esbuild src/main.ts --bundle --format=esm --external:node:* --external:electron --outfile=dist/main.js",
     "lint": "eslint . --max-warnings 0",
     "type-check": "tsc --noEmit"
   },
