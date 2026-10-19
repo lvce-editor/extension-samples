@@ -368,6 +368,14 @@ export const samples: readonly Sample[] = [
     title: 'Signature Help',
   },
   {
+    description: 'Open the find widget and search the preview document from an extension command.',
+    id: 'find-widget',
+    packageName: 'sample-find-widget',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'Find the matching phrase in this preview.\nAnother line stays unchanged.\n' } },
+    route: 'find-widget',
+    title: 'Find Widget',
+  },
+  {
     description: 'Provide paired braces, closing tags, comments, selections, and log snippets.',
     id: 'language-editing',
     packageName: 'sample-language-editing',
