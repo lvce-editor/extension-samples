@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator } from '@playwright/test'
 
 const sharedWorkerUrl = /(?:renderer|editor|mainArea)WorkerMain/
 
@@ -149,6 +149,72 @@ test('editing the provider workspace does not save or rebuild the source applica
   await expect(source.locator('.Editor')).toContainText('registerFileSystemProvider')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
 })
+
+for (const sampleId of ['code-actions', 'file-system-provider']) {
+  test(`saves only the focused application after repeated pane switches (${sampleId})`, async ({ page }) => {
+    await page.goto(`/extension-samples/${sampleId}/`)
+    await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+    const source = page.locator('#source-ide')
+    const preview = page.locator('#preview-ide')
+    const sourceUri = 'sample-source:///sample/src/main.ts'
+    const previewUri = sampleId === 'code-actions' ? 'memfs:///preview/example.txt' : 'sample-memfs:///README.md'
+    const { entry } = await (await page.request.get('/extension-samples/runtime.json')).json()
+    const readFile = (applicationId: string, uri: string): Promise<string> =>
+      page.evaluate(
+        async ({ applicationId, entry, uri }) => {
+          const renderer = await import(entry)
+          return renderer.executeCommand('Application.execute', applicationId, 'FileSystem.readFile', uri)
+        },
+        { applicationId, entry, uri },
+      )
+    await page.evaluate(() => {
+      globalThis.addEventListener('lvce-file-saved', (event) => {
+        const { applicationId, uri } = (event as CustomEvent<{ applicationId: string; uri: string }>).detail
+        document.body.dataset.lastSavedApplication = applicationId
+        document.body.dataset.lastSavedUri = uri
+      })
+    })
+
+    const replaceText = async (root: Locator, text: string): Promise<void> => {
+      await root.locator('.Editor').click()
+      await root.locator('.Editor textarea').focus()
+      await page.keyboard.press('ControlOrMeta+a')
+      await page.keyboard.insertText(text)
+    }
+    for (let revision = 1; revision <= 2; revision++) {
+      const savedSource = await readFile('source', sourceUri)
+      const savedPreview = await readFile('preview', previewUri)
+      const sourceText = `const paneRevision${revision}=${revision};\n${savedSource}`
+      const previewText = `Saved preview revision ${revision}\n`
+      await replaceText(source, sourceText)
+      await expect(source.locator('.EditorTabCloseButton .MaskIconCircleFilled')).toHaveCount(1)
+      await replaceText(preview, previewText)
+      await expect(preview.locator('.EditorTabCloseButton .MaskIconCircleFilled')).toHaveCount(1)
+      await page.keyboard.press('ControlOrMeta+s')
+
+      await expect(page.locator('body')).toHaveAttribute('data-last-saved-application', 'preview')
+      await expect(page.locator('body')).toHaveAttribute('data-last-saved-uri', previewUri)
+      await expect.poll(() => readFile('preview', previewUri)).toBe(previewText)
+      expect(savedPreview).not.toBe(previewText)
+      expect(await readFile('source', sourceUri)).toBe(savedSource)
+      await expect(preview.locator('.EditorTabCloseButton .MaskIconCircleFilled')).toHaveCount(0)
+      await expect(source.locator('.EditorTabCloseButton .MaskIconCircleFilled')).toHaveCount(1)
+      await expect(source.locator('.EditorRow').first()).toHaveText(`const paneRevision${revision}=${revision};`)
+      await expect(page.locator('body')).toHaveAttribute('data-preview-revision', String(revision))
+
+      await source.locator('.Editor').click()
+      await source.locator('.Editor textarea').focus()
+      await page.keyboard.press('ControlOrMeta+s')
+      await expect(page.locator('body')).toHaveAttribute('data-last-saved-application', 'source')
+      await expect(page.locator('body')).toHaveAttribute('data-last-saved-uri', sourceUri)
+      await expect(source.locator('.EditorTabCloseButton .MaskIconCircleFilled')).toHaveCount(0)
+      await expect(source.locator('.EditorRow').first()).toHaveText(`const paneRevision${revision} = ${revision}`)
+      await expect.poll(async () => (await readFile('source', sourceUri)).split('\n')[0]).toBe(`const paneRevision${revision} = ${revision}`)
+      await expect(page.locator('body')).toHaveAttribute('data-preview-revision', String(revision + 1))
+      await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+    }
+  })
+}
 
 test('reloads the currently open provider file without switching back to README', async ({ page }) => {
   const source = page.locator('#source-ide')
