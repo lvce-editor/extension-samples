@@ -62,6 +62,12 @@ const buildTooling = async (): Promise<Record<string, string>> => {
   }
   await visit('/dist')
   files['/node_modules/@lvce-editor/api/package.json'] = await readFile(join(apiRoot, 'package.json'), 'utf8')
+  const esbuildRoot = dirname(require.resolve('esbuild/package.json'))
+  for (const path of ['package.json', 'README.md', 'LICENSE.md', 'install.js', 'lib/main.js', 'lib/main.d.ts']) {
+    files[`/node_modules/esbuild/${path}`] = await readFile(join(esbuildRoot, path), 'utf8')
+  }
+  // Keep the installed CLI byte-for-byte; on Unix npm may replace it with a native executable.
+  await cp(join(esbuildRoot, 'bin/esbuild'), join(outputRoot, 'esbuild-bin'))
   return files
 }
 
