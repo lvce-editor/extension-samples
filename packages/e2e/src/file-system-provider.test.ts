@@ -158,7 +158,8 @@ for (const sampleId of ['code-actions', 'file-system-provider']) {
     const preview = page.locator('#preview-ide')
     const sourceUri = 'sample-source:///sample/src/main.ts'
     const previewUri = sampleId === 'code-actions' ? 'memfs:///preview/example.txt' : 'sample-memfs:///README.md'
-    const { entry } = await (await page.request.get('/extension-samples/runtime.json')).json()
+    const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
+    const { entry } = await runtimeResponse.json()
     const readFile = (applicationId: string, uri: string): Promise<string> =>
       page.evaluate(
         async ({ applicationId, entry, uri }) => {
@@ -168,6 +169,7 @@ for (const sampleId of ['code-actions', 'file-system-provider']) {
         { applicationId, entry, uri },
       )
     await page.evaluate(() => {
+      const { document } = globalThis
       globalThis.addEventListener('lvce-file-saved', (event) => {
         const { applicationId, uri } = (event as CustomEvent<{ applicationId: string; uri: string }>).detail
         document.body.dataset.lastSavedApplication = applicationId
@@ -210,7 +212,12 @@ for (const sampleId of ['code-actions', 'file-system-provider']) {
       await expect(page.locator('body')).toHaveAttribute('data-last-saved-uri', sourceUri)
       await expect(source.locator('.EditorTabCloseButton .MaskIconCircleFilled')).toHaveCount(0)
       await expect(source.locator('.EditorRow').first()).toHaveText(`const paneRevision${revision} = ${revision}`)
-      await expect.poll(async () => (await readFile('source', sourceUri)).split('\n')[0]).toBe(`const paneRevision${revision} = ${revision}`)
+      await expect
+        .poll(async () => {
+          const content = await readFile('source', sourceUri)
+          return content.split('\n', 1)[0]
+        })
+        .toBe(`const paneRevision${revision} = ${revision}`)
       await expect(page.locator('body')).toHaveAttribute('data-preview-revision', String(revision + 1))
       await expect(page.locator('#preview-status')).toHaveText('Preview ready')
     }
