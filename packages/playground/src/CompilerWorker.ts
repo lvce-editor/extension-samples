@@ -10,6 +10,7 @@ const loadApi = async (): Promise<string> => {
 }
 const apiSource = loadApi()
 const getLoader = (path: string): esbuild.Loader => {
+  if (path.endsWith('.css')) return 'text'
   if (path.endsWith('.json')) return 'json'
   if (path.endsWith('.ts')) return 'ts'
   return 'js'

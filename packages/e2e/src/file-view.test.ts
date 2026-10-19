@@ -35,6 +35,28 @@ test('file view counter keeps independent state for each open file', async ({ pa
   await expect(preview.locator('.FileViewCounter')).toHaveCount(0)
 })
 
+test('file view counter stays within a narrow preview and shows keyboard focus', async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 700 })
+  await page.goto('/extension-samples/file-view-counter/')
+  const preview = page.locator('#preview-ide')
+  const counter = preview.locator('.FileViewCounter')
+  const button = counter.getByRole('button', { name: 'Increment' })
+  await expect(button).toBeVisible({ timeout: 30_000 })
+
+  await button.evaluate((element: HTMLButtonElement) => element.focus({ focusVisible: true }))
+  await expect(button).toHaveCSS('outline-style', 'solid')
+
+  await counter.evaluate((element) => {
+    element.style.width = '180px'
+  })
+  const fitsNarrowPreview = await counter.evaluate((element) => {
+    const bounds = element.getBoundingClientRect()
+    const children = [...element.children].map((child) => child.getBoundingClientRect())
+    return element.scrollWidth <= element.clientWidth && children.every((child) => child.left >= bounds.left && child.right <= bounds.right)
+  })
+  expect(fitsNarrowPreview).toBe(true)
+})
+
 test('file view counter source rebuilds and reset restores the sample', async ({ page }) => {
   await page.goto('/extension-samples/file-view-counter/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
@@ -49,9 +71,20 @@ test('file view counter source rebuilds and reset restores the sample', async ({
   await page.locator('#preview-ide .FileViewCounter').getByRole('button', { name: 'Increment' }).click()
   await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 2')
 
+  const srcFolder = source.getByRole('treeitem', { exact: true, name: 'src' })
+  await srcFolder.click()
+  await source.getByRole('treeitem', { exact: true, name: 'main.css' }).click()
+  await source.locator('.Editor textarea').focus()
+  await page.keyboard.press('Control+a')
+  await page.keyboard.insertText(files['/src/main.css'].replace('gap: 12px', 'gap: 24px'))
+  await page.keyboard.press('Control+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '3')
+  await expect(page.locator('#preview-ide .FileViewCounter')).toHaveCSS('gap', '24px')
+
   await page.getByRole('button', { name: 'Reset sample' }).click()
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 0')
+  await expect(page.locator('#preview-ide .FileViewCounter')).toHaveCSS('gap', '12px')
 })
 
 test('greeting source rebuilds and reset restores the sample', async ({ page }) => {
