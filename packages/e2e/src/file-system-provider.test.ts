@@ -180,6 +180,7 @@ for (const sampleId of ['code-actions', 'file-system-provider']) {
       await root.locator('.Editor textarea').focus()
       await page.keyboard.press('ControlOrMeta+a')
       await page.keyboard.insertText(text)
+      await page.keyboard.press('ControlOrMeta+Home')
     }
     for (let revision = 1; revision <= 2; revision++) {
       const savedSource = await readFile('source', sourceUri)
