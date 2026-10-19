@@ -140,7 +140,8 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       workspaceUri,
     })
     const commands = ['Layout.hideTitleBar', 'Layout.hideStatusBar']
-    if (id !== previewId || (sampleId !== 'source-control-provider' && sampleId !== 'sidebar-counter')) commands.push('Layout.hideActivityBar')
+    if (id !== previewId || (sampleId !== 'source-control-provider' && sampleId !== 'sidebar-counter' && sampleId !== 'color-view'))
+      commands.push('Layout.hideActivityBar')
     commands.push('Layout.moveSideBarLeft', 'Layout.showSideBar')
     for (const command of commands) {
       await invoke('Application.execute', id, command)
