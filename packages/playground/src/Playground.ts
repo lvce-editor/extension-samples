@@ -168,6 +168,22 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   const observers: ResizeObserver[] = []
   for (const id of [sourceId, previewId]) {
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
+    // The shared shortcut dispatcher does not carry the application's identity.
+    // Save the editor that received the shortcut through its owning application.
+    root.addEventListener(
+      'keydown',
+      (event) => {
+        if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey || event.key.toLowerCase() !== 's') return
+        const editor = event.target instanceof Element ? event.target.closest<HTMLElement>('.Editor[data-uid]') : null
+        if (!editor || !root.contains(editor)) return
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        void invoke('Application.execute', id, 'Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'Editor.save').catch((error) => {
+          status.textContent = String(error)
+        })
+      },
+      { capture: true },
+    )
     // Editor workers use coordinates relative to their application's viewport.
     for (const type of ['pointerdown', 'pointermove', 'pointerup', 'mousedown', 'mousemove', 'mouseup', 'click', 'dblclick', 'contextmenu']) {
       root.addEventListener(
