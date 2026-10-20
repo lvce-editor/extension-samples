@@ -15,7 +15,7 @@ const repeatedPattern = /\b(\w+)(\s+)(\1)\b/gi
 const main = async (): Promise<void> => {
   await activate()
   let isAddSelection = false
-  let activeExample: 'todo' | 'keywords' | 'repeated' | undefined
+  let activeExample: 'todo' | 'keywords' | 'repeated' | undefined = 'todo'
   const documents = new Map<string, { text: string; decorations: readonly EditorTextDecoration[] }>()
   const findDecorations = (text: string, expression: RegExp, color: string): EditorTextDecoration[] => {
     const decorations: EditorTextDecoration[] = []

@@ -10,6 +10,61 @@ test('file extension selects a custom view and unrelated files stay in the edito
   await expect(preview.locator('.FileViewGreeting')).toHaveCount(0)
 })
 
+test('F1 opens the command picker in the focused application', async ({ page }) => {
+  await page.goto('/extension-samples/file-view/')
+  const source = page.locator('#source-ide')
+  const preview = page.locator('#preview-ide')
+
+  await expect(preview.locator('.FileViewGreeting')).toBeVisible({ timeout: 30_000 })
+  await preview.getByRole('treeitem', { exact: true, name: 'notes.txt' }).click()
+  await expect(preview.locator('.Editor')).toContainText('This file stays in the text editor.')
+  await expect(preview.locator('.Editor textarea')).toBeFocused()
+  await page.keyboard.press('F1')
+  await expect(preview.locator('.QuickPick')).toBeVisible()
+  await expect(source.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('.QuickPick input')).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.QuickPick')).toBeHidden()
+
+  await source.locator('.EditorRow').first().click()
+  await expect(source.locator('.Editor textarea')).toBeFocused()
+  await page.keyboard.press('F1')
+  await expect(source.locator('.QuickPick')).toBeVisible()
+  await expect(preview.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('.QuickPick input')).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.QuickPick')).toBeHidden()
+
+  await preview.getByRole('treeitem', { exact: true, name: 'notes.txt' }).click()
+  await expect(preview.locator('.Editor')).toContainText('This file stays in the text editor.')
+  await expect(preview.locator('.Editor textarea')).toBeFocused()
+  await page.keyboard.press('F1')
+  await expect(preview.locator('.QuickPick')).toBeVisible()
+  await expect(source.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('.QuickPick input')).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.QuickPick')).toBeHidden()
+
+  await preview.getByRole('heading', { exact: true, name: 'preview' }).click()
+  await page.keyboard.press('F1')
+  await expect(preview.locator('.QuickPick')).toBeVisible()
+  await expect(source.locator('.QuickPick')).toBeHidden()
+  await expect(page.locator('.QuickPick input')).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.QuickPick')).toBeHidden()
+
+  await preview.getByRole('treeitem', { exact: true, name: 'welcome.hello' }).click()
+  for (const shortcut of ['F1', 'ControlOrMeta+Shift+p']) {
+    await preview.locator('.FileViewGreeting').click()
+    await page.keyboard.press(shortcut)
+    await expect(preview.locator('.QuickPick')).toBeVisible()
+    await expect(source.locator('.QuickPick')).toBeHidden()
+    await expect(page.locator('.QuickPick input')).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.QuickPick')).toBeHidden()
+  }
+})
+
 test('file view counter keeps independent state for each open file', async ({ page }) => {
   await page.goto('/extension-samples/file-view-counter/')
   const preview = page.locator('#preview-ide')

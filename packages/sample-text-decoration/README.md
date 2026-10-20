@@ -1,6 +1,8 @@
 # Text Decoration
 
-Select text in [the playground](https://lvce-editor.github.io/extension-samples/text-decoration/), press F1, and run **Sample: Underline Selection**. A red, straight 2-pixel underline appears without changing the text or its undo history. Select across lines or add another overlapping range to underline more text. An empty selection does nothing and repeating a range does not add duplicates.
+When [the playground](https://lvce-editor.github.io/extension-samples/text-decoration/) opens, the preview automatically highlights its `TODO` marker in warm orange. This makes text decorations visible immediately. The source editor remains undecorated.
+
+Select text in the preview, press F1, and run **Sample: Underline Selection**. A red, straight 2-pixel underline appears without changing the text or its undo history. Select across lines or add another overlapping range to underline more text. An empty selection does nothing and repeating a range does not add duplicates.
 
 Try three live examples from F1: **Sample: Highlight TODO Markers** marks each `TODO` tag in warm orange, **Sample: Color Code Keywords** gives declaration and flow keywords different colors, and **Sample: Find Repeated Words** underlines the second word in repeated pairs. The marks follow the current preview text, so edit or remove a match to see the decoration update. These examples inspect the preview only; the source editor stays undecorated.
 

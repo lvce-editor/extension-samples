@@ -140,7 +140,8 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       workspaceUri,
     })
     const commands = ['Layout.hideTitleBar', 'Layout.hideStatusBar']
-    if (id !== previewId || (sampleId !== 'source-control-provider' && sampleId !== 'sidebar-counter')) commands.push('Layout.hideActivityBar')
+    if (id !== previewId || (sampleId !== 'source-control-provider' && sampleId !== 'sidebar-counter' && sampleId !== 'color-view'))
+      commands.push('Layout.hideActivityBar')
     commands.push('Layout.moveSideBarLeft', 'Layout.showSideBar')
     for (const command of commands) {
       await invoke('Application.execute', id, command)
@@ -166,8 +167,30 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   }
 
   const observers: ResizeObserver[] = []
+  // Custom views can receive pointer input without moving DOM focus.
+  let activeApplicationId = sourceId
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      const isCommandPaletteShortcut =
+        (!event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.key === 'F1') ||
+        ((event.ctrlKey || event.metaKey) && !event.altKey && event.shiftKey && event.key.toLowerCase() === 'p')
+      if (!isCommandPaletteShortcut) return
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      void invoke('Application.execute', activeApplicationId, 'Viewlet.openWidget', 'QuickPick', 'everything').catch((error) => {
+        status.textContent = String(error)
+      })
+    },
+    { capture: true },
+  )
   for (const id of [sourceId, previewId]) {
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
+    const activateApplication = (): void => {
+      activeApplicationId = id
+    }
+    root.addEventListener('pointerdown', activateApplication, { capture: true })
+    root.addEventListener('focusin', activateApplication)
     // The shared shortcut dispatcher does not carry the application's identity.
     // Save the editor that received the shortcut through its owning application.
     root.addEventListener(

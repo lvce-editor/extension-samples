@@ -1,0 +1,19 @@
+{
+  "id": "sample.color-view",
+  "name": "Color View Sample",
+  "description": "Change a view background by typing a CSS color",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onView:sample.color-view"],
+  "views": [
+    {
+      "id": "sample.color-view",
+      "title": "Color",
+      "icon": "symbol-number",
+      "kind": "virtualDom",
+      "preferredLocation": "sideBar"
+    }
+  ]
+}

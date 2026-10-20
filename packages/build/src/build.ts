@@ -52,16 +52,19 @@ const buildTooling = async (): Promise<Record<string, string>> => {
     files[`/node_modules/${name}/index.cjs`] = result.outputFiles[0].text
     files[`/node_modules/${name}/package.json`] = JSON.stringify({ name, main: 'index.cjs' })
   }
-  const apiRoot = dirname(dirname(require.resolve('@lvce-editor/api')))
-  const visit = async (relative: string): Promise<void> => {
-    for (const entry of await readdir(join(apiRoot, relative), { withFileTypes: true })) {
-      const path = `${relative}/${entry.name}`
-      if (entry.isDirectory()) await visit(path)
-      else if (entry.name.endsWith('.d.ts')) files[`/node_modules/@lvce-editor/api${path}`] = await readFile(join(apiRoot, path), 'utf8')
+  for (const name of ['@lvce-editor/api', '@lvce-editor/virtual-dom-worker', '@lvce-editor/constants']) {
+    const packageRoot = dirname(dirname(require.resolve(name)))
+    const visit = async (relative: string): Promise<void> => {
+      for (const entry of await readdir(join(packageRoot, relative), { withFileTypes: true })) {
+        const path = `${relative}/${entry.name}`
+        if (entry.isDirectory()) await visit(path)
+        else if (entry.name.endsWith('.d.ts') || (name === '@lvce-editor/api' && entry.name.endsWith('.js')))
+          files[`/node_modules/${name}/${path}`] = await readFile(join(packageRoot, path), 'utf8')
+      }
     }
+    await visit('dist')
+    files[`/node_modules/${name}/package.json`] = await readFile(join(packageRoot, 'package.json'), 'utf8')
   }
-  await visit('/dist')
-  files['/node_modules/@lvce-editor/api/package.json'] = await readFile(join(apiRoot, 'package.json'), 'utf8')
   const esbuildRoot = dirname(require.resolve('esbuild/package.json'))
   for (const path of ['package.json', 'README.md', 'LICENSE.md', 'install.js', 'lib/main.js', 'lib/main.d.ts']) {
     files[`/node_modules/esbuild/${path}`] = await readFile(join(esbuildRoot, path), 'utf8')
