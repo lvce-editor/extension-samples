@@ -4,10 +4,11 @@ Interactive examples for the [Lvce Editor](https://github.com/lvce-editor/lvce-e
 
 [Open the playground](https://lvce-editor.github.io/extension-samples/).
 
-Each extension lives in `packages/sample-<id>`. The static playground shows two real LVCE IDEs side by side: the sample workspace on the left and the running extension on the right. Saving with `Ctrl+S` formats the code with Prettier, bundles the workspace in the browser with esbuild-wasm, and refreshes the preview. Each sample includes a `prettier` field in `package.json` with the default style (no semicolons, single quotes, and a print width of 150); edit it to customize formatting.
+Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static playground shows two real LVCE IDEs side by side: the sample workspace on the left and the running extension on the right. Saving with `Ctrl+S` formats the code with Prettier, bundles the workspace in the browser with esbuild-wasm, and refreshes the preview. Each sample includes a `prettier` field in `package.json` with the default style (no semicolons, single quotes, and a print width of 150); edit it to customize formatting.
 
 ## Samples
 
+- [Basic Vim](./packages/basic-vim)
 - [File View](./packages/sample-file-view)
 - [File View Counter](./packages/sample-file-view-counter)
 - [Sidebar counter](./packages/sample-sidebar-counter)
@@ -56,7 +57,7 @@ Run `npm run knip` to check unused files, exports, and dependencies across every
 
 New `packages/sample-*` workspaces are included automatically, with `src/main.ts` as the extension entry point. Knip checks other source files for unused code. Optional `.lvce/setup-preview.js` modules are also entry points; mark their dynamically called `setupPreview` export with `/** @public */`. Other unused entry-point exports are still reported.
 
-Run `npm run lint` for repository checks, or `npm run lint --workspace=packages/sample-file-system-provider` (substitute any sample package) to lint one extension. Every `packages/sample-*` extension uses the shared `eslint.samples.config.js`: typescript-eslint's [strict type-checked rules](https://typescript-eslint.io/users/configs/#strict-type-checked) and [Unicorn's recommended rules](https://github.com/sindresorhus/eslint-plugin-unicorn). API abbreviations and explicit `undefined` values are allowed. Sample TypeScript projects also enable strict checking and checked indexed access.
+Run `npm run lint` for repository checks, or `npm run lint --workspace=packages/sample-file-system-provider` (substitute any sample package) to lint one extension. Every `packages/sample-*` extension and `packages/basic-vim` uses the shared `eslint.samples.config.js`: typescript-eslint's [strict type-checked rules](https://typescript-eslint.io/users/configs/#strict-type-checked) and [Unicorn's recommended rules](https://github.com/sindresorhus/eslint-plugin-unicorn). API abbreviations and explicit `undefined` values are allowed. Sample TypeScript projects also enable strict checking and checked indexed access.
 
 The playground shares the strict syntax and Unicorn rules, including checks against explicit `any` and non-null assertions. Type-aware rules (such as unsafe values and unhandled promises) run in CI and local lint commands; they are disabled in the browser because the playground's virtual filesystem does not yet support TypeScript project loading. New samples should include a `tsconfig.json` covering all source files.
 

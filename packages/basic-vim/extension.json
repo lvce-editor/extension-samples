@@ -1,0 +1,20 @@
+{
+  "id": "sample.basic-vim",
+  "name": "Basic Vim",
+  "description": "A small modal editor keymap with a block cursor.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:basicVim.start", "onCommand:basicVim.stop"],
+  "commands": [
+    {
+      "id": "basicVim.start",
+      "label": "Basic Vim: Start"
+    },
+    {
+      "id": "basicVim.stop",
+      "label": "Basic Vim: Stop"
+    }
+  ]
+}
