@@ -130,6 +130,15 @@ export const buildStatic = async (): Promise<void> => {
   await installExtension('language-features-typescript', '5.35.0', commitHash, pathPrefix)
   await installExtension('prettier', '2.23.1', commitHash, pathPrefix)
   await cp(join(root, 'dist'), join(outputRoot, 'runtime'), { recursive: true })
+  if (process.env.E2E_FOCUS_DIAGNOSTICS === '1') {
+    const rendererPath = join(outputRoot, 'runtime', commitHash, 'packages', 'renderer-process', 'dist', 'rendererProcessMain.js')
+    const code = await readFile(rendererPath, 'utf8')
+    const receiver = 'const handleMessage = event => {\n'
+    if (code.split(receiver).length !== 2) throw new Error(`Expected exactly one renderer RPC receiver in ${rendererPath}`)
+    await writeFile(rendererPath, code.replace(receiver, `${receiver}  globalThis.___recordReceivedMessage?.(event.data);\n`))
+    const { version } = JSON.parse(await readFile(require.resolve('@lvce-editor/server/package.json'), 'utf8'))
+    process.stdout.write(`Focus diagnostics: server ${version}, renderer RPC receiver ${rendererPath}\n`)
+  }
   const assetDir = `${pathPrefix}/${commitHash}`
   const runtimeHtml = await readFile(join(outputRoot, 'runtime', 'index.html'), 'utf8')
   const runtimeConfigText = runtimeHtml.match(/<script id="Config" type="application\/json">([\s\S]*?)<\/script>/)?.[1]
