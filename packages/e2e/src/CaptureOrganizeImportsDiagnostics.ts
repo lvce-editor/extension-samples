@@ -17,28 +17,29 @@ export const captureOrganizeImportsDiagnostics = async (page: Page, testInfo: Te
       'setFocus = (focusKey, additionalFocusKey, uid, viewletModuleId) => { console.log("[DEBUG-ORGANIZE] focus", focusKey, uid);',
     )
     entries.push(`[DEBUG-ORGANIZE] injected ${new URL(route.request().url()).pathname}`)
-    await route.fulfill({ response, body })
+    await route.fulfill({ body, response })
   })
   await page.route('**/editorWorkerMain.js*', async (route) => {
     const response = await route.fetch()
-    const body = (await response.text()).replace(
+    const source = await response.text()
+    const body = source.replace(
       'const undo = state => {',
       'const undo = state => { console.log("[DEBUG-ORGANIZE] undo", state.uid, state.undoStack.length, JSON.stringify(state.lines));',
     )
     entries.push(`[DEBUG-ORGANIZE] injected ${new URL(route.request().url()).pathname}`)
-    await route.fulfill({ response, body })
+    await route.fulfill({ body, response })
   })
   await page.addInitScript(() => {
     document.addEventListener(
       'keydown',
       (event) => {
-        console.log('[DEBUG-ORGANIZE] key', event.key, event.code, event.metaKey, event.ctrlKey, document.activeElement?.outerHTML)
+        console.warn('[DEBUG-ORGANIZE] key', event.key, event.code, event.metaKey, event.ctrlKey, globalThis.document.activeElement?.outerHTML)
       },
-      true,
+      { capture: true },
     )
   })
   return async () => {
-    console.log('[DEBUG-ORGANIZE] captured', JSON.stringify(entries))
+    console.warn('[DEBUG-ORGANIZE] captured', JSON.stringify(entries))
     await testInfo.attach('organize-command-diagnostics', { body: JSON.stringify(entries, null, 2), contentType: 'application/json' })
   }
 }

@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test'
+import { captureOrganizeImportsDiagnostics } from './CaptureOrganizeImportsDiagnostics.ts'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
-import { captureOrganizeImportsDiagnostics } from './CaptureOrganizeImportsDiagnostics.ts'
 
 const horizontalCursorTranslation = /^[-\d.]+px(?: 0px)?$/
 
