@@ -51,10 +51,10 @@ jobs:
       - run: npm ci
       - name: install playwright system dependencies
         if: runner.os == 'Linux'
-        run: sudo npx playwright install-deps chromium
+        run: sudo npx playwright install-deps chromium firefox
         working-directory: packages/e2e
       - name: install playwright browser
-        run: npx playwright install chromium
+        run: npx playwright install chromium firefox
         working-directory: packages/e2e
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0

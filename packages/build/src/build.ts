@@ -59,7 +59,8 @@ const buildTooling = async (): Promise<Record<string, string>> => {
       for (const entry of await readdir(join(packageRoot, relative), { withFileTypes: true })) {
         const path = `${relative}/${entry.name}`
         if (entry.isDirectory()) await visit(path)
-        else if (entry.name.endsWith('.d.ts')) files[`/node_modules/${name}/${path}`] = await readFile(join(packageRoot, path), 'utf8')
+        else if (entry.name.endsWith('.d.ts') || (name === '@lvce-editor/api' && entry.name.endsWith('.js')))
+          files[`/node_modules/${name}/${path}`] = await readFile(join(packageRoot, path), 'utf8')
       }
     }
     await visit('dist')
