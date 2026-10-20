@@ -10,4 +10,11 @@ Edit `src/main.ts` or `extension.json` in the source editor and save with Ctrl+S
 
 ## API
 
-The sample uses `openColorPicker(initialColor)` from `@lvce-editor/api`.
+The sample calls `await getActiveEditor()` to obtain `{ id, uri }`, or `undefined` when no editor is active. It then calls `openColorPicker(editor.id, '#ff8800')`. The editor id is required, and the initial color is optional. The picker targets that editor even if focus changes; invalid or closed editor ids are rejected.
+
+```ts
+const editor = await getActiveEditor()
+if (editor) {
+  await openColorPicker(editor.id, '#ff8800')
+}
+```
