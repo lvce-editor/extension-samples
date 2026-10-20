@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
+import { expect, test } from './FocusDiagnostics.ts'
 
 const sourceSelections = async (page: Page): Promise<unknown> => {
   const response = await page.request.get('/extension-samples/runtime.json')

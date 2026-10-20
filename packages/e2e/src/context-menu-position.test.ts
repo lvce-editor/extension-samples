@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './FocusDiagnostics.ts'
 
 test('anchors Explorer menus to the owning embedded IDE after resizing and page offsets', async ({ page }) => {
   await page.goto('/extension-samples/hello-world/')

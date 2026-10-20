@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './FocusDiagnostics.ts'
 
 const firstLineCursor = /^[-\d.]+px(?: 0px)?$/
 
