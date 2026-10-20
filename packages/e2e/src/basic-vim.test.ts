@@ -64,6 +64,14 @@ test('normal mode has a block cursor and moves without inserting keys, including
   await expect.poll(() => translation(page)).toBe(end)
   await page.keyboard.press('j')
   await page.keyboard.press('l')
+  await page.evaluate(async () => {
+    const prefix = globalThis.document.body.dataset.routePrefix
+    const response = await globalThis.fetch(`${prefix}/runtime.json`)
+    const { entry } = await response.json()
+    const renderer = await import(entry)
+    // Wait for preceding native shortcuts, including no-op boundary commands.
+    await renderer.executeShortcut('Application.execute', 'preview', 'GetActiveEditor.getSelections')
+  })
   await expect.poll(() => translation(page)).toBe(end)
   await expectOriginalText(page)
 })
@@ -123,7 +131,8 @@ test('source and command palette inputs remain editable across focus changes', a
   await page.keyboard.press('ControlOrMeta+Shift+p')
   const input = page.locator('#preview-ide .QuickPick input')
   await expect(input).toBeVisible()
-  await input.fill('>')
+  await expect(input).toBeFocused()
+  await expect(input).toHaveValue('>')
   await page.keyboard.type('basic')
   await expect(input).toHaveValue('>basic')
   await page.keyboard.press('Escape')
