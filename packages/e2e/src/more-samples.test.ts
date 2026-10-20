@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
+import { captureOrganizeImportsDiagnostics } from './CaptureOrganizeImportsDiagnostics.ts'
 
 const horizontalCursorTranslation = /^[-\d.]+px(?: 0px)?$/
 
@@ -153,23 +154,28 @@ test('rename opens automatically, changes complete identifiers, and can be cance
   await expect(input).toHaveValue('color')
 })
 
-test('organize imports quick pick sorts the import block, is repeatable, and supports undo', async ({ page }) => {
-  await page.goto('/extension-samples/code-actions/')
-  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
-  const editor = page.locator('#preview-ide .Editor')
-  await focusEditor(page)
-  const rows = editor.locator('.EditorRow')
-  await runSelectedCommand(page, 'Editor: Organize Imports')
-  await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
-  await runSelectedCommand(page, 'Editor: Organize Imports')
-  await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
-  await focusEditor(page)
-  await page.keyboard.press('ControlOrMeta+z')
-  await expect(rows).toHaveText(['import zebra', 'import apple', 'import delta', '', 'print(apple)', ''])
-  await focusEditor(page)
-  await page.keyboard.press('Shift+Alt+o')
-  await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
-  await focusEditor(page)
-  await page.keyboard.press('ControlOrMeta+z')
-  await expect(rows).toHaveText(['import zebra', 'import apple', 'import delta', '', 'print(apple)', ''])
+test('organize imports quick pick sorts the import block, is repeatable, and supports undo', async ({ page }, testInfo) => {
+  const finishDiagnostics = await captureOrganizeImportsDiagnostics(page, testInfo)
+  try {
+    await page.goto('/extension-samples/code-actions/')
+    await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+    const editor = page.locator('#preview-ide .Editor')
+    await focusEditor(page)
+    const rows = editor.locator('.EditorRow')
+    await runSelectedCommand(page, 'Editor: Organize Imports')
+    await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
+    await runSelectedCommand(page, 'Editor: Organize Imports')
+    await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
+    await focusEditor(page)
+    await page.keyboard.press('ControlOrMeta+z')
+    await expect(rows).toHaveText(['import zebra', 'import apple', 'import delta', '', 'print(apple)', ''])
+    await focusEditor(page)
+    await page.keyboard.press('Shift+Alt+o')
+    await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
+    await focusEditor(page)
+    await page.keyboard.press('ControlOrMeta+z')
+    await expect(rows).toHaveText(['import zebra', 'import apple', 'import delta', '', 'print(apple)', ''])
+  } finally {
+    await finishDiagnostics()
+  }
 })
