@@ -11,6 +11,12 @@ import {
 } from '@lvce-editor/api'
 import { readGeneratedBundle } from './GeneratedBundleStorage.ts'
 
+class BinaryFileError extends Error {
+  override get name(): string {
+    return 'BinaryFileError'
+  }
+}
+
 const prefix = 'sample-source://'
 const memoryUri = (uri: string): string => uri.replace(prefix, 'memfs://')
 const generatedRoot = 'sample-source:///sample/dist'
@@ -63,9 +69,7 @@ const main = async (): Promise<void> => {
           if (bytes.includes(0)) throw new Error('Binary content')
           return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
         } catch {
-          const error = new Error('The esbuild executable is a binary file and cannot be opened as text')
-          error.name = 'BinaryFileError'
-          throw error
+          throw new BinaryFileError('The esbuild executable is a binary file and cannot be opened as text')
         }
       }
       if (binaryDirectories.includes(uri)) throw new Error(`Not a file: ${uri}`)
