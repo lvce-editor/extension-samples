@@ -90,7 +90,7 @@ test('playground packages and opens authentic API runtime files', async ({ page 
   await source.getByRole('treeitem', { exact: true, name: 'node_modules' }).click()
   await source.getByRole('treeitem', { exact: true, name: '@lvce-editor' }).click()
   await source.getByRole('treeitem', { exact: true, name: 'api' }).click()
-  await source.getByRole('treeitem', { exact: true, name: 'dist' }).click()
+  await source.getByRole('treeitem', { description: `${root}/@lvce-editor/api/dist`, exact: true, name: 'dist' }).click()
   await source.getByRole('treeitem', { exact: true, name: 'index.js' }).click()
   await expect(source.getByRole('tab', { exact: true, name: 'index.js Close' })).toBeVisible()
   await expect(source.locator('.Editor')).toContainText('export { activate }')
