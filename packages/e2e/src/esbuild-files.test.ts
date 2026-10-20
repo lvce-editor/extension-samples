@@ -54,13 +54,41 @@ test('esbuild package and CLI entries are visible, authentic, and lazy', async (
     // A native executable has no text representation.
   }
   for (const uri of [`${root}/esbuild/bin/esbuild`, `${root}/.bin/esbuild`]) {
-    if (text === undefined) await expect(execute(page, 'FileSystem.readFile', uri)).rejects.toThrow('binary file')
-    else expect(await execute(page, 'FileSystem.readFile', uri)).toBe(text)
+    if (text === undefined) {
+      await expect(execute(page, 'FileSystem.readFile', uri)).rejects.toMatchObject({ name: 'BinaryFileError' })
+      expect(await execute(page, 'FileSystem.readFile', uri, 'binary')).toBe(new TextDecoder().decode(bytes))
+    } else expect(await execute(page, 'FileSystem.readFile', uri)).toBe(text)
     await expect(execute(page, 'FileSystem.writeFile', uri, 'overwrite')).rejects.toThrow('read-only')
     await expect(execute(page, 'FileSystem.readDirWithFileTypes', uri)).rejects.toThrow('Not a directory')
   }
   expect(page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))).toHaveLength(0)
   expect(await page.evaluate(() => globalThis.localStorage.getItem('extension-samples:workspace:file-view-counter'))).toBeNull()
+})
+
+test('opens a native esbuild executable as text when requested', async ({ page }) => {
+  await page.goto('/extension-samples/file-view-counter/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+
+  const source = page.locator('#source-ide')
+  const executableUri = `${root}/esbuild/bin/esbuild`
+  try {
+    await execute(page, 'FileSystem.readFile', executableUri)
+    test.skip(true, 'The platform esbuild entry is already text')
+  } catch {
+    // Native binaries are the behavior under test; Windows text shims remain readable.
+  }
+  await source.getByRole('treeitem', { exact: true, name: 'node_modules' }).click()
+  await source.getByRole('treeitem', { exact: true, name: 'esbuild' }).first().click()
+  await source.getByRole('treeitem', { exact: true, name: 'bin' }).click()
+  await source.getByRole('treeitem', { exact: true, name: 'esbuild' }).last().click()
+
+  const binaryContent = page.locator('.EditorContentBinary')
+  await expect(binaryContent).toHaveText('The file is not displayed in the text editor because its contents are binary.Reopen with Text Editor')
+  await expect(page.getByRole('button', { name: 'Retry' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Reopen with Text Editor' }).click()
+  await expect(binaryContent).toBeHidden()
+  await expect(source.locator('.EditorContent')).toBeVisible()
+  await expect(source.locator('.TabTitle').filter({ hasText: 'esbuild' })).toHaveCount(1)
 })
 
 test('playground packages declarations for the API virtual DOM exports', async ({ page }) => {

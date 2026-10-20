@@ -50,18 +50,22 @@ const main = async (): Promise<void> => {
       if (uri === `${modulesRoot}/esbuild`) return [...entries.filter((entry) => entry.name !== 'bin'), { name: 'bin', type: 3 }]
       return uri === 'sample-source:///sample' ? [...entries.filter((entry) => entry.name !== 'dist'), { name: 'dist', type: 3 }] : entries
     },
-    async readFile(uri) {
+    async readFile(uri: string, ...args: unknown[]) {
+      const encoding = args[0]
       if (isBinary(uri)) {
         const response = await fetch(new URL('../esbuild-bin', import.meta.url))
         if (!response.ok) throw new Error(`Unable to load esbuild binary: ${response.status}`)
         const bytes = new Uint8Array(await response.arrayBuffer())
+        if (encoding === 'binary') return new TextDecoder().decode(bytes)
         // Application filesystem reads are text-only, even when a provider returns a Blob.
         // Windows installs may retain the text CLI shim; Unix installs use a native binary.
         try {
           if (bytes.includes(0)) throw new Error('Binary content')
           return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
         } catch {
-          throw new Error('The esbuild executable is a binary file and cannot be opened as text')
+          const error = new Error('The esbuild executable is a binary file and cannot be opened as text')
+          error.name = 'BinaryFileError'
+          throw error
         }
       }
       if (binaryDirectories.includes(uri)) throw new Error(`Not a file: ${uri}`)
