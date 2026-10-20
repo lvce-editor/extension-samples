@@ -58,11 +58,10 @@ jobs:
           npm run e2e:headless --workspace=packages/e2e --
           src/context-menu-position.test.ts src/definition-providers.test.ts src/file-view.test.ts
           src/format-on-save.test.ts src/more-samples.test.ts src/text-decoration.test.ts
-          --grep 'anchors Explorer|navigates to its declaration|F1 opens|formats saved sample|status bar item updates|shows live TODO'
+          --retries=0
+          --grep 'anchors Explorer|navigates to its declaration|F1 opens|formats saved sample|uses edited package settings|status bar item updates|shows live TODO|disposal clears output'
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-          E2E_FOCUS_DIAGNOSTICS: 1
-          E2E_ATTEMPT: ${{ matrix.attempt }}
       - uses: actions/upload-artifact@v7
         if: always()
         with:

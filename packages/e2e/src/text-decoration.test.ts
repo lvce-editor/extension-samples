@@ -1,6 +1,6 @@
-import type { Page } from '@playwright/test'
-import { expect, test } from './FocusDiagnostics.ts'
+import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { replaceSourceText } from './ReplaceSourceText.ts'
 
 const command = async (page: Page, label: string): Promise<void> => {
   await focusEditor(page)
@@ -132,36 +132,9 @@ test('disposal clears output and rebuilding resets registrations and stale under
 
   const response = await page.request.get('/extension-samples/samples/text-decoration/files.json')
   const files = await response.json()
-  const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
-  const { entry } = await runtimeResponse.json()
-  const sourceState = async (): Promise<{ selections: readonly number[]; text: string }> =>
-    page.evaluate(async (entry) => {
-      const renderer = await import(entry)
-      const [document, selections] = await Promise.all([
-        renderer.executeCommand('Application.execute', 'source', 'GetActiveEditor.getTextDocument'),
-        renderer.executeCommand('Application.execute', 'source', 'GetActiveEditor.getSelections'),
-      ])
-      return { selections, text: document.text }
-    }, entry)
   const rebuild = async (color: string, revision: string): Promise<void> => {
-    await focusEditor(page, 'source')
-    const { text } = await sourceState()
-    const lines = text.split('\n')
-    await page.keyboard.press('ControlOrMeta+a')
-    await expect
-      .poll(async () => {
-        const { selections } = await sourceState()
-        return selections
-      })
-      .toEqual([0, 0, lines.length - 1, lines.at(-1)!.length])
     const replacement = files['/src/main.ts'].replace('#ff0000', () => color)
-    await page.keyboard.insertText(replacement)
-    await expect
-      .poll(async () => {
-        const { text } = await sourceState()
-        return text
-      })
-      .toBe(replacement)
+    await replaceSourceText(page, replacement)
     await page.keyboard.press('ControlOrMeta+s')
     await expect(page.locator('body')).toHaveAttribute('data-preview-revision', revision)
     await expect(page.getByRole('status')).toHaveText('Preview ready')

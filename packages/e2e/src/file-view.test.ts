@@ -1,4 +1,4 @@
-import { expect, test } from './FocusDiagnostics.ts'
+import { expect, test } from '@playwright/test'
 
 test('file extension selects a custom view and unrelated files stay in the editor', async ({ page }) => {
   await page.goto('/extension-samples/file-view/')
