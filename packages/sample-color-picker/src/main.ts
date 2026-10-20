@@ -1,10 +1,14 @@
-import { activate, openColorPicker, registerCommand } from '@lvce-editor/api'
+import { activate, getActiveEditor, openColorPicker, registerCommand } from '@lvce-editor/api'
 
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
     async execute() {
-      await openColorPicker('#ff8800')
+      const editor = await getActiveEditor()
+      if (!editor) {
+        return
+      }
+      await openColorPicker(editor.id, '#ff8800')
     },
     id: 'sample.openColorPicker',
   })
