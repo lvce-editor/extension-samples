@@ -57,8 +57,11 @@ test('normal mode has a block cursor and moves without inserting keys, including
   })
   await expectOriginalText(page)
   await page.keyboard.press('ControlOrMeta+End')
-  await expect.poll(() => translation(page)).not.toBe(origin)
-  const end = await translation(page)
+  const lastRowOffset = await page
+    .locator('#preview-ide .EditorRow')
+    .evaluateAll((rows) => (rows.at(-1) as HTMLElement).offsetTop - (rows[0] as HTMLElement).offsetTop)
+  const end = `${origin.split(' ', 1)[0]} ${lastRowOffset}px`
+  await expect.poll(() => translation(page)).toBe(end)
   await page.keyboard.press('j')
   await page.keyboard.press('l')
   await expect.poll(() => translation(page)).toBe(end)

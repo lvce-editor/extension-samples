@@ -34,7 +34,12 @@ const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
     return content
   })
 
-export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExtensions: readonly unknown[]): Promise<void> => {
+export const mountPlayground = async (
+  invoke: Invoke,
+  prefix: string,
+  sourceExtensions: readonly unknown[],
+  invokeShortcut: Invoke,
+): Promise<void> => {
   setupPreviewDivider()
   await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.formatOnSave': true, 'editor.lineNumbers': true })
   const sourceId = 'source'
@@ -178,7 +183,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       if (!isCommandPaletteShortcut) return
       event.preventDefault()
       event.stopImmediatePropagation()
-      void invoke('Application.execute', activeApplicationId, 'Viewlet.openWidget', 'QuickPick', 'everything').catch((error) => {
+      void invokeShortcut('Application.execute', activeApplicationId, 'Viewlet.openWidget', 'QuickPick', 'everything').catch((error) => {
         status.textContent = String(error)
       })
     },
@@ -201,7 +206,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         if (!editor || !root.contains(editor)) return
         event.preventDefault()
         event.stopImmediatePropagation()
-        void invoke('Application.execute', id, 'Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'Editor.save').catch((error) => {
+        void invokeShortcut('Application.execute', id, 'Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'Editor.save').catch((error) => {
           status.textContent = String(error)
         })
       },
