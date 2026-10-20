@@ -17,5 +17,5 @@
     "target": "esnext",
     "types": ["node"]
   },
-  "include": ["src", "playwright.config.ts"]
+  "include": ["src", "playwright.config.ts", "../build/src/getEsbuildBinaryPath.ts"]
 }

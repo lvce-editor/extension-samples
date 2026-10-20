@@ -7,6 +7,7 @@ import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
 import { createIgnoreHashes } from './CreateIgnoreHashes.ts'
 import { createHtml } from './html.ts'
+import { getEsbuildBinaryPath } from './getEsbuildBinaryPath.ts'
 import { samples } from './samples.ts'
 
 const root = resolve(import.meta.dirname, '../../..')
@@ -68,8 +69,7 @@ const buildTooling = async (): Promise<Record<string, string>> => {
   for (const path of ['package.json', 'README.md', 'LICENSE.md', 'install.js', 'lib/main.js', 'lib/main.d.ts']) {
     files[`/node_modules/esbuild/${path}`] = await readFile(join(esbuildRoot, path), 'utf8')
   }
-  // Keep the installed CLI byte-for-byte; on Unix npm may replace it with a native executable.
-  await cp(join(esbuildRoot, 'bin/esbuild'), join(outputRoot, 'esbuild-bin'))
+  await cp(getEsbuildBinaryPath(), join(outputRoot, 'esbuild-bin'))
   return files
 }
 
