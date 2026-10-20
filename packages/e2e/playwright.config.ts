@@ -15,6 +15,13 @@ export default defineConfig({
         browserName: 'chromium',
       },
     },
+    {
+      name: 'firefox',
+      testMatch: /diagnostic-geometry\.test\.ts/,
+      use: {
+        browserName: 'firefox',
+      },
+    },
   ],
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   retries: process.env.CI ? 2 : 0,
