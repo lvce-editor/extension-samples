@@ -13,7 +13,7 @@ The playground starts in normal mode with a block cursor. When installing the sa
 | `x`                | Delete the character to the right                                         |
 | `u`                | Undo                                                                      |
 
-Insert mode allows ordinary typing. Normal mode ignores unassigned text keys, Enter, Backspace, Delete and paste. Modified shortcuts (including the command palette), arrow keys and other inputs keep their editor behavior. These commands reuse the editor's movement and undo semantics, including its boundary and word behavior. Counts, operators, visual mode, registers, macros and Ex commands are outside this basic sample.
+Insert mode allows ordinary typing. Normal mode ignores unassigned text keys, Enter, Backspace, Delete, paste, cut and composition input. The command palette, arrow keys and other inputs keep their editor behavior. These commands reuse the editor's movement and undo semantics, including its boundary and word behavior. Counts, operators, visual mode, registers, macros and Ex commands are outside this basic sample.
 
 **Basic Vim: Stop** removes the keymap and restores the cursor preference. Restarting returns to normal mode. The keymap belongs to the preview application, so source editing and search inputs remain usable. Saving the source reloads the extension and starts a fresh keymap; disposing the preview removes its bindings and cursor override.
 

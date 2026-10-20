@@ -47,6 +47,14 @@ test('normal mode has a block cursor and moves without inserting keys, including
   await page.keyboard.press('Enter')
   await page.keyboard.press('Backspace')
   await page.keyboard.press('Delete')
+  await page.locator('#preview-ide .Editor textarea').evaluate((element) => {
+    const clipboardData = new DataTransfer()
+    clipboardData.setData('text/plain', 'ignored paste')
+    element.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
+    for (const type of ['compositionstart', 'compositionupdate', 'compositionend']) {
+      element.dispatchEvent(new CompositionEvent(type, { bubbles: true, data: 'ignored composition' }))
+    }
+  })
   await expectOriginalText(page)
   await page.keyboard.press('ControlOrMeta+End')
   await expect.poll(() => translation(page)).not.toBe(origin)
