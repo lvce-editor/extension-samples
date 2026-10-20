@@ -116,6 +116,10 @@ export const buildStatic = async (): Promise<void> => {
   const settingsPath = join(root, 'dist', commitHash, 'config', 'defaultSettings.json')
   const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
   await writeJson(settingsPath, { ...settings, 'application.useOnLoadJson': true })
+  // Keep editor input ordered with shortcuts through the renderer worker.
+  await cp(dirname(require.resolve('@lvce-editor/renderer-process')), join(root, 'dist', commitHash, 'packages', 'renderer-process', 'dist'), {
+    recursive: true,
+  })
   // Ship editor fixes independently of the full server runtime release.
   await cp(dirname(require.resolve('@lvce-editor/editor-worker')), join(root, 'dist', commitHash, 'packages', 'editor-worker', 'dist'), {
     recursive: true,
