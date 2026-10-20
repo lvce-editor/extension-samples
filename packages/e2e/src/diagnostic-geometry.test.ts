@@ -72,4 +72,6 @@ test('diagnostic underlines match the rendered TODO text', async ({ page }) => {
   await page.keyboard.type('color=blue size=large')
   await expect(editor.locator('.EditorRow').first()).toHaveText('color=blue size=large')
   await expect(editor.locator('.DiagnosticError')).toHaveCount(0)
+  await expect(page.locator('#preview-ide .Problems')).toBeVisible()
+  await expect(page.locator('#preview-ide .Problems').getByText('Replace TODO with a setting value.', { exact: true })).toHaveCount(0)
 })
