@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test'
-import { runCommand } from './RunCommand.ts'
 
 test('hello world notifications stay within their applications and dismiss independently', async ({ page }) => {
   await page.goto('/extension-samples/hello-world/')
@@ -29,7 +28,14 @@ test('hello world notifications stay within their applications and dismiss indep
   await preview.locator('.NotificationCloseButton').click()
   await expect(preview.locator('.NotificationMessage')).toHaveCount(0)
   await expect(source.locator('.NotificationMessage')).toHaveText('Source notification')
-  await runCommand(page, 'Sample: Hello World')
+  await preview.locator('.EditorRow').first().click()
+  await page.keyboard.press('F1')
+  const palette = preview.locator('.QuickPick')
+  await expect(palette).toBeVisible()
+  await expect(source.locator('.QuickPick')).toBeHidden()
+  await palette.locator('input').fill('>Sample: Hello World')
+  await palette.getByRole('option', { exact: true, name: 'Sample: Hello World' }).click()
+  await expect(palette).toBeHidden()
   await expect(preview.locator('.NotificationMessage')).toHaveText('Hello World!')
   await source.locator('.NotificationCloseButton').click()
   await expect(source.locator('.NotificationMessage')).toHaveCount(0)
