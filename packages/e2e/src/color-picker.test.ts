@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 
 test('extension color picker opens with an initial color and edits the current document', async ({ page }) => {
@@ -52,9 +53,9 @@ test('explicit picker target edits only that editor after focus moves to another
   await execute(page, 'preview', 'GetActiveEditor.openColorPicker', target.id, '#ff8800')
   const targetEditor = page.locator(`#preview-ide .Editor[data-uid="${target.id}"]`)
   const otherEditor = page.locator(`#preview-ide .Editor[data-uid="${other.id}"]`)
-  const picker = targetEditor.locator('.ColorPicker')
+  const picker = page.locator('#preview-ide .ColorPicker')
   await expect(picker).toBeVisible()
-  await expect(otherEditor.locator('.ColorPicker')).toHaveCount(0)
+  await expect(page.locator('.ColorPicker')).toHaveCount(1)
   await picker.locator('.ColorPickerSliderWrapper').click({ position: { x: 200, y: 15 } })
   await expect(targetEditor).not.toContainText('#112233')
   await expect(otherEditor).toContainText('#445566')
@@ -67,14 +68,33 @@ test('missing, foreign and closed editor targets reject and an empty preview has
   await expect(page.locator('#preview-ide .ColorPicker')).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.locator('.ColorPicker')).toHaveCount(0)
+  const response = await page.request.get('/extension-samples/samples/color-picker/files.json')
+  const files = await response.json()
+  const source = files['/src/main.ts']
+    .replace('        return\n', '        return { absent: editor === undefined, editor: editor ?? null }\n')
+    .replace(
+      "      await openColorPicker(editor.id, '#ff8800')",
+      "      await openColorPicker(editor.id, '#ff8800')\n      return { absent: false, editor }",
+    )
+  await focusEditor(page, 'source')
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(source)
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.ColorPicker')).toHaveCount(0)
   const target = await execute(page, 'preview', 'GetActiveEditor.getActiveEditorInfo')
-  const source = await execute(page, 'source', 'GetActiveEditor.getActiveEditorInfo')
-  for (const id of [undefined, -1, source.id]) {
+  expect(await execute(page, 'preview', 'ExtensionHost.executeCommand', 'sample.openColorPicker')).toEqual({ absent: false, editor: target })
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.ColorPicker')).toHaveCount(0)
+  const sourceEditor = await execute(page, 'source', 'GetActiveEditor.getActiveEditorInfo')
+  for (const id of [undefined, -1, sourceEditor.id]) {
     await expect(execute(page, 'preview', 'GetActiveEditor.openColorPicker', id)).rejects.toThrow()
   }
   await expect(page.locator('.ColorPicker')).toHaveCount(0)
   await execute(page, 'preview', 'Main.closeAllEditors')
-  expect(await execute(page, 'preview', 'GetActiveEditor.getActiveEditorInfo')).toBeUndefined()
+  await expect(page.locator('#preview-ide .Editor')).toHaveCount(0)
+  expect(await execute(page, 'preview', 'ExtensionHost.executeCommand', 'sample.openColorPicker')).toEqual({ absent: true, editor: null })
   await expect(execute(page, 'preview', 'GetActiveEditor.openColorPicker', target.id)).rejects.toThrow()
   await execute(page, 'preview', 'ExtensionHost.executeCommand', 'sample.openColorPicker')
   await expect(page.locator('.ColorPicker')).toHaveCount(0)
