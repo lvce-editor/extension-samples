@@ -15,7 +15,8 @@ interface TextDocument {
 const openTag = /<([a-z][a-z0-9]*)>[^<>]*<$/i
 const braces = new Set(['(', '[', '{'])
 
-const ready = activate().then(() => {
+const main = async (): Promise<void> => {
+  await activate()
   registerBraceCompletionProvider({
     id: 'sample-braces',
     languageId: 'plaintext',
@@ -58,22 +59,22 @@ const ready = activate().then(() => {
       return text.slice(0, offset).endsWith('log') ? { deleted: 3, inserted: 'console.log($0)', type: 1 } : undefined
     },
   })
-})
 
-const commands = [
-  { args: ['('], command: 'Editor.braceCompletion', id: 'sample.completeBrace' },
-  { args: ['/'], command: 'Editor.typeWithAutoClosing', id: 'sample.closeTag' },
-  { args: [], command: 'Editor.toggleBlockComment', id: 'sample.commentSelection' },
-  { args: [], command: 'Editor.selectionGrow', id: 'sample.expandSelection' },
-  { args: [], command: 'Editor.tabCompletion', id: 'sample.completeLog' },
-]
-for (const { args, command, id } of commands) {
-  registerCommand({
-    async execute() {
-      await ready
-      await executeCommand(command, ...args)
-    },
-    id,
-  })
+  const commands = [
+    { args: ['('], command: 'Editor.braceCompletion', id: 'sample.completeBrace' },
+    { args: ['/'], command: 'Editor.typeWithAutoClosing', id: 'sample.closeTag' },
+    { args: [], command: 'Editor.toggleBlockComment', id: 'sample.commentSelection' },
+    { args: [], command: 'Editor.selectionGrow', id: 'sample.expandSelection' },
+    { args: [], command: 'Editor.tabCompletion', id: 'sample.completeLog' },
+  ]
+  for (const { args, command, id } of commands) {
+    registerCommand({
+      async execute() {
+        await executeCommand(command, ...args)
+      },
+      id,
+    })
+  }
 }
-ready.catch(console.error)
+
+main().catch(console.error)

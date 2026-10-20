@@ -11,6 +11,7 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [File View](./packages/sample-file-view)
 - [File View Counter](./packages/sample-file-view-counter)
 - [Sidebar counter](./packages/sample-sidebar-counter)
+- [Color view](./packages/sample-color-view)
 - [Hello World](./packages/sample-hello-world)
 - [Text Decoration](./packages/sample-text-decoration)
 - [Text Manipulation](./packages/sample-text-manipulation)
@@ -37,6 +38,7 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Authentication Provider](./packages/sample-authentication-provider)
 - [Editor Decorations](./packages/sample-editor-decorations)
 - [Signature Help](./packages/sample-signature-help)
+- [Find Widget](./packages/sample-find-widget)
 - [Language Editing](./packages/sample-language-editing)
 
 ## Development

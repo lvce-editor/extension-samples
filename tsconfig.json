@@ -50,6 +50,9 @@
       "path": "./packages/sample-dialog"
     },
     {
+      "path": "./packages/sample-color-view"
+    },
+    {
       "path": "./packages/sample-sidebar-counter"
     },
     {
@@ -93,6 +96,9 @@
     },
     {
       "path": "./packages/sample-language-editing"
+    },
+    {
+      "path": "./packages/sample-find-widget"
     }
   ]
 }

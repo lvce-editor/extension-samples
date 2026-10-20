@@ -11,10 +11,11 @@ import {
 } from '@lvce-editor/api'
 
 const preferenceKey = 'editor.fontSize'
-const output = createOutputChannel('sample-preferences')
 
 const main = async (): Promise<void> => {
-  const originalFontSize = activate().then(() => getPreference(preferenceKey))
+  await activate()
+  const output = createOutputChannel('sample-preferences')
+  const originalFontSize = getPreference(preferenceKey)
   const ready = originalFontSize.then((value) => output.appendLine(`Current ${preferenceKey}: ${String(value)}`))
   registerCommand({
     async execute() {

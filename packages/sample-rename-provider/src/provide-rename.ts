@@ -1,7 +1,6 @@
-interface TextDocument {
-  readonly text: string
-  readonly uri: string
-}
+import type { HoverProvider } from '@lvce-editor/api'
+
+type TextDocument = Pick<Parameters<HoverProvider['provideHover']>[0], 'text' | 'uri'>
 
 interface RenameResult {
   readonly canRename: boolean
