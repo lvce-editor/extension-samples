@@ -4,6 +4,7 @@ import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 
 const require = createRequire(import.meta.url)
+const buildRequire = createRequire(new URL('../../build/package.json', import.meta.url))
 const root = 'sample-source:///sample/node_modules'
 
 const execute = async (page: Page, command: string, ...args: readonly unknown[]): Promise<any> => {
@@ -80,7 +81,7 @@ test('playground packages and opens authentic API runtime files', async ({ page 
   await page.goto('/extension-samples/file-view-counter/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const source = page.locator('#source-ide')
-  const apiRoot = dirname(dirname(require.resolve('@lvce-editor/api')))
+  const apiRoot = dirname(dirname(buildRequire.resolve('@lvce-editor/api')))
   for (const path of ['dist/index.js', 'dist/parts/Activation/Activation.js']) {
     const expected = await readFile(join(apiRoot, path), 'utf8')
     expect(await execute(page, 'FileSystem.readFile', `${root}/@lvce-editor/api/${path}`)).toBe(expected)
