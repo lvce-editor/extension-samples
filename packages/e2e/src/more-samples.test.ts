@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { replaceSourceText } from './ReplaceSourceText.ts'
 import { runCommand } from './RunCommand.ts'
 
 const horizontalCursorTranslation = /^[-\d.]+px(?: 0px)?$/
@@ -20,9 +21,7 @@ test('status bar item updates after selection and preserves its value on cancell
 
   const response = await page.request.get('/extension-samples/samples/status-bar-item/files.json')
   const files = await response.json()
-  await focusEditor(page, 'source')
-  await page.keyboard.press('ControlOrMeta+a')
-  await page.keyboard.insertText(files['/src/main.ts'].replace("let environment = 'Development'", "let environment = 'Production'"))
+  await replaceSourceText(page, files['/src/main.ts'].replace("let environment = 'Development'", "let environment = 'Production'"))
   await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(item).toHaveText('Environment: Production')

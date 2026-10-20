@@ -30,10 +30,12 @@ jobs:
       - run: npm run lint
 
   e2e-platform:
+    name: e2e-platform (${{ matrix.os }}, attempt ${{ matrix.attempt }})
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2025]
+        os: [macos-15]
+        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
@@ -52,13 +54,18 @@ jobs:
         working-directory: packages/e2e
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-      - run: npm run e2e:headless
+      - run: >-
+          npm run e2e:headless --workspace=packages/e2e --
+          src/context-menu-position.test.ts src/definition-providers.test.ts src/file-view.test.ts
+          src/format-on-save.test.ts src/more-samples.test.ts src/text-decoration.test.ts
+          --retries=0
+          --grep 'anchors Explorer|navigates to its declaration|F1 opens|formats saved sample|uses edited package settings|status bar item updates|shows live TODO|disposal clears output'
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: playground-e2e-${{ matrix.os }}
+          name: playground-e2e-${{ matrix.os }}-attempt-${{ matrix.attempt }}
           path: |
             packages/e2e/playwright-report
             packages/e2e/test-results

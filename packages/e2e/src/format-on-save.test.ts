@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
+import { focusEditor } from './FocusEditor.ts'
+import { replaceSourceText } from './ReplaceSourceText.ts'
 
 const sourceSelections = async (page: Page): Promise<unknown> => {
   const response = await page.request.get('/extension-samples/runtime.json')
@@ -27,7 +29,7 @@ for (const restoredDraft of [false, true]) {
     const source = page.locator('#source-ide')
     const editor = source.locator('.Editor')
     await editor.locator('.EditorRow').first().click()
-    await editor.locator('textarea').focus()
+    await focusEditor(page, 'source')
     await page.keyboard.press('ControlOrMeta+Home')
     await expect.poll(() => sourceSelections(page)).toEqual([0, 0, 0, 0])
     await page.keyboard.insertText('const message={text:"formatted on save"};')
@@ -61,9 +63,7 @@ test('uses edited package settings for the next save', async ({ page }) => {
   const files = await response.json()
   const packageJson = JSON.parse(files['/package.json'])
   packageJson.prettier = { semi: true, singleQuote: false }
-  await source.locator('.Editor textarea').focus()
-  await page.keyboard.press('ControlOrMeta+a')
-  await page.keyboard.insertText(JSON.stringify(packageJson))
+  await replaceSourceText(page, JSON.stringify(packageJson))
   await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   expect(
@@ -73,8 +73,9 @@ test('uses edited package settings for the next save', async ({ page }) => {
   ).toEqual({ semi: true, singleQuote: false })
   await source.getByRole('tab', { exact: false, name: 'main.ts' }).click()
   await expect(source.getByRole('tab', { exact: true, name: 'main.ts Close' })).toHaveAttribute('aria-selected', 'true')
-  await source.locator('.Editor textarea').focus()
+  await focusEditor(page, 'source')
   await page.keyboard.press('ControlOrMeta+Home')
+  await expect.poll(() => sourceSelections(page)).toEqual([0, 0, 0, 0])
   await page.keyboard.insertText("const message={text:'custom settings'}")
   await page.keyboard.press('Enter')
   await page.keyboard.press('ControlOrMeta+s')

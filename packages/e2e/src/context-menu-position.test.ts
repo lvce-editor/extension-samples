@@ -54,7 +54,12 @@ test('anchors Explorer menus to the owning embedded IDE after resizing and page 
   await target.click({ button: 'right', position: { x: 60, y: 11 } })
   await expect(menu).toBeVisible()
   const rightEdgeBox = (await menu.boundingBox())!
-  expect(rightEdgeBox.x).toBeGreaterThanOrEqual(narrowRoot.x)
+  const placement = await preview.evaluate((root) => ({
+    host: root.getBoundingClientRect().toJSON(),
+    scrollLeft: root.scrollLeft,
+    workbench: root.querySelector('.Workbench')?.getBoundingClientRect().toJSON(),
+  }))
+  expect(rightEdgeBox.x, JSON.stringify(placement)).toBeGreaterThanOrEqual(narrowRoot.x)
   expect(rightEdgeBox.x + rightEdgeBox.width).toBeLessThanOrEqual(narrowRoot.x + narrowRoot.width + 2)
   await expect.poll(() => menu.evaluate((element) => element.contains(document.activeElement))).toBe(true)
   await page.keyboard.press('Escape')

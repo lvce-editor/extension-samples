@@ -25,6 +25,8 @@ test('F1 opens the command picker in the focused application', async ({ page }) 
   await expect(page.locator('.QuickPick input')).toBeFocused()
   await page.keyboard.press('Escape')
   await expect(page.locator('.QuickPick')).toBeHidden()
+  await expect(preview.locator('.Editor textarea')).toBeFocused()
+  await expect(source.locator('.Editor textarea')).not.toBeFocused()
 
   await source.locator('.EditorRow').first().click()
   await expect(source.locator('.Editor textarea')).toBeFocused()
