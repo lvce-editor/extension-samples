@@ -12,8 +12,9 @@ import {
 import { readGeneratedBundle } from './GeneratedBundleStorage.ts'
 
 class BinaryFileError extends Error {
-  override get name(): string {
-    return 'BinaryFileError'
+  constructor(message: string) {
+    super(message)
+    Object.defineProperty(this, 'name', { value: 'BinaryFileError' })
   }
 }
 
