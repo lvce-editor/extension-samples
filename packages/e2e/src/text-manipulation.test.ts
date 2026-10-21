@@ -59,9 +59,10 @@ test('text insertion survives a sample rebuild and inserts at an empty selection
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello again!')
 
   await page.keyboard.press('ControlOrMeta+z')
+  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!')
   await page.keyboard.press('ArrowRight')
   await runCommand(page, 'Sample: Insert Text')
-  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello again!')
+  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!Hello again!')
 })
 
 test('selection API collapses a selection without replacing its text', async ({ page }) => {
