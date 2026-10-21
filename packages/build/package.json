@@ -8,7 +8,7 @@
     "@lvce-editor/editor-worker": "19.77.2",
     "@lvce-editor/extension-management-worker": "4.92.0",
     "@lvce-editor/renderer-process": "30.77.0",
-    "@lvce-editor/shared-process": "0.124.15",
+    "@lvce-editor/shared-process": "0.124.23",
     "esbuild": "^0.28.2",
     "esbuild-wasm": "^0.28.2",
     "tar": "^7.5.22"
