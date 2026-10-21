@@ -6,7 +6,13 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onCommand:basicVim.start", "onCommand:basicVim.stop", "onCommand:basicVim.handleKey"],
+  "activation": [
+    "onCommand:basicVim.start",
+    "onCommand:basicVim.stop",
+    "onCommand:basicVim.handleKey",
+    "onCommand:basicVim.deleteWord",
+    "onCommand:basicVim.consumeKey"
+  ],
   "commands": [
     {
       "id": "basicVim.start",
@@ -19,6 +25,14 @@
     {
       "id": "basicVim.handleKey",
       "label": "Basic Vim: Handle Key"
+    },
+    {
+      "id": "basicVim.deleteWord",
+      "label": "Basic Vim: Delete Word"
+    },
+    {
+      "id": "basicVim.consumeKey",
+      "label": "Basic Vim: Consume Key"
     }
   ],
   "keyMap": {
@@ -29,8 +43,8 @@
         "bindings": {
           "Escape": {
             "command": "basicVim.handleKey",
-            "args": ["Escape"],
-            "mode": "normal"
+            "mode": "normal",
+            "args": ["Escape"]
           }
         }
       },
@@ -46,13 +60,13 @@
           },
           "a": {
             "command": "basicVim.handleKey",
-            "args": ["a"],
-            "mode": "insert"
+            "mode": "insert",
+            "args": ["a"]
           },
           "A": {
             "command": "basicVim.handleKey",
-            "args": ["A"],
-            "mode": "insert"
+            "mode": "insert",
+            "args": ["A"]
           },
           "b": {
             "command": "basicVim.handleKey",
@@ -64,13 +78,13 @@
           },
           "i": {
             "command": "basicVim.handleKey",
-            "args": ["i"],
-            "mode": "insert"
+            "mode": "insert",
+            "args": ["i"]
           },
           "I": {
             "command": "basicVim.handleKey",
-            "args": ["I"],
-            "mode": "insert"
+            "mode": "insert",
+            "args": ["I"]
           },
           "j": {
             "command": "basicVim.handleKey",
@@ -95,6 +109,82 @@
           "x": {
             "command": "basicVim.handleKey",
             "args": ["x"]
+          },
+          "c": {
+            "mode": "change",
+            "command": "basicVim.consumeKey"
+          },
+          "d": {
+            "mode": "delete",
+            "command": "basicVim.consumeKey"
+          }
+        },
+        "captureText": true
+      },
+      "delete": {
+        "bindings": {
+          "a": {
+            "mode": "deleteAround",
+            "command": "basicVim.consumeKey"
+          },
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          }
+        },
+        "captureText": true
+      },
+      "change": {
+        "bindings": {
+          "a": {
+            "mode": "changeAround",
+            "command": "basicVim.consumeKey"
+          },
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          }
+        },
+        "captureText": true
+      },
+      "deleteAround": {
+        "bindings": {
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "w": {
+            "command": "basicVim.deleteWord",
+            "mode": "normal"
+          }
+        },
+        "captureText": true
+      },
+      "changeAround": {
+        "bindings": {
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "w": {
+            "command": "basicVim.deleteWord",
+            "mode": "insert"
           }
         },
         "captureText": true

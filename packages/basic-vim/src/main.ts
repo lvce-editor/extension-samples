@@ -1,6 +1,7 @@
 import { activate, executeCommand, registerCommand, registerEditorKeymap, type EditorKeymapHandle } from '@lvce-editor/api'
 
 // cspell:words keymap
+const wordCharacter = /[a-zA-Z\u{C0}-\u{17F}\d]/u
 const main = async (): Promise<void> => {
   await activate()
   let keymap: Promise<EditorKeymapHandle> | undefined
@@ -34,6 +35,18 @@ const main = async (): Promise<void> => {
     if (['i', 'I', 'a', 'A'].includes(key)) mode = 'insert'
   }
 
+  const deleteWord = async (): Promise<void> => {
+    const selections = (await executeCommand('GetActiveEditor.getSelections')) as readonly number[] | undefined
+    const document = (await executeCommand('GetActiveEditor.getTextDocument')) as { readonly text: string } | undefined
+    if (!selections?.length || !document) return
+    const [row, column] = selections
+    if (row === undefined || column === undefined) return
+    const character = document.text.split('\n')[row]?.[column]
+    if (!character || !wordCharacter.test(character)) return
+    await executeCommand('Editor.selectWord', row, column)
+    await executeCommand('Editor.deleteLeft')
+  }
+
   const start = async (): Promise<void> => {
     if (keymap) {
       await keymap
@@ -56,6 +69,8 @@ const main = async (): Promise<void> => {
   }
 
   registerCommand({ execute: handleKey, id: 'basicVim.handleKey' })
+  registerCommand({ execute: () => undefined, id: 'basicVim.consumeKey' })
+  registerCommand({ execute: deleteWord, id: 'basicVim.deleteWord' })
   registerCommand({ execute: start, id: 'basicVim.start' })
   registerCommand({ execute: stop, id: 'basicVim.stop' })
 }
