@@ -160,8 +160,12 @@ test('organize imports quick pick sorts the import block, is repeatable, and sup
   await focusEditor(page)
   const rows = editor.locator('.EditorRow')
   await runSelectedCommand(page, 'Editor: Organize Imports')
+  // Wait for palette focus restoration before issuing another editor shortcut.
+  await expect(editor.locator('textarea')).toBeFocused()
   await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
   await runSelectedCommand(page, 'Editor: Organize Imports')
+  // Wait for palette focus restoration before issuing another editor shortcut.
+  await expect(editor.locator('textarea')).toBeFocused()
   await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
   await focusEditor(page)
   await page.keyboard.press('ControlOrMeta+z')

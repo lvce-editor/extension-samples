@@ -5,9 +5,10 @@ const main = async (): Promise<void> => {
   registerCommand({
     async execute() {
       const editor = await getActiveEditor()
-      if (editor) {
-        await openColorPicker(editor.id, '#ff8800')
+      if (!editor) {
+        return
       }
+      await openColorPicker(editor.id, '#ff8800')
     },
     id: 'sample.openColorPicker',
   })

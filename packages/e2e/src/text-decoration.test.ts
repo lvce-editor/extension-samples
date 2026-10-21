@@ -11,6 +11,8 @@ const command = async (page: Page, label: string): Promise<void> => {
   await expect(option).toBeVisible()
   await option.click()
   await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
+  // Removing the palette precedes its asynchronous editor focus restoration.
+  await expect(page.locator('#preview-ide .Editor textarea')).toBeFocused()
 }
 
 const focusPreview = async (page: Page): Promise<void> => {
