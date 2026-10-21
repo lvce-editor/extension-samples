@@ -7,18 +7,14 @@ import {
   registerCommand,
   registerFileSystemProvider,
   remove,
+  stat,
   writeFile,
 } from '@lvce-editor/api'
 import { readGeneratedBundle } from './GeneratedBundleStorage.ts'
+import { binaryDirectories, generatedRoot, getSourceFileStat, isBinary, isGenerated, modulesRoot } from './SourceFileSystemStat.ts'
 
 const prefix = 'sample-source://'
 const memoryUri = (uri: string): string => uri.replace(prefix, 'memfs://')
-const generatedRoot = 'sample-source:///sample/dist'
-const isGenerated = (uri: string): boolean => uri === generatedRoot || uri.startsWith(`${generatedRoot}/`)
-const modulesRoot = 'sample-source:///sample/node_modules'
-const binaryDirectories = [`${modulesRoot}/esbuild/bin`, `${modulesRoot}/.bin`]
-const isBinary = (uri: string): boolean => binaryDirectories.some((directory) => uri === `${directory}/esbuild`)
-
 const assertWritable = (uri: string): void => {
   if (isGenerated(uri) || uri === 'sample-source:///sample') throw new Error('Generated files are read-only')
   if (binaryDirectories.some((directory) => directory === uri || directory.startsWith(`${uri}/`) || uri.startsWith(`${directory}/`)))
@@ -70,6 +66,9 @@ const main = async (): Promise<void> => {
       const response = await readGeneratedBundle(generatedUrl)
       if (!response.ok) throw new Error(`Unable to load generated output: ${response.status}`)
       return response.text()
+    },
+    async stat(uri) {
+      return getSourceFileStat(uri, (memoryUri) => stat(memoryUri))
     },
     async remove(uri) {
       assertWritable(uri)
