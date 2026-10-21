@@ -67,9 +67,6 @@ const main = async (): Promise<void> => {
       if (!response.ok) throw new Error(`Unable to load generated output: ${response.status}`)
       return response.text()
     },
-    async stat(uri) {
-      return getSourceFileStat(uri, (memoryUri) => stat(memoryUri))
-    },
     async remove(uri) {
       assertWritable(uri)
       await remove(memoryUri(uri))
@@ -79,6 +76,13 @@ const main = async (): Promise<void> => {
       assertWritable(newUri)
       // Use the application filesystem command to preserve directory renames too.
       await executeCommand('FileSystem.rename', memoryUri(oldUri), memoryUri(newUri))
+    },
+    async stat(uri) {
+      return getSourceFileStat(uri, async (memoryUri) => {
+        const type = await stat(memoryUri)
+        if (typeof type !== 'number') throw new TypeError(`Invalid file type for ${memoryUri}`)
+        return type
+      })
     },
     async writeFile(uri, content) {
       assertWritable(uri)

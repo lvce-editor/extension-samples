@@ -1,36 +1,33 @@
 import { expect, test } from '@jest/globals'
 import { getSourceFileStat, modulesRoot } from '../src/SourceFileSystemStat.ts'
 
+const unavailable = async (): Promise<number> => {
+  throw new Error('unexpected memory filesystem lookup')
+}
+
 test('sample-source stat delegates ordinary paths to memfs', async () => {
   let invokedUri = ''
-  const expected = { exists: true, type: 7 }
 
   const result = await getSourceFileStat('sample-source:///sample/src/main.ts', async (uri) => {
     invokedUri = uri
-    return expected
+    return 7
   })
 
-  expect(result).toEqual(expected)
+  expect(result).toBe(7)
   expect(invokedUri).toBe('memfs:///sample/src/main.ts')
 })
 
 test('sample-source stat reports generated and executable paths without loading them', async () => {
-  const unavailable = async (): Promise<never> => {
-    throw new Error('unexpected memory filesystem lookup')
-  }
-
-  await expect(getSourceFileStat('sample-source:///sample/dist', unavailable)).resolves.toEqual({ exists: true, type: 3 })
-  await expect(getSourceFileStat('sample-source:///sample/dist/main.js', unavailable)).resolves.toEqual({ exists: true, type: 7 })
-  await expect(getSourceFileStat(`${modulesRoot}/esbuild/bin`, unavailable)).resolves.toEqual({ exists: true, type: 3 })
-  await expect(getSourceFileStat(`${modulesRoot}/esbuild/bin/esbuild`, unavailable)).resolves.toEqual({ exists: true, type: 7 })
-  await expect(getSourceFileStat(`${modulesRoot}/.bin/esbuild`, unavailable)).resolves.toEqual({ exists: true, type: 7 })
+  await expect(getSourceFileStat('sample-source:///sample/dist', unavailable)).resolves.toBe(3)
+  await expect(getSourceFileStat('sample-source:///sample/dist/main.js', unavailable)).resolves.toBe(7)
+  await expect(getSourceFileStat(`${modulesRoot}/esbuild/bin`, unavailable)).resolves.toBe(3)
+  await expect(getSourceFileStat(`${modulesRoot}/esbuild/bin/esbuild`, unavailable)).resolves.toBe(7)
+  await expect(getSourceFileStat(`${modulesRoot}/.bin/esbuild`, unavailable)).resolves.toBe(7)
 })
 
-test('sample-source stat reports missing synthetic paths consistently', async () => {
-  const unavailable = async (): Promise<never> => {
-    throw new Error('unexpected memory filesystem lookup')
-  }
-
-  await expect(getSourceFileStat('sample-source:///sample/dist/other.js', unavailable)).resolves.toEqual({ exists: false, size: 0 })
-  await expect(getSourceFileStat(`${modulesRoot}/.bin/other`, unavailable)).resolves.toEqual({ exists: false, size: 0 })
+test('sample-source stat rejects missing synthetic paths', async () => {
+  await expect(getSourceFileStat('sample-source:///sample/dist/other.js', unavailable)).rejects.toThrow(
+    'File not found: sample-source:///sample/dist/other.js',
+  )
+  await expect(getSourceFileStat(`${modulesRoot}/.bin/other`, unavailable)).rejects.toThrow(`File not found: ${modulesRoot}/.bin/other`)
 })
