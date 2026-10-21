@@ -310,7 +310,7 @@ export const samples: readonly Sample[] = [
     preview: {
       entry: '/example.txt',
       files: {
-        '/example.txt': 'import zebra\nimport apple\n\nprint(apple)\n',
+        '/example.txt': 'import zebra\nimport apple\nimport delta\n\nprint(apple)\n',
       },
     },
     route: 'code-actions',
