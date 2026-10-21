@@ -9,6 +9,8 @@ export const runSelectedCommand = async (page: Page, label: string): Promise<voi
   await expect(input).toBeVisible()
   await input.fill(`>${label}`)
   const command = page.locator('#preview-ide .QuickPick').getByRole('option', { exact: true, name: label })
+  // The item is also visible before filtering; wait for its final list position.
+  await expect(command).toHaveAttribute('aria-setsize', '1')
   await expect(command).toBeVisible()
   await command.click()
   // The command may immediately open another QuickPick (for example a text input).
