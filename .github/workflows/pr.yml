@@ -63,6 +63,42 @@ jobs:
             packages/e2e/playwright-report
             packages/e2e/test-results
 
+  e2e-macos-diagnostic:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15]
+        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - name: install playwright system dependencies
+        if: runner.os == 'Linux'
+        run: sudo npx playwright install-deps chromium firefox
+        working-directory: packages/e2e
+      - name: install playwright browser
+        run: npx playwright install chromium firefox
+        working-directory: packages/e2e
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - run: npm run e2e:headless -- --retries=0 --reporter=github,html,json
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+          PLAYWRIGHT_JSON_OUTPUT_NAME: test-results/results.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: playground-e2e-${{ matrix.os }}-attempt-${{ matrix.attempt }}
+          path: |
+            packages/e2e/playwright-report
+            packages/e2e/test-results
+
   e2e:
     needs: e2e-platform
     if: always()
