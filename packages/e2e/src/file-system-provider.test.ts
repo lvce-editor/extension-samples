@@ -1,6 +1,7 @@
 import { expect, test, type Locator } from '@playwright/test'
 
 const sharedWorkerUrl = /(?:renderer|editor|mainArea)WorkerMain/
+const dialogUrl = /\/extension-samples\/dialog\/$/
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/')
@@ -30,7 +31,7 @@ test('opens two real LVCE editors with TypeScript highlighting and the file-syst
 
 test('updates the document title when selecting and reloading another sample', async ({ page }) => {
   await page.getByLabel('Extension sample', { exact: true }).selectOption('dialog')
-  await expect(page).toHaveURL(/\/extension-samples\/dialog\/$/)
+  await expect(page).toHaveURL(dialogUrl)
   await expect(page).toHaveTitle('dialog - Extension Samples - Lvce Editor')
   await page.reload()
   await expect(page).toHaveTitle('dialog - Extension Samples - Lvce Editor')
