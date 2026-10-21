@@ -18,7 +18,7 @@ try {
   const renderer = await import(entry)
   await renderer.ready
   await renderer.executeCommand('Application.waitForHost')
-  await mountPlayground(renderer.executeCommand, prefix, sourceExtensions)
+  await mountPlayground(renderer.executeCommand, prefix, sourceExtensions, renderer.executeShortcut)
   removeApplicationHostParameter()
 } catch (error) {
   document.querySelector('#preview-status')!.textContent = String(error)

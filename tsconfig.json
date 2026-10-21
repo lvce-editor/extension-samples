@@ -99,6 +99,9 @@
     },
     {
       "path": "./packages/sample-find-widget"
+    },
+    {
+      "path": "./packages/basic-vim"
     }
   ]
 }

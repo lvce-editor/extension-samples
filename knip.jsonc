@@ -14,6 +14,10 @@
       "entry": ["src/site.ts", "src/CompilerWorker.ts", "src/SourceFileSystem.ts"],
       "includeEntryExports": true,
     },
+    "packages/basic-vim": {
+      "entry": ["{src/main.ts,.lvce/setup-preview.js}!"],
+      "includeEntryExports": true,
+    },
     "packages/sample-*": {
       // The extension and optional, dynamically loaded preview setup module.
       // Production mode also checks their exports without build-script exemptions.
