@@ -4,6 +4,7 @@ import { samples } from '../src/samples.ts'
 
 test('creates a nested static route with relative assets', () => {
   const html = createHtml(samples[0], true)
+  expect(html).toContain('<title>basic-vim - Extension Samples - Lvce Editor</title>')
   expect(html).toMatch(/id="source-ide"/)
   expect(html).toMatch(/rel="icon" href="\.\.\/runtime\/favicon\.ico" type="image\/x-icon"/)
   expect(html).toMatch(/src="\.\.\/assets\/site\.js"/)
@@ -13,9 +14,15 @@ test('creates a nested static route with relative assets', () => {
 
 test('creates a root route with root-relative sample assets', () => {
   const html = createHtml(samples[0], false)
+  expect(html).toContain('<title>basic-vim - Extension Samples - Lvce Editor</title>')
   expect(html).toMatch(/id="source-ide"/)
   expect(html).toMatch(/rel="icon" href="\.\/runtime\/favicon\.ico" type="image\/x-icon"/)
   expect(html).toMatch(/src="\.\/assets\/site\.js"/)
+})
+
+test('escapes the sample id in the document title', () => {
+  const html = createHtml({ ...samples[0], id: 'sample<id>&"' }, false)
+  expect(html).toContain('<title>sample&lt;id&gt;&amp;&quot; - Extension Samples - Lvce Editor</title>')
 })
 
 test('passes exported worker configuration to the runtime before startup', () => {
