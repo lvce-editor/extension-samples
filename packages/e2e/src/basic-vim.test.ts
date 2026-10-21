@@ -1,4 +1,4 @@
-// cspell:words keymap lpha zzzalpha hzzzalpha himport iworks worksalpha
+// cspell:words keymap lpha zzzalpha hzzzalpha himport iworks worksalpha cawword dawqqq dawdaw ldaw
 import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
@@ -131,6 +131,86 @@ test('delete and undo work, rapid mode transitions preserve typing, and stop res
   await page.keyboard.type('qqq')
   await expect(row).toHaveText('hzzzalpha beta')
   await expect(page.locator('#preview-ide .EditorCursor')).toHaveCSS('opacity', '0.5')
+})
+
+test('daw deletes the word under the cursor and caw enters insert mode with undo support', async ({ page }) => {
+  await open(page)
+  const rows = page.locator('#preview-ide .EditorRow')
+  await page.keyboard.press('l')
+  await page.keyboard.press('l')
+  await page.keyboard.press('l')
+  await page.keyboard.type('daw')
+  await expect(rows.first()).toHaveText(' beta')
+  await page.keyboard.press('u')
+  await expectOriginalText(page)
+
+  await page.keyboard.press('ControlOrMeta+Home')
+  await page.keyboard.press('l')
+  await page.keyboard.press('l')
+  await page.keyboard.press('l')
+  await page.keyboard.type('cawword')
+  await expect(rows.first()).toHaveText('word beta')
+  await page.keyboard.press('Escape')
+  await page.keyboard.type('q')
+  await expect(rows.first()).toHaveText('word beta')
+  await page.keyboard.press('u')
+  await expect(rows.first()).toHaveText(' beta')
+  await page.keyboard.press('u')
+  await expectOriginalText(page)
+})
+
+for (const [text, column, expected] of [
+  ['alpha beta', 0, ' beta'],
+  ['alpha beta', 4, ' beta'],
+  ['alpha beta', 6, 'alpha '],
+  ['alpha beta', 9, 'alpha '],
+  ['alpha beta', 5, 'alpha beta'],
+  ['alpha beta', 10, 'alpha beta'],
+  ['alpha, beta', 5, 'alpha, beta'],
+  ['café42, next', 3, ', next'],
+  ['', 0, ''],
+] as const) {
+  test(`daw at column ${String(column)} in ${JSON.stringify(text)} preserves surrounding text`, async ({ page }) => {
+    await open(page)
+    await page.keyboard.press('i')
+    await page.keyboard.press('ControlOrMeta+a')
+    await page.keyboard.press('Backspace')
+    if (text) await page.keyboard.insertText(text)
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('ControlOrMeta+Home')
+    for (let index = 0; index < column; index++) await page.keyboard.press('l')
+    await page.keyboard.type('dawqqq')
+    await expect(page.locator('#preview-ide .EditorRow')).toHaveText([expected])
+  })
+}
+
+test('incomplete and invalid operator sequences recover without editing text', async ({ page }) => {
+  await open(page)
+  for (const prefix of ['d', 'da', 'c', 'ca']) {
+    await page.keyboard.type(prefix)
+    await page.keyboard.press('Escape')
+    await page.keyboard.type('qqq')
+    await expectOriginalText(page)
+  }
+  for (const sequence of ['dq', 'daq', 'cq', 'caq']) {
+    await page.keyboard.type(sequence)
+    await page.keyboard.type('qqq')
+    await expectOriginalText(page)
+  }
+  await page.keyboard.type('dawdaw')
+  await expect(page.locator('#preview-ide .EditorRow').first()).toHaveText(' beta')
+  await page.keyboard.type('ldaw')
+  await expect(page.locator('#preview-ide .EditorRow').first()).toHaveText(' ')
+})
+
+test('caw on the empty final line accepts immediate replacement text', async ({ page }) => {
+  await open(page)
+  await page.keyboard.press('ControlOrMeta+End')
+  await page.keyboard.type('cawword')
+  await expect(page.locator('#preview-ide .EditorRow').last()).toHaveText('word')
+  await page.keyboard.press('Escape')
+  await page.keyboard.type('qqq')
+  await expect(page.locator('#preview-ide .EditorRow').last()).toHaveText('word')
 })
 
 test('source and command palette inputs remain editable across focus changes', async ({ page }) => {
