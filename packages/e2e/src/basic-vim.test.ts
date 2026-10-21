@@ -17,6 +17,19 @@ const expectOriginalText = async (page: Page): Promise<void> => {
   await expect(page.locator('#preview-ide .EditorRow')).toHaveText(['alpha beta', 'second line', 'third', ''])
 }
 
+test('starts Basic Vim in legacy application host mode', async ({ page }) => {
+  const workspaceErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error' && message.text().includes('No Workspace instance')) workspaceErrors.push(message.text())
+  })
+  await page.goto('/extension-samples/basic-vim/?applicationHost=1')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+  await expect(page.locator('#source-ide .Editor')).toHaveCount(1)
+  await expect(page.locator('#preview-ide .Editor')).toHaveCount(1)
+  expect(workspaceErrors).toEqual([])
+})
+
 test('normal mode has a block cursor and moves without inserting keys, including at boundaries', async ({ page }) => {
   await open(page)
   const cursor = page.locator('#preview-ide .EditorCursor')
