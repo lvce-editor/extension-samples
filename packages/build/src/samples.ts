@@ -12,6 +12,14 @@ export interface Sample {
 
 export const samples: readonly Sample[] = [
   {
+    description: 'Try normal and insert modes with Vim navigation and a block cursor.',
+    id: 'basic-vim',
+    packageName: 'basic-vim',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'alpha beta\nsecond line\nthird\n' } },
+    route: 'basic-vim',
+    title: 'Basic Vim',
+  },
+  {
     description: 'Replace matching files with a custom virtual DOM greeting view.',
     id: 'file-view',
     packageName: 'sample-file-view',

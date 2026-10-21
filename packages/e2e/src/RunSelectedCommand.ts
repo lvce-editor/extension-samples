@@ -1,6 +1,8 @@
 import { expect, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 
+const activeQuickPickItem = /\bQuickPickItemActive\b/
+
 export const runSelectedCommand = async (page: Page, label: string): Promise<void> => {
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await focusEditor(page)
@@ -9,6 +11,8 @@ export const runSelectedCommand = async (page: Page, label: string): Promise<voi
   await expect(input).toBeVisible()
   await input.fill(`>${label}`)
   const command = page.locator('#preview-ide .QuickPick').getByRole('option', { exact: true, name: label })
+  // The item is also visible before filtering; wait for the intended filtered selection.
+  await expect(command).toHaveClass(activeQuickPickItem)
   await expect(command).toBeVisible()
   await command.click()
   // The command may immediately open another QuickPick (for example a text input).

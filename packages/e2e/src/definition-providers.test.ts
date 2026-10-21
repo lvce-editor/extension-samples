@@ -33,6 +33,14 @@ for (const sample of [
     await page.keyboard.press('ArrowUp')
     await page.keyboard.press('Home')
     for (let index = 0; index < 7; index++) await page.keyboard.press('ArrowRight')
+    // Finish queued movement and rendering before locating the context-menu target.
+    await page.evaluate(async () => {
+      const prefix = globalThis.document.body.dataset.routePrefix
+      const response = await globalThis.fetch(`${prefix}/runtime.json`)
+      const { entry } = await response.json()
+      const renderer = await import(entry)
+      await renderer.executeShortcut('Application.execute', 'preview', 'GetActiveEditor.getSelections')
+    })
     await navigate()
     await expect(page.locator('#preview-ide .EditorMessage')).toContainText(sample.missing)
   })

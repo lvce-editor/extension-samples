@@ -23,7 +23,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['packages/sample-*/**/*.ts'],
+    files: ['packages/sample-*/**/*.ts', 'packages/basic-vim/**/*.ts'],
     extends: sampleConfig,
     languageOptions: {
       parserOptions: {
