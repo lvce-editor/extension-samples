@@ -339,7 +339,7 @@ export const mountPlayground = async (
   const sourceProvider = {
     activation: ['onFileSystem:sample-source'],
     browser: new URL(`${prefix}/assets/source-files.js?sample=${encodeURIComponent(sampleId)}`, location.href).href,
-    commands: [{ id: 'sampleSource.setGeneratedUrl' }],
+    commands: [{ id: 'sampleSource.setGeneratedUrl', label: 'Set generated output URL' }],
     contentSecurityPolicy: [],
     fileSystemProviders: [{ id: 'sample-source' }],
     id: 'playground.source-files',
