@@ -6,6 +6,35 @@ const main = async (): Promise<void> => {
   await activate()
   let keymap: Promise<EditorKeymapHandle> | undefined
 
+  let mode = 'normal'
+
+  const editorCommands: Readonly<Record<string, string>> = {
+    $: 'Editor.cursorEnd',
+    '0': 'Editor.cursorHome',
+    a: 'Editor.cursorCharacterRight',
+    A: 'Editor.cursorEnd',
+    b: 'Editor.cursorWordLeft',
+    h: 'Editor.cursorCharacterLeft',
+    I: 'Editor.cursorHome',
+    j: 'Editor.cursorDown',
+    k: 'Editor.cursorUp',
+    l: 'Editor.cursorCharacterRight',
+    u: 'Editor.undo',
+    w: 'Editor.cursorWordRight',
+    x: 'Editor.deleteCharacterRight',
+  }
+
+  const handleKey = async (key: string): Promise<void> => {
+    if (key === 'Escape') {
+      mode = 'normal'
+      return
+    }
+    if (mode !== 'normal') return
+    const command = editorCommands[key]
+    if (typeof command === 'string') await executeCommand(command)
+    if (['i', 'I', 'a', 'A'].includes(key)) mode = 'insert'
+  }
+
   const deleteWord = async (): Promise<void> => {
     const selections = (await executeCommand('GetActiveEditor.getSelections')) as readonly number[] | undefined
     const document = (await executeCommand('GetActiveEditor.getTextDocument')) as { readonly text: string } | undefined
@@ -18,63 +47,13 @@ const main = async (): Promise<void> => {
     await executeCommand('Editor.deleteLeft')
   }
 
-  // Consume invalid sequence keys and return to normal mode without inserting them.
-  const cancelBindings = Object.fromEntries(
-    [...Array.from({ length: 95 }, (_, index) => String.fromCodePoint(index + 32)), 'Enter', 'Backspace', 'Delete', 'Escape'].map((key) => [
-      key,
-      { mode: 'normal' },
-    ]),
-  )
-
   const start = async (): Promise<void> => {
     if (keymap) {
       await keymap
       return
     }
-    keymap = registerEditorKeymap({
-      cursorStyle: 'block',
-      initialMode: 'normal',
-      modes: {
-        change: { bindings: { ...cancelBindings, a: { mode: 'changeAround' } }, captureText: true },
-        changeAround: {
-          bindings: {
-            ...cancelBindings,
-            w: { args: ['basicVim.deleteWord'], command: 'ExtensionHost.executeCommand', mode: 'insert' },
-          },
-          captureText: true,
-        },
-        delete: { bindings: { ...cancelBindings, a: { mode: 'deleteAround' } }, captureText: true },
-        deleteAround: {
-          bindings: {
-            ...cancelBindings,
-            w: { args: ['basicVim.deleteWord'], command: 'ExtensionHost.executeCommand', mode: 'normal' },
-          },
-          captureText: true,
-        },
-        insert: { bindings: { Escape: { mode: 'normal' } } },
-        normal: {
-          bindings: {
-            $: { command: 'Editor.cursorEnd' },
-            '0': { command: 'Editor.cursorHome' },
-            a: { command: 'Editor.cursorCharacterRight', mode: 'insert' },
-            A: { command: 'Editor.cursorEnd', mode: 'insert' },
-            b: { command: 'Editor.cursorWordLeft' },
-            c: { mode: 'change' },
-            d: { mode: 'delete' },
-            h: { command: 'Editor.cursorCharacterLeft' },
-            i: { mode: 'insert' },
-            I: { command: 'Editor.cursorHome', mode: 'insert' },
-            j: { command: 'Editor.cursorDown' },
-            k: { command: 'Editor.cursorUp' },
-            l: { command: 'Editor.cursorCharacterRight' },
-            u: { command: 'Editor.undo' },
-            w: { command: 'Editor.cursorWordRight' },
-            x: { command: 'Editor.deleteCharacterRight' },
-          },
-          captureText: true,
-        },
-      },
-    })
+    mode = 'normal'
+    keymap = registerEditorKeymap('sample.basic-vim')
     try {
       await keymap
     } catch (error) {
@@ -89,9 +68,11 @@ const main = async (): Promise<void> => {
     keymap = undefined
   }
 
+  registerCommand({ execute: handleKey, id: 'basicVim.handleKey' })
+  registerCommand({ execute: () => undefined, id: 'basicVim.consumeKey' })
+  registerCommand({ execute: deleteWord, id: 'basicVim.deleteWord' })
   registerCommand({ execute: start, id: 'basicVim.start' })
   registerCommand({ execute: stop, id: 'basicVim.stop' })
-  registerCommand({ execute: deleteWord, id: 'basicVim.deleteWord' })
 }
 
 main()

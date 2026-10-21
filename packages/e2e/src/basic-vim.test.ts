@@ -89,6 +89,32 @@ test('normal mode has a block cursor and moves without inserting keys, including
   await expectOriginalText(page)
 })
 
+test('legacy application host URL starts Basic Vim and refreshes the preview after saving', async ({ page }) => {
+  await page.goto('/extension-samples/basic-vim/?applicationHost=1')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await expect(page.locator('#source-ide .Editor')).toBeVisible()
+  await expect(page.locator('#preview-ide .Editor')).toBeVisible()
+  const response = await page.request.get('/extension-samples/samples/basic-vim/files.json')
+  const files = await response.json()
+  await page.locator('#source-ide').getByRole('treeitem', { exact: true, name: 'extension.json' }).click()
+  await expect(page.locator('#source-ide').getByRole('tab', { exact: true, name: 'extension.json Close' })).toBeVisible()
+  await focusEditor(page, 'source')
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(files['/extension.json'].replace('"cursorStyle": "block"', '"cursorStyle": "line"'))
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+  await expect(page.locator('#preview-ide .EditorCursor')).toHaveCSS('width', '2px')
+})
+
+test('root legacy application host URL starts the selected sample', async ({ page }) => {
+  await page.goto('/extension-samples/?applicationHost=1')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await expect(page.locator('#source-ide .Editor')).toBeVisible()
+  await expect(page.locator('#preview-ide .Editor')).toBeVisible()
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+})
+
 for (const [key, expected] of [
   ['i', '|alpha beta'],
   ['a', 'a|lpha beta'],
@@ -238,9 +264,11 @@ test('rebuilding and resetting releases the old keymap and cursor override', asy
   await open(page)
   const response = await page.request.get('/extension-samples/samples/basic-vim/files.json')
   const files = await response.json()
+  await page.locator('#source-ide').getByRole('treeitem', { exact: true, name: 'extension.json' }).click()
+  await expect(page.locator('#source-ide').getByRole('tab', { exact: true, name: 'extension.json Close' })).toBeVisible()
   await focusEditor(page, 'source')
   await page.keyboard.press('ControlOrMeta+a')
-  await page.keyboard.insertText(files['/src/main.ts'].replace("cursorStyle: 'block'", "cursorStyle: 'line'"))
+  await page.keyboard.insertText(files['/extension.json'].replace('"cursorStyle": "block"', '"cursorStyle": "line"'))
   await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready')
@@ -256,4 +284,27 @@ test('rebuilding and resetting releases the old keymap and cursor override', asy
   await page.keyboard.type('iworks')
   await page.keyboard.press('Escape')
   await expect(page.locator('#preview-ide .EditorRow').first()).toHaveText('worksalpha beta')
+})
+
+test('manifest keys invoke the Vim extension command', async ({ page }) => {
+  await open(page)
+  const response = await page.request.get('/extension-samples/samples/basic-vim/files.json')
+  const files = await response.json()
+  const manifest: { keyMap: { modes: Record<string, { bindings: Record<string, { command: string }> }> } } = JSON.parse(files['/extension.json'])
+  for (const mode of Object.values(manifest.keyMap.modes)) {
+    for (const binding of Object.values(mode.bindings))
+      expect(['basicVim.handleKey', 'basicVim.consumeKey', 'basicVim.deleteWord']).toContain(binding.command)
+  }
+  await focusEditor(page, 'source')
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace('Editor.cursorCharacterLeft', 'Editor.cursorCharacterRight'))
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+  await focusEditor(page)
+  await page.keyboard.press('ControlOrMeta+Home')
+  const origin = await translation(page)
+  await page.keyboard.press('h')
+  await expect.poll(() => translation(page)).not.toBe(origin)
+  await expectOriginalText(page)
 })

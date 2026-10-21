@@ -41,6 +41,11 @@ export const mountPlayground = async (
   invokeShortcut: Invoke,
 ): Promise<void> => {
   setupPreviewDivider()
+  try {
+    await invoke('ColorTheme.setColorTheme', 'slime')
+  } catch (error) {
+    if (!String(error).includes('Layout.handleColorThemeChanged')) throw error
+  }
   // Rebuild each saved source snapshot after formatting has finished.
   await invoke('Preferences.update', {
     'editor.diagnostics': true,
