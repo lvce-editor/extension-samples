@@ -1,6 +1,7 @@
 import { expect, test, type Locator } from '@playwright/test'
 
 const sharedWorkerUrl = /(?:renderer|editor|mainArea)WorkerMain/
+const dialogUrl = /\/extension-samples\/dialog\/$/
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/')
@@ -10,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('opens two real LVCE editors with TypeScript highlighting and the file-system preview', async ({ page }, testInfo) => {
-  await expect(page).toHaveTitle('File System Provider · Lvce Editor Extension Samples')
+  await expect(page).toHaveTitle('file-system-provider - Extension Samples - Lvce Editor')
   await expect(page.getByLabel('Extension sample', { exact: true })).toHaveValue('file-system-provider')
 
   const workbench = page
@@ -26,6 +27,14 @@ test('opens two real LVCE editors with TypeScript highlighting and the file-syst
   await expect(page.locator('#source-ide').getByRole('treeitem', { exact: true, name: 'extension.json' })).toBeVisible()
   await expect(page.locator('#preview-ide').getByRole('treeitem', { exact: true, name: 'README.md' })).toBeVisible()
   await testInfo.attach('side-by-side-ides', { body: await page.screenshot(), contentType: 'image/png' })
+})
+
+test('updates the document title when selecting and reloading another sample', async ({ page }) => {
+  await page.getByLabel('Extension sample', { exact: true }).selectOption('dialog')
+  await expect(page).toHaveURL(dialogUrl)
+  await expect(page).toHaveTitle('dialog - Extension Samples - Lvce Editor')
+  await page.reload()
+  await expect(page).toHaveTitle('dialog - Extension Samples - Lvce Editor')
 })
 
 test('runs the built-in ESLint extension in the source editor', async ({ page }) => {
