@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@lvce-editor/api": "^9.51.0",
-    "@lvce-editor/editor-worker": "19.76.4",
+    "@lvce-editor/editor-worker": "19.77.2",
     "@lvce-editor/extension-management-worker": "4.92.0",
     "@lvce-editor/renderer-process": "30.75.0",
     "@lvce-editor/shared-process": "0.124.15",
