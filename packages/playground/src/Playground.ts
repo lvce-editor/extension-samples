@@ -41,7 +41,13 @@ export const mountPlayground = async (
   invokeShortcut: Invoke,
 ): Promise<void> => {
   setupPreviewDivider()
-  await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.formatOnSave': true, 'editor.lineNumbers': true })
+  // Rebuild each saved source snapshot after formatting has finished.
+  await invoke('Preferences.update', {
+    'editor.diagnostics': true,
+    'editor.formatActions': 'pre-save',
+    'editor.formatOnSave': true,
+    'editor.lineNumbers': true,
+  })
   const sourceId = 'source'
   const previewId = 'preview'
   const sampleId = document.body.dataset.sampleId || 'file-system-provider'
