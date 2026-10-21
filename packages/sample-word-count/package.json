@@ -9,7 +9,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@lvce-editor/api": "^9.46.0"
+    "@lvce-editor/api": "^9.52.0"
   },
   "devDependencies": {
     "@jest/globals": "^30.5.2",
