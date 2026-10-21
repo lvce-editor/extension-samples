@@ -1,41 +1,46 @@
-import { activate, registerCommand, registerEditorKeymap, type EditorKeymapHandle } from '@lvce-editor/api'
+import { activate, executeCommand, registerCommand, registerEditorKeymap, type EditorKeymapHandle } from '@lvce-editor/api'
 
 // cspell:words keymap
 const main = async (): Promise<void> => {
   await activate()
   let keymap: Promise<EditorKeymapHandle> | undefined
 
+  let mode = 'normal'
+
+  const editorCommands: Readonly<Record<string, string>> = {
+    $: 'Editor.cursorEnd',
+    '0': 'Editor.cursorHome',
+    a: 'Editor.cursorCharacterRight',
+    A: 'Editor.cursorEnd',
+    b: 'Editor.cursorWordLeft',
+    h: 'Editor.cursorCharacterLeft',
+    I: 'Editor.cursorHome',
+    j: 'Editor.cursorDown',
+    k: 'Editor.cursorUp',
+    l: 'Editor.cursorCharacterRight',
+    u: 'Editor.undo',
+    w: 'Editor.cursorWordRight',
+    x: 'Editor.deleteCharacterRight',
+  }
+
+  const handleKey = async (key: string): Promise<void> => {
+    if (key === 'Escape') {
+      mode = 'normal'
+      return
+    }
+    if (mode !== 'normal') return
+    const command = editorCommands[key]
+    if (typeof command === 'string') await executeCommand(command)
+    if (['i', 'I', 'a', 'A'].includes(key)) mode = 'insert'
+  }
+
   const start = async (): Promise<void> => {
     if (keymap) {
       await keymap
       return
     }
-    keymap = registerEditorKeymap({
-      cursorStyle: 'block',
-      initialMode: 'normal',
-      modes: {
-        insert: { bindings: { Escape: { mode: 'normal' } } },
-        normal: {
-          bindings: {
-            $: { command: 'Editor.cursorEnd' },
-            '0': { command: 'Editor.cursorHome' },
-            a: { command: 'Editor.cursorCharacterRight', mode: 'insert' },
-            A: { command: 'Editor.cursorEnd', mode: 'insert' },
-            b: { command: 'Editor.cursorWordLeft' },
-            h: { command: 'Editor.cursorCharacterLeft' },
-            i: { mode: 'insert' },
-            I: { command: 'Editor.cursorHome', mode: 'insert' },
-            j: { command: 'Editor.cursorDown' },
-            k: { command: 'Editor.cursorUp' },
-            l: { command: 'Editor.cursorCharacterRight' },
-            u: { command: 'Editor.undo' },
-            w: { command: 'Editor.cursorWordRight' },
-            x: { command: 'Editor.deleteCharacterRight' },
-          },
-          captureText: true,
-        },
-      },
-    })
+    mode = 'normal'
+    keymap = registerEditorKeymap('sample.basic-vim')
     try {
       await keymap
     } catch (error) {
@@ -50,6 +55,7 @@ const main = async (): Promise<void> => {
     keymap = undefined
   }
 
+  registerCommand({ execute: handleKey, id: 'basicVim.handleKey' })
   registerCommand({ execute: start, id: 'basicVim.start' })
   registerCommand({ execute: stop, id: 'basicVim.stop' })
 }
