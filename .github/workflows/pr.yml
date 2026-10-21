@@ -87,10 +87,12 @@ jobs:
         working-directory: packages/e2e
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-      - run: npm run e2e:headless -- --retries=0 --reporter=github,html,json
+      - run: npm run e2e:headless --workspace=packages/e2e -- --grep 'generated output follows|status bar item updates' --retries=0 --trace=on --reporter=github,html,json
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
           PLAYWRIGHT_JSON_OUTPUT_NAME: test-results/results.json
+          E2E_FOCUS_DIAGNOSTICS: 1
+          E2E_ATTEMPT: ${{ matrix.attempt }}
       - uses: actions/upload-artifact@v7
         if: always()
         with:
