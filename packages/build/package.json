@@ -6,7 +6,7 @@
   "dependencies": {
     "@lvce-editor/api": "^9.53.0",
     "@lvce-editor/editor-worker": "19.77.2",
-    "@lvce-editor/extension-management-worker": "4.93.0",
+    "@lvce-editor/extension-management-worker": "4.94.0",
     "@lvce-editor/renderer-process": "30.77.0",
     "@lvce-editor/shared-process": "0.124.26",
     "esbuild": "^0.28.2",
