@@ -64,6 +64,32 @@ jobs:
             packages/e2e/playwright-report
             packages/e2e/test-results
 
+  focus-diagnostics:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+        working-directory: packages/e2e
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - run: npm exec --workspace packages/e2e -- playwright test --project=chromium --grep 'generated output follows|status bar item updates' --repeat-each=20 --workers=1 --retries=0
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+          E2E_FOCUS_DIAGNOSTICS: '1'
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: macos-focus-diagnostics
+          path: |
+            packages/e2e/playwright-report
+            packages/e2e/test-results
+
   e2e:
     needs: e2e-platform
     if: always()
