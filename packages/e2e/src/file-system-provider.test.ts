@@ -1,6 +1,7 @@
 import { expect, test, type Locator } from '@playwright/test'
 
 const sharedWorkerUrl = /(?:renderer|editor|mainArea)WorkerMain/
+const findWidgetUrl = /\/extension-samples\/find-widget\/$/
 const dialogUrl = /\/extension-samples\/dialog\/$/
 
 test.beforeEach(async ({ page }) => {
@@ -11,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('opens two real LVCE editors with TypeScript highlighting and the file-system preview', async ({ page }, testInfo) => {
-  await expect(page).toHaveTitle('file-system-provider - Extension Samples - Lvce Editor')
+  await expect(page).toHaveTitle('File System Provider · Lvce Editor Extension Samples')
   await expect(page.getByLabel('Extension sample', { exact: true })).toHaveValue('file-system-provider')
 
   const workbench = page
@@ -29,12 +30,22 @@ test('opens two real LVCE editors with TypeScript highlighting and the file-syst
   await testInfo.attach('side-by-side-ides', { body: await page.screenshot(), contentType: 'image/png' })
 })
 
-test('updates the document title when selecting and reloading another sample', async ({ page }) => {
+test('uses readable sample titles on direct navigation, selection and reload', async ({ page }) => {
+  await page.goto('/extension-samples/find-widget/')
+  await expect(page).toHaveURL(findWidgetUrl)
+  await expect(page.locator('#source-ide .Editor')).toHaveCount(1, { timeout: 30_000 })
+  await expect(page.locator('#preview-ide .Editor')).toHaveCount(1, { timeout: 30_000 })
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true')
+  await expect(page).toHaveTitle('Find Widget · Lvce Editor Extension Samples')
+
   await page.getByLabel('Extension sample', { exact: true }).selectOption('dialog')
   await expect(page).toHaveURL(dialogUrl)
-  await expect(page).toHaveTitle('dialog - Extension Samples - Lvce Editor')
+  await expect(page).toHaveTitle('Dialog · Lvce Editor Extension Samples')
   await page.reload()
-  await expect(page).toHaveTitle('dialog - Extension Samples - Lvce Editor')
+  await expect(page.locator('#source-ide .Editor')).toHaveCount(1, { timeout: 30_000 })
+  await expect(page.locator('#preview-ide .Editor')).toHaveCount(1, { timeout: 30_000 })
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true')
+  await expect(page).toHaveTitle('Dialog · Lvce Editor Extension Samples')
 })
 
 test('runs the built-in ESLint extension in the source editor', async ({ page }) => {
