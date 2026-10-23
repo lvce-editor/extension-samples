@@ -3,6 +3,7 @@ import { activate, getWorkspaceUri, openUri, path, registerCommand, showQuickInp
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
+    id: 'sample.createGreeting',
     async execute() {
       // Freeform text input accepts any name without a results list.
       const name = await showQuickInput({ placeholder: 'Who should we greet?', value: 'World' })
@@ -13,7 +14,6 @@ const main = async (): Promise<void> => {
       await writeFile(uri, `Hello, ${name.trim()}!\n`)
       await openUri(uri)
     },
-    id: 'sample.createGreeting',
   })
 }
 

@@ -21,6 +21,7 @@ const main = async (): Promise<void> => {
   let fileRevision = 0
   const watchedUri = async (): Promise<string> => `${await getWorkspaceUri()}/watched.txt`
   registerCommand({
+    id: 'sample.runBuild',
     async execute() {
       await ready
       build++
@@ -30,17 +31,17 @@ const main = async (): Promise<void> => {
       await output.appendLine('Build succeeded.')
       await openOutputView({ channel: 'sample-build' })
     },
-    id: 'sample.runBuild',
   })
   registerCommand({
+    id: 'sample.clearBuildOutput',
     async execute() {
       await ready
       await output.clear()
       await openOutputView({ channel: 'sample-build' })
     },
-    id: 'sample.clearBuildOutput',
   })
   registerCommand({
+    id: 'sample.cacheBuildArtifact',
     async execute() {
       await ready
       const key = 'https://extension-samples.invalid/build-artifact'
@@ -56,9 +57,9 @@ const main = async (): Promise<void> => {
       await output.appendLine(`Artifact removed: ${String((await getCacheStorageItem(key)) === null)}`)
       await openOutputView({ channel: 'sample-build' })
     },
-    id: 'sample.cacheBuildArtifact',
   })
   registerCommand({
+    id: 'sample.watchFileChanges',
     async execute() {
       await ready
       const uri = await watchedUri()
@@ -69,9 +70,9 @@ const main = async (): Promise<void> => {
       await output.appendLine('Watching watched.txt')
       await openOutputView({ channel: 'sample-build' })
     },
-    id: 'sample.watchFileChanges',
   })
   registerCommand({
+    id: 'sample.writeWatchedFile',
     async execute() {
       await ready
       fileRevision++
@@ -79,9 +80,9 @@ const main = async (): Promise<void> => {
       await output.appendLine(`Wrote watched.txt: ${String(fileRevision)}`)
       await openOutputView({ channel: 'sample-build' })
     },
-    id: 'sample.writeWatchedFile',
   })
   registerCommand({
+    id: 'sample.stopWatchingFileChanges',
     async execute() {
       await ready
       changeHandler?.dispose()
@@ -89,16 +90,15 @@ const main = async (): Promise<void> => {
       await output.appendLine('Stopped watching watched.txt')
       await openOutputView({ channel: 'sample-build' })
     },
-    id: 'sample.stopWatchingFileChanges',
   })
   registerCommand({
+    id: 'sample.reportBuildError',
     async execute() {
       await ready
       const error = await preparePrettyError(new Error('Example build failure'))
       await output.appendLine(`Build error: ${error.message ?? 'Unknown error'}`)
       await openOutputView({ channel: 'sample-build' })
     },
-    id: 'sample.reportBuildError',
   })
   await ready
 }

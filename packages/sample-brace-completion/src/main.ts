@@ -16,10 +16,10 @@ const main = async (): Promise<void> => {
     },
   })
   registerCommand({
+    id: 'sample.completeBrace',
     async execute() {
       await executeCommand('Editor.braceCompletion', '(')
     },
-    id: 'sample.completeBrace',
   })
 }
 

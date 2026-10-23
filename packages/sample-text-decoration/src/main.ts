@@ -119,8 +119,8 @@ class TextDecorationSample {
 
   private registerExample(id: string, example: Example): void {
     registerCommand({
-      execute: this.selectExample.bind(this, example),
       id,
+      execute: this.selectExample.bind(this, example),
     })
   }
 
@@ -147,19 +147,19 @@ class TextDecorationSample {
       provideEditorTextDecorations: this.provideEditorTextDecorations.bind(this),
     })
     registerCommand({
-      execute: this.underlineSelection.bind(this),
       id: 'sample.underlineSelection',
+      execute: this.underlineSelection.bind(this),
     })
     this.registerExample('sample.highlightTodos', 'todo')
     this.registerExample('sample.colorKeywords', 'keywords')
     this.registerExample('sample.findRepeatedWords', 'repeated')
     registerCommand({
-      execute: this.clearUnderlines.bind(this),
       id: 'sample.clearUnderlines',
+      execute: this.clearUnderlines.bind(this),
     })
     registerCommand({
-      execute: this.disposeUnderlines.bind(this),
       id: 'sample.disposeUnderlines',
+      execute: this.disposeUnderlines.bind(this),
     })
   }
 }

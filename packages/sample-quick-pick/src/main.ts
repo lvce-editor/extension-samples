@@ -5,6 +5,7 @@ const trailingSlash = /\/$/
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
+    id: 'sample.chooseEnvironment',
     async execute() {
       const value = await showQuickPick({
         items: [
@@ -22,7 +23,6 @@ const main = async (): Promise<void> => {
       await writeFile(uri, `Selected environment: ${value}\n`)
       await openUri(uri)
     },
-    id: 'sample.chooseEnvironment',
   })
 }
 

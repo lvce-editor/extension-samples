@@ -20,10 +20,10 @@ const main = async (): Promise<void> => {
     },
   })
   registerCommand({
+    id: 'sample.expandSelection',
     async execute() {
       await executeCommand('Editor.selectionGrow')
     },
-    id: 'sample.expandSelection',
   })
 }
 

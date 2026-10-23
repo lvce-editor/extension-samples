@@ -63,8 +63,8 @@ const main = async (): Promise<void> => {
   await activateExtensionApi()
   registerSourceControlProvider(provider)
   registerCommand({
-    execute: discardFile,
     id: 'sampleSourceControl.discard',
+    execute: discardFile,
   })
 }
 
