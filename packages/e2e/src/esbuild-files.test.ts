@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
+import { getEsbuildBinaryPath } from '../../build/src/getEsbuildBinaryPath.ts'
 
 const require = createRequire(import.meta.url)
 const buildRequire = createRequire(new URL('../../build/package.json', import.meta.url))
@@ -10,13 +11,23 @@ const root = 'sample-source:///sample/node_modules'
 const execute = async (page: Page, command: string, ...args: readonly unknown[]): Promise<any> => {
   const response = await page.request.get('/extension-samples/runtime.json')
   const { entry } = await response.json()
-  return page.evaluate(
+  const outcome = await page.evaluate(
     async ({ args, command, entry }) => {
       const renderer = await import(entry)
-      return renderer.executeCommand('Application.execute', 'source', command, ...args)
+      try {
+        return { result: await renderer.executeCommand('Application.execute', 'source', command, ...args) }
+      } catch (error) {
+        // Preserve the application error name across Playwright's evaluation boundary.
+        const value = error as Error
+        return { error: { message: value.message, name: value.name } }
+      }
     },
     { args, command, entry },
   )
+  if (outcome.error) {
+    throw Object.defineProperty(new Error(outcome.error.message), 'name', { value: outcome.error.name })
+  }
+  return outcome.result
 }
 
 test('esbuild package and CLI entries are visible, authentic, and lazy', async ({ page }) => {
@@ -44,7 +55,7 @@ test('esbuild package and CLI entries are visible, authentic, and lazy', async (
     expect(await execute(page, 'FileSystem.readFile', `${root}/esbuild/${path}`)).toBe(await readFile(join(esbuildRoot, path), 'utf8'))
   }
   expect(binaryRequests).toEqual([])
-  const bytes = await readFile(join(esbuildRoot, 'bin/esbuild'))
+  const bytes = await readFile(getEsbuildBinaryPath())
   const response = await page.request.get('/extension-samples/esbuild-bin')
   expect(response.ok()).toBe(true)
   expect(await response.body()).toEqual(bytes)
@@ -55,13 +66,49 @@ test('esbuild package and CLI entries are visible, authentic, and lazy', async (
     // A native executable has no text representation.
   }
   for (const uri of [`${root}/esbuild/bin/esbuild`, `${root}/.bin/esbuild`]) {
-    if (text === undefined) await expect(execute(page, 'FileSystem.readFile', uri)).rejects.toThrow('binary file')
-    else expect(await execute(page, 'FileSystem.readFile', uri)).toBe(text)
+    if (text === undefined) {
+      await expect(execute(page, 'FileSystem.readFile', uri)).rejects.toMatchObject({ name: 'BinaryFileError' })
+      expect(await execute(page, 'FileSystem.readFile', uri, 'binary')).toBe(new TextDecoder().decode(bytes))
+    } else expect(await execute(page, 'FileSystem.readFile', uri)).toBe(text)
     await expect(execute(page, 'FileSystem.writeFile', uri, 'overwrite')).rejects.toThrow('read-only')
     await expect(execute(page, 'FileSystem.readDirWithFileTypes', uri)).rejects.toThrow('Not a directory')
   }
   expect(page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))).toHaveLength(0)
   expect(await page.evaluate(() => globalThis.localStorage.getItem('extension-samples:workspace:file-view-counter'))).toBeNull()
+})
+
+test('opens a native esbuild executable as text when requested', async ({ page }) => {
+  await page.goto('/extension-samples/file-view-counter/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+
+  const source = page.locator('#source-ide')
+  const bytes = await readFile(getEsbuildBinaryPath())
+  let isText = false
+  try {
+    if (!bytes.includes(0)) {
+      new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+      isText = true
+    }
+  } catch {
+    // Native executables are the behavior under test.
+  }
+  if (isText) {
+    test.skip(true, 'The platform esbuild entry is already text')
+    return
+  }
+  await source.getByRole('treeitem', { exact: true, name: 'node_modules' }).click()
+  await source.getByRole('treeitem', { exact: true, name: 'esbuild' }).first().click()
+  await source.getByRole('treeitem', { exact: true, name: 'bin' }).click()
+  await expect(source.getByRole('treeitem', { exact: true, name: 'esbuild' })).toHaveCount(2)
+  await source.getByRole('treeitem', { exact: true, name: 'esbuild' }).last().click()
+
+  const binaryContent = page.locator('.EditorContentBinary')
+  await expect(binaryContent).toHaveText('The file is not displayed in the text editor because its contents are binary.Reopen with Text Editor')
+  await expect(page.getByRole('button', { name: 'Retry' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Reopen with Text Editor' }).click()
+  await expect(binaryContent).toBeHidden()
+  await expect(source.locator('.EditorContent')).toBeVisible()
+  await expect(source.locator('.TabTitle').filter({ hasText: 'esbuild' })).toHaveCount(1)
 })
 
 test('playground packages declarations for the API virtual DOM exports', async ({ page }) => {

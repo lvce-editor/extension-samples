@@ -13,6 +13,13 @@ import {
 import { readGeneratedBundle } from './GeneratedBundleStorage.ts'
 import { binaryDirectories, generatedRoot, getSourceFileStat, isBinary, isGenerated, modulesRoot } from './SourceFileSystemStat.ts'
 
+class BinaryFileError extends Error {
+  constructor(message: string) {
+    super(message)
+    Object.defineProperty(this, 'name', { value: 'BinaryFileError' })
+  }
+}
+
 const prefix = 'sample-source://'
 const memoryUri = (uri: string): string => uri.replace(prefix, 'memfs://')
 const assertWritable = (uri: string): void => {
@@ -46,18 +53,20 @@ const main = async (): Promise<void> => {
       if (uri === `${modulesRoot}/esbuild`) return [...entries.filter((entry) => entry.name !== 'bin'), { name: 'bin', type: 3 }]
       return uri === 'sample-source:///sample' ? [...entries.filter((entry) => entry.name !== 'dist'), { name: 'dist', type: 3 }] : entries
     },
-    async readFile(uri) {
+    async readFile(uri: string, ...args: unknown[]) {
+      const encoding = args[0]
       if (isBinary(uri)) {
         const response = await fetch(new URL('../esbuild-bin', import.meta.url))
         if (!response.ok) throw new Error(`Unable to load esbuild binary: ${response.status}`)
         const bytes = new Uint8Array(await response.arrayBuffer())
+        if (encoding === 'binary') return new TextDecoder().decode(bytes)
         // Application filesystem reads are text-only, even when a provider returns a Blob.
         // Windows installs may retain the text CLI shim; Unix installs use a native binary.
         try {
           if (bytes.includes(0)) throw new Error('Binary content')
           return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
         } catch {
-          throw new Error('The esbuild executable is a binary file and cannot be opened as text')
+          throw new BinaryFileError('The esbuild executable is a binary file and cannot be opened as text')
         }
       }
       if (binaryDirectories.includes(uri)) throw new Error(`Not a file: ${uri}`)
