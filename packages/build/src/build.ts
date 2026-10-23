@@ -2,16 +2,32 @@ import { build } from 'esbuild'
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { builtinModules, createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { brotliDecompressSync } from 'node:zlib'
 import { x as extractTar } from 'tar'
 import { createIgnoreHashes } from './CreateIgnoreHashes.ts'
 import { createHtml } from './html.ts'
 import { samples } from './samples.ts'
+// This shim is also passed to esbuild's JavaScript inject option.
+// @ts-expect-error The JavaScript shim exports the injected process and its own file URL.
+import { process as browserProcess, processShimUrl } from './process-shim.js'
 
 const root = resolve(import.meta.dirname, '../../..')
 const outputRoot = join(root, '.tmp', 'static')
 const require = createRequire(import.meta.url)
+const sampleRequire = createRequire(join(root, 'packages/sample-file-system-provider/package.json'))
+const browserAliases = {
+  assert: require.resolve('assert/'),
+  buffer: require.resolve('buffer/'),
+  events: require.resolve('events/'),
+  path: require.resolve('path-browserify'),
+  process: require.resolve('process/browser'),
+  stream: require.resolve('stream-browserify'),
+  util: require.resolve('util/'),
+}
+const browserInject = [fileURLToPath(processShimUrl)]
+// esbuild injects the exported process identifier into browser bundles that use it.
+void browserProcess
 const writeJson = async (path: string, value: unknown): Promise<void> => {
   await mkdir(dirname(path), { recursive: true })
   await writeFile(path, `${JSON.stringify(value, undefined, 2)}\n`)
@@ -52,6 +68,31 @@ const buildTooling = async (): Promise<Record<string, string>> => {
     files[`/node_modules/${name}/index.cjs`] = result.outputFiles[0].text
     files[`/node_modules/${name}/package.json`] = JSON.stringify({ name, main: 'index.cjs' })
   }
+  const memfsRoot = dirname(sampleRequire.resolve('memfs/package.json'))
+  const memfsBundle = await build({
+    alias: browserAliases,
+    bundle: true,
+    format: 'esm',
+    inject: browserInject,
+    minify: true,
+    platform: 'browser',
+    stdin: {
+      contents: "export { createFsFromVolume, Volume } from 'memfs'",
+      resolveDir: join(root, 'packages/sample-file-system-provider'),
+      sourcefile: 'memfs-entry.js',
+    },
+    write: false,
+  })
+  files['/node_modules/memfs/index.js'] = memfsBundle.outputFiles[0].text
+  files['/node_modules/memfs/package.json'] = JSON.stringify({ name: 'memfs', main: 'index.js', types: 'lib/index.d.ts' })
+  const visitMemfsTypes = async (relative: string): Promise<void> => {
+    for (const entry of await readdir(join(memfsRoot, relative), { withFileTypes: true })) {
+      const path = `${relative}/${entry.name}`
+      if (entry.isDirectory()) await visitMemfsTypes(path)
+      else if (entry.name.endsWith('.d.ts')) files[`/node_modules/memfs/${path}`] = await readFile(join(memfsRoot, path), 'utf8')
+    }
+  }
+  await visitMemfsTypes('lib')
   for (const name of ['@lvce-editor/api', '@lvce-editor/virtual-dom-worker', '@lvce-editor/constants']) {
     const packageRoot = dirname(dirname(require.resolve(name)))
     const visit = async (relative: string): Promise<void> => {
@@ -157,6 +198,7 @@ export const buildStatic = async (): Promise<void> => {
     ['SourceFileSystem.ts', 'source-files.js'],
   ]) {
     await build({
+      alias: browserAliases,
       bundle: true,
       entryPoints: [join(root, 'packages/playground/src', entry)],
       external: ['node:*', 'electron'],
@@ -184,10 +226,12 @@ export const buildStatic = async (): Promise<void> => {
     await writeJson(join(outputRoot, 'samples', sample.id, 'files.json'), files)
     await writeJson(join(outputRoot, 'samples', sample.id, 'eslint-ignore-hashes.json'), createIgnoreHashes(files))
     await build({
+      alias: browserAliases,
       bundle: true,
       entryPoints: [join(packageRoot, 'src/main.ts')],
       external: ['@lvce-editor/api'],
       format: 'esm',
+      inject: browserInject,
       loader: { '.css': 'text' },
       outfile: join(packageRoot, 'dist/main.js'),
       platform: 'browser',
@@ -196,10 +240,11 @@ export const buildStatic = async (): Promise<void> => {
     })
     await cp(join(packageRoot, 'dist'), join(outputRoot, 'samples', sample.id, 'dist'), { recursive: true })
     await build({
-      alias: { '@lvce-editor/api': join(assets, 'api.js') },
+      alias: { ...browserAliases, '@lvce-editor/api': join(assets, 'api.js') },
       bundle: true,
       entryPoints: [join(packageRoot, 'src/main.ts')],
       format: 'esm',
+      inject: browserInject,
       loader: { '.css': 'text' },
       outfile: join(outputRoot, 'samples', sample.id, 'main.js'),
       platform: 'browser',

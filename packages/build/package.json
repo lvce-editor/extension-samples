@@ -9,8 +9,15 @@
     "@lvce-editor/extension-management-worker": "4.94.0",
     "@lvce-editor/renderer-process": "30.79.0",
     "@lvce-editor/shared-process": "0.125.5",
+    "assert": "^2.1.0",
+    "buffer": "^6.0.3",
     "esbuild": "^0.28.2",
     "esbuild-wasm": "^0.28.2",
-    "tar": "^7.5.22"
+    "events": "^3.3.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "tar": "^7.5.22",
+    "util": "^0.12.5"
   }
 }

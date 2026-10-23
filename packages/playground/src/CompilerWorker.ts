@@ -28,6 +28,7 @@ const buildOutput = async (files: Record<string, string>, api: string, inlineApi
         setup(build): void {
           build.onResolve({ filter: allPaths }, (args) => {
             if (args.path === '@lvce-editor/api') return inlineApi ? { namespace: 'api', path: 'api' } : { external: true, path: args.path }
+            if (args.path === 'memfs') return { namespace: 'workspace', path: '/node_modules/memfs/index.js' }
             if (args.importer && !args.path.startsWith('.')) {
               return { errors: [{ text: `Only relative imports and @lvce-editor/api are supported: ${args.path}` }] }
             }
