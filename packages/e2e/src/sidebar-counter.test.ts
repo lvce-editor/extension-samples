@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 test('sidebar counter renders virtual DOM and responds to mouse and keyboard', async ({ page }) => {
   await page.goto('/extension-samples/sidebar-counter/')
@@ -49,7 +50,7 @@ test('editing the counter updates the preview and reset restores the sample', as
   await counter.getByRole('button', { name: 'Increment' }).click()
   await expect(counter.getByRole('status')).toHaveText('Count: 2')
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(page.locator('#preview-ide .ActivityBar')).toBeVisible()
   await expect(counter.getByRole('status')).toHaveText('Count: 0')

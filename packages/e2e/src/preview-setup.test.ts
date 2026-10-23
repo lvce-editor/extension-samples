@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 test('saved setup edits apply on page load without interrupting hot reload', async ({ page }) => {
   await page.goto('/extension-samples/completion-provider/')
@@ -22,7 +23,7 @@ test('saved setup edits apply on page load without interrupting hot reload', asy
   await expect(page.locator('.EditorCompletionItem')).toHaveText(['blue', 'green', 'red'], { timeout: 30_000 })
   await page.keyboard.press('Enter')
   await expect(page.locator('#preview-ide .EditorRow').first()).toHaveText(['blue', 'color='].join(''))
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('.EditorCompletionItem')).toHaveText(['blue', 'green', 'red'], { timeout: 30_000 })
   await page.keyboard.press('Enter')
   await expect(page.locator('#preview-ide .EditorRow').first()).toHaveText('color=blue')

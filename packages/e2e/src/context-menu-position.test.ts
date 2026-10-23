@@ -31,7 +31,7 @@ test('anchors Explorer menus to the owning embedded IDE after resizing and page 
   await assertPosition('preview')
   await assertPosition('source')
 
-  await page.addStyleTag({ content: '.Toolbar { margin-top: 40px } .Playground { padding: 20px 30px; grid-template-rows: 88px minmax(0, 1fr) }' })
+  await page.addStyleTag({ content: '.Playground { padding: 20px 30px; grid-template-rows: minmax(0, 1fr) }' })
   await assertPosition('source')
   await assertPosition('preview')
 

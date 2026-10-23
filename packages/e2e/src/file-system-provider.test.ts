@@ -1,4 +1,5 @@
 import { expect, test, type Locator } from '@playwright/test'
+import { selectSample } from './PlaygroundControls.ts'
 
 const sharedWorkerUrl = /(?:renderer|editor|mainArea)WorkerMain/
 const findWidgetUrl = /\/extension-samples\/find-widget\/$/
@@ -14,7 +15,7 @@ test.beforeEach(async ({ page }) => {
 
 test('opens two real LVCE editors with TypeScript highlighting and the file-system preview', async ({ page }, testInfo) => {
   await expect(page).toHaveTitle('File System Provider · Lvce Editor Extension Samples')
-  await expect(page.getByLabel('Extension sample', { exact: true })).toHaveValue('file-system-provider')
+  await expect(page.locator('#source-ide .StatusBarItem').filter({ hasText: 'Sample:' })).toHaveText('Sample: File System Provider')
 
   const workbench = page
   await expect(workbench.getByRole('tab', { name: 'main.ts' })).toBeVisible()
@@ -23,7 +24,9 @@ test('opens two real LVCE editors with TypeScript highlighting and the file-syst
   const previewEditor = workbench.locator('.Editor').nth(1)
   await expect(previewEditor).toContainText('# Hello from memfs')
   await expect(workbench.locator('iframe')).toHaveCount(0)
-  await expect(workbench.locator('.TitleBar:visible, .ActivityBar:visible, .StatusBar:visible')).toHaveCount(0)
+  await expect(workbench.locator('.TitleBar:visible, .ActivityBar:visible, .StatusBar:visible')).toHaveCount(2)
+  await expect(page.locator('#source-ide .StatusBar')).toBeVisible()
+  await expect(page.locator('#preview-ide .StatusBar')).toBeVisible()
   await expect(page.locator('#source-ide .Explorer')).toBeVisible()
   await expect(page.locator('#preview-ide .Explorer')).toBeVisible()
   await expect(page.locator('#source-ide').getByRole('treeitem', { exact: true, name: 'extension.json' })).toBeVisible()
@@ -39,7 +42,7 @@ test('uses readable sample titles on direct navigation, selection and reload', a
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true')
   await expect(page).toHaveTitle('Find Widget · Lvce Editor Extension Samples')
 
-  await page.getByLabel('Extension sample', { exact: true }).selectOption('dialog')
+  await selectSample(page, 'Dialog')
   await expect(page).toHaveURL(dialogUrl)
   await expect(page).toHaveTitle('Dialog · Lvce Editor Extension Samples')
   await page.reload()
@@ -109,7 +112,8 @@ test('saving TypeScript reloads the provider without replacing the preview edito
     const result = await view.evaluate((element) => ({ className: (element as Element).className, connected: element.isConnected }))
     expect(result.connected, result.className).toBe(true)
   }
-  await expect(page.locator('#preview-ide')).not.toHaveAttribute('data-chrome-remounted', 'true')
+  await expect(page.locator('#preview-ide .StatusBar')).toHaveCount(1)
+  await expect(page.locator('#preview-ide .StatusBar').getByRole('button', { exact: true, name: 'Preview' })).toHaveCount(1)
   await expect(page.locator('#preview-ide').getByRole('treeitem', { exact: true, name: 'example.ts' })).toBeVisible()
 })
 

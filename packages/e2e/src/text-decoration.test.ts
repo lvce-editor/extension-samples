@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { resetSample } from './PlaygroundControls.ts'
 
 const command = async (page: Page, label: string): Promise<void> => {
   await focusEditor(page)
@@ -67,7 +68,7 @@ test('restores the initial TODO decoration when resetting the sample', async ({ 
   await expect(decorations).toHaveCount(1)
   await command(page, 'Sample: Clear Underlines')
   await expect(decorations).toHaveCount(0)
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(decorations).toHaveCount(1)
   await expect(decorations.first()).toHaveCSS('background-color', 'rgb(224, 90, 51)')
@@ -165,7 +166,7 @@ test('disposal clears output and rebuilding resets registrations and stale under
       .toBe(replacement)
     await page.keyboard.press('ControlOrMeta+s')
     await expect(page.locator('body')).toHaveAttribute('data-preview-revision', revision)
-    await expect(page.getByRole('status')).toHaveText('Preview ready')
+    await expect(page.locator('#preview-status')).toHaveText('Preview ready')
   }
   await rebuild('#0000ff', '2')
   await command(page, 'Sample: Clear Underlines')

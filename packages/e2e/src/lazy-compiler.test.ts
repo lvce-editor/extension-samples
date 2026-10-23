@@ -1,4 +1,5 @@
 import { expect, test, type Worker } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 const compilerAsset = /\/assets\/(?:compiler\.js|esbuild\.wasm|api\.js)$/
 
@@ -71,7 +72,7 @@ test('loads the compiler on the first saved edit and restores edited drafts', as
   await page.reload()
   await expect(preview).toContainText('Lazy compiler revision 2', { timeout: 30_000 })
   expect(compilerWorkers()).toHaveLength(1)
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await expect(preview).toContainText('Hello from memfs')
   expect(compilerWorkers()).toHaveLength(0)
