@@ -24,5 +24,10 @@
       "entry": ["{src/main.ts,.lvce/setup-preview.js}!"],
       "includeEntryExports": true,
     },
+    "packages/sample-syntax-highlighting": {
+      // The extension manifest loads this tokenizer dynamically by URL.
+      "entry": ["src/tokenizeSprout.js"],
+      "includeEntryExports": true,
+    },
   },
 }

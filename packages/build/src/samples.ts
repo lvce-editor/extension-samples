@@ -20,6 +20,19 @@ export const samples: readonly Sample[] = [
     title: 'Basic Vim',
   },
   {
+    description: 'Import lodash from an npm dependency and add two numbers.',
+    id: 'npm-dependency',
+    packageName: 'sample-npm-dependency',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md': '# Npm Dependency\n\nEdit src/main.ts and save to rebuild the lodash-powered preview.\n',
+      },
+    },
+    route: 'npm-dependency',
+    title: 'Npm Dependency',
+  },
+  {
     description: 'Replace matching files with a custom virtual DOM greeting view.',
     id: 'file-view',
     packageName: 'sample-file-view',
@@ -287,6 +300,20 @@ export const samples: readonly Sample[] = [
     title: 'Status Bar Item',
   },
   {
+    description: 'Increment a counter from a clickable status bar item.',
+    id: 'status-bar-counter',
+    packageName: 'sample-status-bar-counter',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Status Bar Counter\n\nClick the **Count: 0** item in the preview status bar to increase its count. The command palette also offers **Sample: Increment Status Bar Counter**.\n',
+      },
+    },
+    route: 'status-bar-counter',
+    title: 'Status Bar Counter',
+  },
+  {
     description: 'Write, append, and clear simulated build logs in the Output panel.',
     id: 'output-channel',
     packageName: 'sample-output-channel',
@@ -438,5 +465,18 @@ export const samples: readonly Sample[] = [
     preview: { entry: '/example.txt', files: { '/example.txt': 'log\n' } },
     route: 'tab-completion',
     title: 'Tab Completion',
+  },
+  {
+    description: 'Contribute syntax highlighting for a small invented language.',
+    id: 'syntax-highlighting',
+    packageName: 'sample-syntax-highlighting',
+    preview: {
+      entry: '/example.sprout',
+      files: {
+        '/example.sprout': '// A tiny Sprout program\nlet greeting = "Hello, Sprout!"\nlet visits = 3\nprint(greeting)\nprint(true)\n',
+      },
+    },
+    route: 'syntax-highlighting',
+    title: 'Syntax Highlighting',
   },
 ]
