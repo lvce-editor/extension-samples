@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
+import { expect, test } from './FocusDiagnostics.ts'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 
