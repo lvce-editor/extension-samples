@@ -49,6 +49,7 @@ test('selection expansion sample selects and replaces the current line', async (
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
   const textarea = editor.locator('textarea')
+  await editor.locator('.EditorRow').first().click()
   await runSelectedCommand(page, 'Sample: Select Current Line')
   await expect(editor.locator('.EditorSelection')).toHaveCount(1)
   await textarea.focus()
