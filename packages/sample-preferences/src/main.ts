@@ -18,6 +18,7 @@ const main = async (): Promise<void> => {
   const originalFontSize = getPreference(preferenceKey)
   const ready = originalFontSize.then((value) => output.appendLine(`Current ${preferenceKey}: ${String(value)}`))
   registerCommand({
+    id: 'sample.setFontSize',
     async execute() {
       await ready
       const fontSize = await showQuickPick({
@@ -34,9 +35,9 @@ const main = async (): Promise<void> => {
       await output.appendLine(`Updated ${preferenceKey}: ${String(currentFontSize)}`)
       await openOutputView({ channel: 'sample-preferences' })
     },
-    id: 'sample.setFontSize',
   })
   registerCommand({
+    id: 'sample.resetFontSize',
     async execute() {
       await ready
       await setPreference(preferenceKey, await originalFontSize)
@@ -44,9 +45,9 @@ const main = async (): Promise<void> => {
       await output.appendLine(`Restored ${preferenceKey}: ${String(currentFontSize)}`)
       await openOutputView({ channel: 'sample-preferences' })
     },
-    id: 'sample.resetFontSize',
   })
   registerCommand({
+    id: 'sample.inspectConfiguration',
     async execute() {
       await ready
       const [definitions, themes] = await Promise.all([getConfigurationDefinitions(), getColorThemeNames()])
@@ -54,7 +55,6 @@ const main = async (): Promise<void> => {
       await output.appendLine(`Color themes: ${String(themes.length)}`)
       await openOutputView({ channel: 'sample-preferences' })
     },
-    id: 'sample.inspectConfiguration',
   })
   await ready
 }

@@ -1,0 +1,194 @@
+{
+  "id": "sample.basic-vim",
+  "name": "Basic Vim",
+  "description": "A small modal editor keymap with a block cursor.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": [
+    "onCommand:basicVim.start",
+    "onCommand:basicVim.stop",
+    "onCommand:basicVim.handleKey",
+    "onCommand:basicVim.deleteWord",
+    "onCommand:basicVim.consumeKey"
+  ],
+  "commands": [
+    {
+      "id": "basicVim.start",
+      "label": "Basic Vim: Start"
+    },
+    {
+      "id": "basicVim.stop",
+      "label": "Basic Vim: Stop"
+    },
+    {
+      "id": "basicVim.handleKey",
+      "label": "Basic Vim: Handle Key"
+    },
+    {
+      "id": "basicVim.deleteWord",
+      "label": "Basic Vim: Delete Word"
+    },
+    {
+      "id": "basicVim.consumeKey",
+      "label": "Basic Vim: Consume Key"
+    }
+  ],
+  "keyMap": {
+    "cursorStyle": "block",
+    "initialMode": "normal",
+    "modes": {
+      "insert": {
+        "bindings": {
+          "Escape": {
+            "command": "basicVim.handleKey",
+            "mode": "normal",
+            "args": ["Escape"]
+          }
+        }
+      },
+      "normal": {
+        "bindings": {
+          "$": {
+            "command": "basicVim.handleKey",
+            "args": ["$"]
+          },
+          "0": {
+            "command": "basicVim.handleKey",
+            "args": ["0"]
+          },
+          "a": {
+            "command": "basicVim.handleKey",
+            "mode": "insert",
+            "args": ["a"]
+          },
+          "A": {
+            "command": "basicVim.handleKey",
+            "mode": "insert",
+            "args": ["A"]
+          },
+          "b": {
+            "command": "basicVim.handleKey",
+            "args": ["b"]
+          },
+          "h": {
+            "command": "basicVim.handleKey",
+            "args": ["h"]
+          },
+          "i": {
+            "command": "basicVim.handleKey",
+            "mode": "insert",
+            "args": ["i"]
+          },
+          "I": {
+            "command": "basicVim.handleKey",
+            "mode": "insert",
+            "args": ["I"]
+          },
+          "j": {
+            "command": "basicVim.handleKey",
+            "args": ["j"]
+          },
+          "k": {
+            "command": "basicVim.handleKey",
+            "args": ["k"]
+          },
+          "l": {
+            "command": "basicVim.handleKey",
+            "args": ["l"]
+          },
+          "u": {
+            "command": "basicVim.handleKey",
+            "args": ["u"]
+          },
+          "w": {
+            "command": "basicVim.handleKey",
+            "args": ["w"]
+          },
+          "x": {
+            "command": "basicVim.handleKey",
+            "args": ["x"]
+          },
+          "c": {
+            "mode": "change",
+            "command": "basicVim.consumeKey"
+          },
+          "d": {
+            "mode": "delete",
+            "command": "basicVim.consumeKey"
+          }
+        },
+        "captureText": true
+      },
+      "delete": {
+        "bindings": {
+          "a": {
+            "mode": "deleteAround",
+            "command": "basicVim.consumeKey"
+          },
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          }
+        },
+        "captureText": true
+      },
+      "change": {
+        "bindings": {
+          "a": {
+            "mode": "changeAround",
+            "command": "basicVim.consumeKey"
+          },
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          }
+        },
+        "captureText": true
+      },
+      "deleteAround": {
+        "bindings": {
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "w": {
+            "command": "basicVim.deleteWord",
+            "mode": "normal"
+          }
+        },
+        "captureText": true
+      },
+      "changeAround": {
+        "bindings": {
+          "q": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "Escape": {
+            "mode": "normal",
+            "command": "basicVim.consumeKey"
+          },
+          "w": {
+            "command": "basicVim.deleteWord",
+            "mode": "insert"
+          }
+        },
+        "captureText": true
+      }
+    }
+  }
+}

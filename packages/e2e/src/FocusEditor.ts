@@ -11,7 +11,7 @@ export const focusEditor = async (page: Page, rootId = 'preview'): Promise<void>
     const { entry } = await response.json()
     const renderer = await import(entry)
     const editor = globalThis.document.querySelector<HTMLElement>(`#${id}-ide .Editor`)!
-    await renderer.executeCommand('Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'handleFocus')
+    await renderer.executeShortcut('Application.execute', id, 'Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'handleFocus')
   }, rootId)
   await expect(input).toBeFocused()
 }

@@ -6,10 +6,10 @@ const main = async (): Promise<void> => {
   registerDocumentSymbolProvider({ id: 'sample-document-symbols', languageId: 'plaintext', provideDocumentSymbols })
   const ready = setPreference('breadcrumbs.enabled', true)
   registerCommand({
+    id: 'sample.initializeDocumentSymbols',
     async execute() {
       await ready
     },
-    id: 'sample.initializeDocumentSymbols',
   })
   await ready
 }

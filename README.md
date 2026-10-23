@@ -4,15 +4,17 @@ Interactive examples for the [Lvce Editor](https://github.com/lvce-editor/lvce-e
 
 [Open the playground](https://lvce-editor.github.io/extension-samples/).
 
-Each extension lives in `packages/sample-<id>`. The static playground shows two real LVCE IDEs side by side: the sample workspace on the left and the running extension on the right. Saving with `Ctrl+S` formats the code with Prettier, bundles the workspace in the browser with esbuild-wasm, and refreshes the preview. Each sample includes a `prettier` field in `package.json` with the default style (no semicolons, single quotes, and a print width of 150); edit it to customize formatting.
+Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static playground shows two real LVCE IDEs side by side: the sample workspace on the left and the running extension on the right. Saving with `Ctrl+S` formats the code with Prettier, bundles the workspace in the browser with esbuild-wasm, and refreshes the preview. Each sample includes a `prettier` field in `package.json` with the default style (no semicolons, single quotes, and a print width of 150); edit it to customize formatting.
 
 ## Samples
 
+- [Basic Vim](./packages/basic-vim)
 - [File View](./packages/sample-file-view)
 - [File View Counter](./packages/sample-file-view-counter)
 - [Sidebar counter](./packages/sample-sidebar-counter)
 - [Color view](./packages/sample-color-view)
 - [Hello World](./packages/sample-hello-world)
+- [Npm Dependency](./packages/sample-npm-dependency)
 - [Text Decoration](./packages/sample-text-decoration)
 - [Text Manipulation](./packages/sample-text-manipulation)
 - [Word Count](./packages/sample-word-count)
@@ -23,6 +25,7 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Source control provider](./packages/sample-source-control-provider)
 - [Diagnostic Provider](./packages/sample-diagnostic-provider)
 - [Completion Provider](./packages/sample-completion-provider)
+- [Completion Resolve Provider](./packages/sample-completion-resolve-provider)
 - [Hover Provider](./packages/sample-hover-provider)
 - [Definition Provider](./packages/sample-definition-provider)
 - [Type Definition Provider](./packages/sample-type-definition-provider)
@@ -30,6 +33,7 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)
 - [Status Bar Item](./packages/sample-status-bar-item)
+- [Status Bar Counter](./packages/sample-status-bar-counter)
 - [Output Channel](./packages/sample-output-channel)
 - [Rename Provider](./packages/sample-rename-provider)
 - [Code Actions](./packages/sample-code-actions)
@@ -39,7 +43,12 @@ Each extension lives in `packages/sample-<id>`. The static playground shows two 
 - [Editor Decorations](./packages/sample-editor-decorations)
 - [Signature Help](./packages/sample-signature-help)
 - [Find Widget](./packages/sample-find-widget)
-- [Language Editing](./packages/sample-language-editing)
+- [Brace Completion](./packages/sample-brace-completion)
+- [Closing Tags](./packages/sample-closing-tags)
+- [Comments](./packages/sample-comments)
+- [Selection Expansion](./packages/sample-selection-expansion)
+- [Tab Completion](./packages/sample-tab-completion)
+- [Syntax Highlighting](./packages/sample-syntax-highlighting)
 
 ## Development
 
@@ -56,7 +65,7 @@ Run `npm run knip` to check unused files, exports, and dependencies across every
 
 New `packages/sample-*` workspaces are included automatically, with `src/main.ts` as the extension entry point. Knip checks other source files for unused code. Optional `.lvce/setup-preview.js` modules are also entry points; mark their dynamically called `setupPreview` export with `/** @public */`. Other unused entry-point exports are still reported.
 
-Run `npm run lint` for repository checks, or `npm run lint --workspace=packages/sample-file-system-provider` (substitute any sample package) to lint one extension. Every `packages/sample-*` extension uses the shared `eslint.samples.config.js`: typescript-eslint's [strict type-checked rules](https://typescript-eslint.io/users/configs/#strict-type-checked) and [Unicorn's recommended rules](https://github.com/sindresorhus/eslint-plugin-unicorn). API abbreviations and explicit `undefined` values are allowed. Sample TypeScript projects also enable strict checking and checked indexed access.
+Run `npm run lint` for repository checks, or `npm run lint --workspace=packages/sample-file-system-provider` (substitute any sample package) to lint one extension. Every `packages/sample-*` extension and `packages/basic-vim` uses the shared `eslint.samples.config.js`: typescript-eslint's [strict type-checked rules](https://typescript-eslint.io/users/configs/#strict-type-checked) and [Unicorn's recommended rules](https://github.com/sindresorhus/eslint-plugin-unicorn). API abbreviations and explicit `undefined` values are allowed. Sample TypeScript projects also enable strict checking and checked indexed access.
 
 The playground shares the strict syntax and Unicorn rules, including checks against explicit `any` and non-null assertions. Type-aware rules (such as unsafe values and unhandled promises) run in CI and local lint commands; they are disabled in the browser because the playground's virtual filesystem does not yet support TypeScript project loading. New samples should include a `tsconfig.json` covering all source files.
 
@@ -70,9 +79,9 @@ The build generates SHA-256 hashes of each sample’s shipped files and configur
 
 The source Explorer also exposes read-only `dist/main.js` through a filesystem provider. It delegates editable files to the application’s memory filesystem and fetches generated JavaScript only when read. Successful builds refresh the package bundle (with `@lvce-editor/api` kept external), including open generated editors; failed builds keep the last successful output. Generated content is excluded from source snapshots and browser storage. Reset restores the shipped bundle without starting the compiler.
 
-The compiler resolves relative workspace imports and `@lvce-editor/api`. Saving code, manifests, or SVG icons rebuilds the preview. Compile and missing-icon errors leave the last working preview visible. The file-system preview reads its workspace from the sample's registered provider; the source-control preview shows its real source-control view and decoration icons.
+The compiler resolves relative workspace imports, `@lvce-editor/api`, and the shipped lodash dependency used by the Npm Dependency sample. Saving code, manifests, or SVG icons rebuilds the preview. Other npm packages and Node-only APIs are not available in the browser compiler. Compile and missing-icon errors leave the last working preview visible. The file-system preview reads its workspace from the sample's registered provider; the source-control preview shows its real source-control view and decoration icons.
 
-Saved workspace snapshots persist in browser storage when available; **Reset sample** restores the example. The generated site is a static GitHub Pages artifact. Arbitrary npm imports, Node-only APIs, and binary asset editing are not supported by the browser compiler.
+Saved workspace snapshots persist in browser storage when available; **Reset sample** restores the example. The generated site is a static GitHub Pages artifact. Beyond the shipped lodash dependency, npm packages, Node-only APIs, and binary asset editing are not supported by the browser compiler.
 
 Application isolation separates editor state and extension services; it is not a security sandbox for hostile code. Use the playground to experiment with code you trust.
 

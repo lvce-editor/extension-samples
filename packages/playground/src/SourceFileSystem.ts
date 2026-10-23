@@ -7,9 +7,11 @@ import {
   registerCommand,
   registerFileSystemProvider,
   remove,
+  stat,
   writeFile,
 } from '@lvce-editor/api'
 import { readGeneratedBundle } from './GeneratedBundleStorage.ts'
+import { binaryDirectories, generatedRoot, getSourceFileStat, isBinary, isGenerated, modulesRoot } from './SourceFileSystemStat.ts'
 
 class BinaryFileError extends Error {
   constructor(message: string) {
@@ -20,12 +22,6 @@ class BinaryFileError extends Error {
 
 const prefix = 'sample-source://'
 const memoryUri = (uri: string): string => uri.replace(prefix, 'memfs://')
-const generatedRoot = 'sample-source:///sample/dist'
-const isGenerated = (uri: string): boolean => uri === generatedRoot || uri.startsWith(`${generatedRoot}/`)
-const modulesRoot = 'sample-source:///sample/node_modules'
-const binaryDirectories = [`${modulesRoot}/esbuild/bin`, `${modulesRoot}/.bin`]
-const isBinary = (uri: string): boolean => binaryDirectories.some((directory) => uri === `${directory}/esbuild`)
-
 const assertWritable = (uri: string): void => {
   if (isGenerated(uri) || uri === 'sample-source:///sample') throw new Error('Generated files are read-only')
   if (binaryDirectories.some((directory) => directory === uri || directory.startsWith(`${uri}/`) || uri.startsWith(`${directory}/`)))
@@ -36,10 +32,10 @@ const main = async (): Promise<void> => {
   let generatedUrl = new URL('../samples/' + new URL(import.meta.url).searchParams.get('sample') + '/dist/main.js', import.meta.url).href
   await activate()
   registerCommand({
+    id: 'sampleSource.setGeneratedUrl',
     execute(url: string) {
       generatedUrl = url
     },
-    id: 'sampleSource.setGeneratedUrl',
   })
   registerFileSystemProvider({
     id: 'sample-source',
@@ -89,6 +85,13 @@ const main = async (): Promise<void> => {
       assertWritable(newUri)
       // Use the application filesystem command to preserve directory renames too.
       await executeCommand('FileSystem.rename', memoryUri(oldUri), memoryUri(newUri))
+    },
+    async stat(uri) {
+      return getSourceFileStat(uri, async (memoryUri) => {
+        const type = await stat(memoryUri)
+        if (typeof type !== 'number') throw new TypeError(`Invalid file type for ${memoryUri}`)
+        return type
+      })
     },
     async writeFile(uri, content) {
       assertWritable(uri)

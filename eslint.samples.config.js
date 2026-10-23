@@ -1,15 +1,27 @@
 import unicorn from 'eslint-plugin-unicorn'
+import perfectionist from 'eslint-plugin-perfectionist'
 import tseslint from 'typescript-eslint'
+
+export const commandRegistrationSort = [
+  'error',
+  {
+    customGroups: [{ elementNamePattern: '^id$', groupName: 'commandId' }],
+    groups: ['commandId', 'unknown'],
+    useConfigurationIf: { callingFunctionNamePattern: '^registerCommand$' },
+  },
+]
 
 export const sampleConfig = [
   ...tseslint.configs.strictTypeChecked,
   unicorn.configs.recommended,
   {
+    plugins: { perfectionist },
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       // The sample entry points intentionally start main without awaiting it.
       '@typescript-eslint/no-floating-promises': ['error', { allowForKnownSafeCalls: ['main'] }],
       'no-debugger': 'error',
+      'perfectionist/sort-objects': commandRegistrationSort,
       // Keep extension API names (uri, cwd, etc.) and explicit undefined values.
       'unicorn/name-replacements': 'off',
       'unicorn/no-useless-undefined': 'off',

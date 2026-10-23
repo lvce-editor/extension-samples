@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
 
@@ -59,9 +60,12 @@ test('text insertion survives a sample rebuild and inserts at an empty selection
   await expect(preview.locator('.EditorRow').first()).toHaveText('Hello again!')
 
   await page.keyboard.press('ControlOrMeta+z')
-  await page.keyboard.press('ArrowRight')
-  await runCommand(page, 'Sample: Insert Text')
-  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello again!')
+  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!')
+  await focusEditor(page)
+  await page.keyboard.press('ControlOrMeta+Home')
+  await page.keyboard.press('End')
+  await runSelectedCommand(page, 'Sample: Insert Text')
+  await expect(preview.locator('.EditorRow').first()).toHaveText('Hello, Lvce!Hello again!')
 })
 
 test('selection API collapses a selection without replacing its text', async ({ page }) => {

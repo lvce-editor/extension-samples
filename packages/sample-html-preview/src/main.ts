@@ -66,10 +66,10 @@ const main = async (): Promise<void> => {
     title: 'HTML Preview',
   })
   registerCommand({
+    id: sampleCommandId,
     async execute(): Promise<void> {
       await executeCommand('Layout.openSideBarViewlet', sampleViewId)
     },
-    id: sampleCommandId,
   })
 }
 

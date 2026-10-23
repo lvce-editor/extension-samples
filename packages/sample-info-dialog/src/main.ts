@@ -3,6 +3,7 @@ import { activate, registerCommand, showDialog } from '@lvce-editor/api'
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
+    id: 'sample.showInformationDialog',
     async execute() {
       await showDialog({
         confirmMessage: 'OK',
@@ -11,7 +12,6 @@ const main = async (): Promise<void> => {
         type: 'info',
       })
     },
-    id: 'sample.showInformationDialog',
   })
 }
 

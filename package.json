@@ -27,9 +27,10 @@
   "devDependencies": {
     "@jest/globals": "^30.5.2",
     "@lvce-editor/eslint-config": "^18.9.0",
-    "@lvce-editor/server": "0.124.12",
+    "@lvce-editor/server": "0.125.5",
     "@types/node": "^26.4.1",
     "eslint": "^10.12.0",
+    "eslint-plugin-perfectionist": "5.10.0",
     "eslint-plugin-unicorn": "71.1.0",
     "jest": "^30.5.2",
     "jiti": "^2.7.0",
@@ -38,8 +39,5 @@
     "ts-jest": "^29.4.14",
     "typescript": "^6.0.3",
     "typescript-eslint": "8.63.0"
-  },
-  "overrides": {
-    "@lvce-editor/json-rpc": "8.9.1"
   }
 }

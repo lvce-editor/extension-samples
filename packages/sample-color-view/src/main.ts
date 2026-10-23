@@ -2,6 +2,7 @@ import { activate as activateExtensionApi, registerView, type VirtualDomViewInst
 
 const { Div, Input, Text } = VirtualDomElements
 const defaultColor = '#f0f0f0'
+const previewBackgroundColor = '#f0f0f0'
 const namedColors = new Set([
   'black',
   'blue',
@@ -30,7 +31,6 @@ const main = async (): Promise<void> => {
   await activateExtensionApi()
   registerView({
     create(): VirtualDomViewInstance {
-      let inputValue = defaultColor
       let backgroundColor = defaultColor
       return {
         getCss(): string {
@@ -42,7 +42,6 @@ const main = async (): Promise<void> => {
         },
         handleEvent(event): void {
           if (event.type !== 'input' || event.name !== 'color' || typeof event.value !== 'string') return
-          inputValue = event.value
           const color = event.value.trim()
           if (color && isCssColor(color)) backgroundColor = color
         },
@@ -55,9 +54,12 @@ const main = async (): Promise<void> => {
               className: 'ColorViewInput',
               inputType: 'text',
               name: 'color',
+              onFocus: 'handleFocus',
               onInput: 'handleInput',
+              onKeyDown: 'nativeInputKeyDown',
               type: Input,
-              value: inputValue,
+              // Keep native edits intact while asynchronous input events update the background.
+              value: defaultColor,
             },
             { childCount: 1, className: 'ColorViewPreview', role: 'status', type: Div },
             { childCount: 0, text: `Background: ${backgroundColor}`, type: Text },
@@ -65,10 +67,30 @@ const main = async (): Promise<void> => {
         },
       }
     },
+    // Leave input editing to the browser instead of the shared editor shortcut dispatcher.
+    eventListeners: [{ name: 'nativeInputKeyDown', params: [], stopPropagation: true }],
     id: 'sample.color-view',
     kind: 'virtualDom',
     preferredLocation: 'sideBar',
     title: 'Color',
+  })
+  registerView({
+    create(): VirtualDomViewInstance {
+      return {
+        getCss(): string {
+          return `.ColorMainAreaView { box-sizing: border-box; min-height: 100%; padding: 24px; background-color: ${previewBackgroundColor}; color: #222; }`
+        },
+        render(): ReturnType<VirtualDomViewInstance['render']> {
+          return [
+            { childCount: 1, className: 'ColorMainAreaView', type: Div },
+            { childCount: 0, text: 'A color view in the main editor area.', type: Text },
+          ]
+        },
+      }
+    },
+    id: 'sample.color-view-preview',
+    kind: 'virtualDom',
+    title: 'Color Preview',
   })
 }
 

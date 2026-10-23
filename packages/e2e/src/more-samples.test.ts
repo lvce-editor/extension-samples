@@ -5,6 +5,29 @@ import { runSelectedCommand } from './RunSelectedCommand.ts'
 
 const horizontalCursorTranslation = /^[-\d.]+px(?: 0px)?$/
 
+test('status bar counter increments on click and resets with the sample', async ({ page }) => {
+  await page.goto('/extension-samples/status-bar-counter/')
+  const item = page.locator('#preview-ide .StatusBarItem').filter({ hasText: 'Count:' })
+  await expect(item).toHaveText('Count: 0', { timeout: 30_000 })
+  await expect(item).toHaveCount(1)
+  await item.click()
+  await expect(item).toHaveText('Count: 1')
+  await item.click()
+  await expect(item).toHaveText('Count: 2')
+  const response = await page.request.get('/extension-samples/samples/status-bar-counter/files.json')
+  const files = await response.json()
+  await focusEditor(page, 'source')
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace('let count = 0', 'let count = 10'))
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(item).toHaveText('Count: 10')
+  await expect(item).toHaveCount(1)
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(item).toHaveText('Count: 0', { timeout: 30_000 })
+  await expect(item).toHaveCount(1)
+})
+
 test('status bar item updates after selection and preserves its value on cancellation', async ({ page }) => {
   await page.goto('/extension-samples/status-bar-item/')
   const item = page.locator('#preview-ide .StatusBarItem').filter({ hasText: 'Environment:' })
@@ -13,10 +36,13 @@ test('status bar item updates after selection and preserves its value on cancell
   await item.click()
   await page.locator('#preview-ide .QuickPick').getByRole('option').filter({ hasText: 'Staging' }).click()
   await expect(item).toHaveText('Environment: Staging')
+  // Closing the picker restores editor focus after removing its DOM.
+  await expect(page.locator('#preview-ide .Editor textarea')).toBeFocused()
   await item.click()
   await expect(page.locator('#preview-ide .QuickPick')).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
+  await expect(page.locator('#preview-ide .Editor textarea')).toBeFocused()
   await expect(item).toHaveText('Environment: Staging')
 
   const response = await page.request.get('/extension-samples/samples/status-bar-item/files.json')
@@ -160,8 +186,12 @@ test('organize imports quick pick sorts the import block, is repeatable, and sup
   await focusEditor(page)
   const rows = editor.locator('.EditorRow')
   await runSelectedCommand(page, 'Editor: Organize Imports')
+  // Wait for palette focus restoration before issuing another editor shortcut.
+  await expect(editor.locator('textarea')).toBeFocused()
   await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
   await runSelectedCommand(page, 'Editor: Organize Imports')
+  // Wait for palette focus restoration before issuing another editor shortcut.
+  await expect(editor.locator('textarea')).toBeFocused()
   await expect(rows).toHaveText(['import apple', 'import delta', 'import zebra', '', 'print(apple)', ''])
   await focusEditor(page)
   await page.keyboard.press('ControlOrMeta+z')

@@ -13,7 +13,9 @@ for (const sample of ['file-system-provider', 'source-control-provider']) {
     await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
     await expect(page.locator('#preview-status')).toHaveText('Preview ready')
     await expect(page.locator('#source-ide .Editor')).toHaveCount(1)
-    await expect(page.locator('#preview-ide .Editor')).toContainText(sample === 'file-system-provider' ? 'Hello from memfs' : 'Preview workspace')
+    await expect(page.locator('#preview-ide .Editor')).toContainText(
+      sample === 'file-system-provider' ? 'Hello from memfs' : 'Source Control Preview',
+    )
     if (sample === 'source-control-provider') await expect(page.locator('#preview-ide .DecorationIcon').first()).toHaveJSProperty('naturalWidth', 16)
     const previewWorker = page.workers().find((worker) => worker.url().endsWith(`/samples/${sample}/main.js`))
     expect(previewWorker?.url()).toBe(new URL(`/extension-samples/samples/${sample}/main.js`, page.url()).href)
@@ -45,13 +47,19 @@ test('loads the compiler on the first saved edit and restores edited drafts', as
   expect(compilerWorkers()).toHaveLength(0)
   const response = await page.request.get('/extension-samples/samples/file-system-provider/files.json')
   const files = await response.json()
+  const sourceTree = page.locator('#source-ide')
+  await sourceTree.getByRole('treeitem', { exact: true, name: 'src' }).click()
+  await sourceTree.getByRole('treeitem', { exact: true, name: 'instructions.ts' }).click()
+  await expect(sourceTree.getByRole('tab', { exact: true, name: 'instructions.ts Close' })).toBeVisible()
   const source = page.locator('#source-ide .Editor')
   const preview = page.locator('#preview-ide .Editor')
   for (let revision = 1; revision <= 2; revision++) {
     const existingCompiler = compilerWorkers()[0]
     await source.locator('textarea').focus()
     await page.keyboard.press('ControlOrMeta+a')
-    await page.keyboard.insertText(files['/src/main.ts'].replace('Hello from memfs', () => `Lazy compiler revision ${revision}`))
+    await page.keyboard.insertText(
+      files['/src/instructions.ts'].replace('Edit this provider and save to rebuild the preview.', () => `Lazy compiler revision ${revision}`),
+    )
     await page.keyboard.press('ControlOrMeta+Home')
     await expect(source).toContainText(`Lazy compiler revision ${revision}`)
     if (revision === 1) expect(compilerWorkers()).toHaveLength(0)

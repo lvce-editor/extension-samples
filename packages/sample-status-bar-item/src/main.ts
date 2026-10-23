@@ -16,10 +16,11 @@ const main = async (): Promise<void> => {
     id: 'sample-environment',
   })
   registerCommand({
-    execute() {},
     id: 'sample.initializeStatusBar',
+    execute() {},
   })
   registerCommand({
+    id: 'sample.selectEnvironment',
     async execute() {
       const value = await showQuickPick({
         items: ['Development', 'Staging', 'Production'].map((label) => ({ description: `Use ${label.toLowerCase()} settings`, label, value: label })),
@@ -30,7 +31,6 @@ const main = async (): Promise<void> => {
       environment = value
       await statusBar.refresh()
     },
-    id: 'sample.selectEnvironment',
   })
 }
 

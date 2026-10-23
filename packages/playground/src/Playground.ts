@@ -10,6 +10,7 @@ type Files = Record<string, string>
 interface BuildOutput {
   readonly code: string
   readonly generated: string
+  readonly tokenizers: Readonly<Record<string, string>>
 }
 interface Sample {
   readonly id: string
@@ -19,6 +20,19 @@ interface Sample {
   }
   readonly route: string
   readonly title: string
+}
+
+const getCompilerFiles = (tooling: Files): Files => {
+  const memfsModule = tooling['/node_modules/memfs/index.js']
+  if (!memfsModule) throw new Error('The bundled memfs module is missing from tooling')
+  const compilerFiles: Files = { '/node_modules/memfs/index.js': memfsModule }
+  const lodashModule = tooling['/node_modules/lodash/index.js']
+  const lodashBundle = tooling['/node_modules/lodash/lodash.js']
+  if (lodashModule && lodashBundle) {
+    compilerFiles['/node_modules/lodash/index.js'] = lodashModule
+    compilerFiles['/node_modules/lodash/lodash.js'] = lodashBundle
+  }
+  return compilerFiles
 }
 
 const fetchJson = async <T>(url: string): Promise<T> => {
@@ -34,26 +48,52 @@ const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
     return content
   })
 
-export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExtensions: readonly unknown[]): Promise<void> => {
+const getPreviewWorkspace = (sampleId: string): string => {
+  if (sampleId === 'file-system-provider') return 'sample-memfs:///'
+  return 'memfs:///preview'
+}
+
+const getPreviewFiles = (sampleId: string, sample: Sample | undefined): Files => {
+  if (sample?.preview) return sample.preview.files
+  if (sampleId === 'file-system-provider') return {}
+  return {
+    '/README.md': '# Preview workspace\n',
+    '/src/main.ts': 'export const message = "Preview file"\n',
+  }
+}
+
+export const mountPlayground = async (
+  invoke: Invoke,
+  prefix: string,
+  sourceExtensions: readonly unknown[],
+  invokeShortcut: Invoke,
+): Promise<void> => {
   setupPreviewDivider()
-  await invoke('Preferences.update', { 'editor.diagnostics': true, 'editor.formatOnSave': true, 'editor.lineNumbers': true })
+  try {
+    await invoke('ColorTheme.setColorTheme', 'slime')
+  } catch (error) {
+    if (!String(error).includes('Layout.handleColorThemeChanged')) throw error
+  }
+  // Rebuild each saved source snapshot after formatting has finished.
+  await invoke('Preferences.update', {
+    'editor.diagnostics': true,
+    'editor.formatActions': 'pre-save',
+    'editor.formatOnSave': true,
+    'editor.lineNumbers': true,
+  })
   const sourceId = 'source'
   const previewId = 'preview'
   const sampleId = document.body.dataset.sampleId || 'file-system-provider'
   const samples = await fetchJson<Sample[]>(`${prefix}/samples.json`)
   const sample = samples.find((sample) => sample.id === sampleId)
-  const previewWorkspace = sampleId === 'file-system-provider' ? 'sample-memfs:///' : 'memfs:///preview'
-  const previewFiles: Files =
-    sample?.preview?.files ??
-    (sampleId === 'file-system-provider'
-      ? {}
-      : {
-          '/README.md': '# Preview workspace\n',
-          '/src/main.ts': 'export const message = "Preview file"\n',
-        })
+  const previewWorkspace = getPreviewWorkspace(sampleId)
+  const previewFiles = getPreviewFiles(sampleId, sample)
   const picker = document.querySelector<HTMLSelectElement>('#sample-picker')!
   const status = document.querySelector<HTMLElement>('#preview-status')!
-  for (const sample of samples) picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
+  const sortedSamples = samples.toSorted((a, b) => a.title.localeCompare(b.title))
+  for (const sample of sortedSamples) {
+    picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
+  }
   picker.addEventListener('change', () => location.assign(`${prefix}/${picker.value}/`))
   const storageKey = `extension-samples:workspace:${sampleId}`
   document.querySelector('#reset-button')!.addEventListener('click', () => {
@@ -66,6 +106,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   const initialFiles = await fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`)
   const ignoreHashes = await fetchJson<readonly string[]>(`${prefix}/samples/${sampleId}/eslint-ignore-hashes.json`)
   const tooling = await fetchJson<Files>(`${prefix}/tooling.json`)
+  const compilerFiles = getCompilerFiles(tooling)
   let files = { ...initialFiles }
   try {
     const stored = JSON.parse(localStorage.getItem(storageKey) || 'null')
@@ -98,7 +139,9 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       for (const request of pending.values()) request.reject(compilerError)
       pending.clear()
     }
-    compiler.onmessage = ({ data }: MessageEvent<{ id: number; code: string; generated: string; error?: string }>): void => {
+    compiler.onmessage = ({
+      data,
+    }: MessageEvent<{ id: number; code: string; generated: string; tokenizers: Record<string, string>; error?: string }>): void => {
       const request = pending.get(data.id)
       pending.delete(data.id)
       if (data.error) request?.reject(new Error(data.error))
@@ -112,14 +155,14 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       const worker = getCompiler()
       const id = ++nextBuild
       pending.set(id, { reject, resolve })
-      worker.postMessage({ files: { ...files }, id })
+      worker.postMessage({ files: { ...compilerFiles, ...files }, id })
     })
 
   const getPreviewCode = async (): Promise<BuildOutput | undefined> => {
     const unchanged =
       Object.keys(files).length === Object.keys(initialFiles).length &&
       Object.entries(initialFiles).every(([path, content]) => files[path] === content)
-    return unchanged ? undefined : compile()
+    return unchanged && !JSON.parse(files['/extension.json']).languages ? undefined : compile()
   }
 
   const mount = async (id: string, workspaceUri: string, workspaceFiles: Files, extensions: readonly unknown[]): Promise<void> => {
@@ -178,7 +221,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
       if (!isCommandPaletteShortcut) return
       event.preventDefault()
       event.stopImmediatePropagation()
-      void invoke('Application.execute', activeApplicationId, 'Viewlet.openWidget', 'QuickPick', 'everything').catch((error) => {
+      void invokeShortcut('Application.execute', activeApplicationId, 'Viewlet.openWidget', 'QuickPick', 'everything').catch((error) => {
         status.textContent = String(error)
       })
     },
@@ -201,7 +244,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         if (!editor || !root.contains(editor)) return
         event.preventDefault()
         event.stopImmediatePropagation()
-        void invoke('Application.execute', id, 'Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'Editor.save').catch((error) => {
+        void invokeShortcut('Application.execute', id, 'Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'Editor.save').catch((error) => {
           status.textContent = String(error)
         })
       },
@@ -236,21 +279,29 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     code: string | undefined,
     manifest: { readonly id: string; readonly [key: string]: unknown },
     icons: readonly string[],
+    tokenizers: Readonly<Record<string, string>>,
   ): Promise<void> => {
     const needsSetup = !previewExists
     const nextIconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
     const nextPreviewUrl = createPreviewUrl(code)
+    const tokenizerUrls = Object.fromEntries(
+      Object.entries(tokenizers).map(([path, content]) => [path, URL.createObjectURL(new Blob([content], { type: 'text/javascript' }))]),
+    )
+    const languages = manifest.languages as readonly { tokenize?: string }[] | undefined
     const extension = {
       ...manifest,
       browser: nextPreviewUrl,
       contentSecurityPolicy: [],
       isWeb: true,
       path: location.origin,
+      ...(languages && {
+        languages: languages.map((language) => ({ ...language, tokenize: language.tokenize ? tokenizerUrls[language.tokenize] : undefined })),
+      }),
       'source-control-icons': nextIconUrls,
       uri: location.origin,
     }
     previewUrls.add(nextPreviewUrl)
-    for (const url of nextIconUrls) previewUrls.add(url)
+    for (const url of [...nextIconUrls, ...Object.values(tokenizerUrls)]) previewUrls.add(url)
     if (previewExists) {
       await invoke('Application.execute', previewId, 'Extensions.reload', previewExtensionId, extension)
     } else {
@@ -267,7 +318,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
     if (Array.isArray(manifest.activation) && manifest.activation.includes('onEditorTextDecoration')) {
       await invoke('Application.execute', previewId, 'Editor.refreshTextDecorations')
     }
-    const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
+    const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls, ...Object.values(tokenizerUrls)])
     for (const url of previewUrls) {
       if (retainedUrls.has(url)) {
         continue
@@ -297,7 +348,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
         if (requested) continue
         const manifest = JSON.parse(files['/extension.json'])
         const icons = readIcons(manifest['source-control-icons'] || [], files)
-        await updatePreview(output?.code, manifest, icons)
+        await updatePreview(output?.code, manifest, icons, output?.tokenizers || {})
         const nextGeneratedUrl = output
           ? await storeGeneratedBundle(output.generated)
           : new URL(`${prefix}/samples/${sampleId}/dist/main.js`, location.href).href
@@ -328,7 +379,7 @@ export const mountPlayground = async (invoke: Invoke, prefix: string, sourceExte
   const sourceProvider = {
     activation: ['onFileSystem:sample-source'],
     browser: new URL(`${prefix}/assets/source-files.js?sample=${encodeURIComponent(sampleId)}`, location.href).href,
-    commands: [{ id: 'sampleSource.setGeneratedUrl' }],
+    commands: [{ id: 'sampleSource.setGeneratedUrl', label: 'Set generated output URL' }],
     contentSecurityPolicy: [],
     fileSystemProviders: [{ id: 'sample-source' }],
     id: 'playground.source-files',

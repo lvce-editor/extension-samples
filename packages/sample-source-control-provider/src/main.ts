@@ -1,11 +1,16 @@
 import { activate as activateExtensionApi, registerCommand, registerSourceControlProvider, type SourceControlProvider } from '@lvce-editor/api'
+import { Volume } from 'memfs'
+import initialFiles from './initial-files.json' with { type: 'json' }
 
 const providerId = 'source-control-provider'
 const workspaceRoot = '/extension-samples/source-control-provider'
-const changedFiles = [
-  { file: `${workspaceRoot}/README.md`, icon: 0, iconTitle: 'Modified', status: 1 },
-  { file: `${workspaceRoot}/src/main.ts`, icon: 0, iconTitle: 'Modified', status: 2 },
-]
+const volume = Volume.fromJSON(initialFiles)
+const changedFiles = Object.keys(volume.toJSON()).map((path) => ({
+  file: `${workspaceRoot}${path}`,
+  icon: 0,
+  iconTitle: 'Modified',
+  status: 1,
+}))
 
 const discardFile = (path: string): string => {
   const index = changedFiles.findIndex(({ file }) => path.endsWith(file.slice(workspaceRoot.length)))
@@ -63,8 +68,8 @@ const main = async (): Promise<void> => {
   await activateExtensionApi()
   registerSourceControlProvider(provider)
   registerCommand({
-    execute: discardFile,
     id: 'sampleSourceControl.discard',
+    execute: discardFile,
   })
 }
 

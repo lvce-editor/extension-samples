@@ -50,6 +50,7 @@ const main = async (): Promise<void> => {
   }
 
   registerCommand({
+    id: 'sample.signIn',
     async execute() {
       const confirmed = await showQuickPick({
         items: [{ description: 'Create an in-memory demonstration session', label: 'Demo Reader', value: true }],
@@ -60,10 +61,10 @@ const main = async (): Promise<void> => {
       await output.appendLine(`Signed in: ${session.account.label}`)
       await listSessions()
     },
-    id: 'sample.signIn',
   })
-  registerCommand({ execute: listSessions, id: 'sample.listSessions' })
+  registerCommand({ id: 'sample.listSessions', execute: listSessions })
   registerCommand({
+    id: 'sample.signOut',
     async execute() {
       const current = await executeAuthenticationProviderGetSessions(providerId, scopes)
       for (const session of current) {
@@ -71,7 +72,6 @@ const main = async (): Promise<void> => {
       }
       await listSessions()
     },
-    id: 'sample.signOut',
   })
 }
 
