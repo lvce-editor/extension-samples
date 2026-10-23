@@ -1,0 +1,16 @@
+{
+  "id": "sample.tab-completion",
+  "name": "Tab Completion Sample",
+  "description": "Expand the `log` prefix into a `console.log()` snippet.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onTabCompletion:plaintext", "onCommand:sample.completeLog"],
+  "commands": [
+    {
+      "id": "sample.completeLog",
+      "label": "Sample: Expand Log Snippet"
+    }
+  ]
+}
