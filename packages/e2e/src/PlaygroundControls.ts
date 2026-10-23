@@ -14,5 +14,6 @@ export const resetSample = async (page: Page): Promise<void> => {
 export const selectSample = async (page: Page, title: string): Promise<void> => {
   await page.getByRole('button', { name: 'Choose a sample' }).click()
   await page.getByRole('combobox', { name: 'Choose an extension sample' }).fill(title)
-  await page.getByRole('option').filter({ hasText: title }).click()
+  const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  await page.getByRole('option', { name: new RegExp(`^${escapedTitle}(?:\\s|$)`) }).click()
 }
