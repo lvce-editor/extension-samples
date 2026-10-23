@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 import { runCommand } from './RunCommand.ts'
 
 test('warning dialog shows its content and supports confirming, reopening, and closing', async ({ page }) => {
@@ -41,7 +42,7 @@ test('warning dialog shows its content and supports confirming, reopening, and c
   await page.reload()
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await expect(dialog).toBeVisible()
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await expect(dialog).toBeVisible()
 })

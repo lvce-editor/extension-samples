@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { resetSample } from './PlaygroundControls.ts'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
 
 test('extension opens the find widget and searches the preview document', async ({ page }) => {
@@ -38,7 +39,7 @@ test('extension opens the find widget and searches the preview document', async 
   await expect(matchCount).toHaveText('1 of 1')
   await expect(editor.locator('.EditorRow')).toHaveText(['Find the matching phrase in this preview.', 'Another line stays unchanged.', ''])
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   await expect(findInput).toBeVisible()
   await expect(findInput).toHaveValue('matching phrase')

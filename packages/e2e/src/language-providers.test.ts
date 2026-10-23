@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 const sizeSymbol = /^size$/
 
@@ -97,7 +98,7 @@ test('sample tokenizer highlights Sprout files and survives preview edits and re
   await expect(editor.locator('.Token.Keyword')).toHaveCount(0)
   await expect(editor.locator('.Token.String').first()).toHaveText('let')
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(editor.locator('.Token.String').first()).toContainText('Hello, Sprout!')
 })

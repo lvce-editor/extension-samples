@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 test('opens the real LVCE source-control view beside the sample source', async ({ page }) => {
   await page.goto('/extension-samples/source-control-provider/')
@@ -78,7 +79,7 @@ test('keeps the source-control preview activity bar visible after resize, reload
   await expect(preview.locator('.SourceControl')).toBeVisible()
   await expect(preview.locator('.ActivityBar')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(preview.locator('.SourceControl')).toBeVisible()
   await expect(preview.locator('.ActivityBar')).toBeVisible()
 })

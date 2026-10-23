@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { resetSample } from './PlaygroundControls.ts'
 
 const sourceSnapshot = async (page: Page): Promise<unknown> => {
   const response = await page.request.get('/extension-samples/runtime.json')
@@ -105,7 +106,7 @@ test('editing the color view rebuilds the preview and reset restores the sample'
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(page.locator('#preview-ide .ColorView')).toHaveCSS('background-color', 'rgb(238, 238, 238)')
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(page.locator('#preview-ide .ColorView')).toHaveCSS('background-color', 'rgb(240, 240, 240)')
 })

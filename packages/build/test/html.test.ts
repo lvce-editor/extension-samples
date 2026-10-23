@@ -9,7 +9,7 @@ test('creates a nested static route with relative assets', () => {
   expect(html).not.toContain('class="Toolbar"')
   expect(html).not.toContain('<header>Source</header>')
   expect(html).not.toContain('<header>Preview')
-  expect(html).toContain('id="preview-status" class="VisuallyHidden" role="status"')
+  expect(html).toContain('id="preview-status" class="VisuallyHidden" aria-live="polite"')
   expect(html).toMatch(/rel="icon" href="\.\.\/runtime\/favicon\.ico" type="image\/x-icon"/)
   expect(html).toMatch(/src="\.\.\/assets\/site\.js"/)
   expect(html).toMatch(/id="preview-ide"/)

@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 const htmlPreviewUrl = /\/extension-samples\/html-preview\/$/
 const completionPreviewUrl = /\/extension-samples\/completion-provider\/$/
 const completionProviderOption = /Completion Provider/
 const htmlPreviewOption = /HTML Preview/
+const resetSampleOption = /Reset sample/
 
 test('selects a sample with the status bar QuickPick and preserves the current URL on cancellation', async ({ page }) => {
   await page.goto('/extension-samples/')
@@ -32,8 +34,11 @@ test('keeps both native status bars visible without the custom toolbar and pane 
   await expect(page.locator('#source-ide .StatusBar')).toBeVisible()
   await expect(page.locator('#preview-ide .StatusBar')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Choose a sample' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Reset sample' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Preview ready' })).toBeVisible()
+  await page.getByRole('button', { name: 'Choose a sample' }).click()
+  await page.getByRole('combobox', { name: 'Choose an extension sample' }).fill('Reset sample')
+  await expect(page.getByRole('option', { name: resetSampleOption })).toBeVisible()
+  await page.keyboard.press('Escape')
 
   await page.setViewportSize({ height: 800, width: 1100 })
   await expect(page.locator('#source-ide .StatusBar')).toBeVisible()
@@ -60,7 +65,7 @@ test('removes the legacy applicationHost parameter after startup and preserves t
   await page.getByRole('option', { name: htmlPreviewOption }).click()
   await expect(page).toHaveURL(htmlPreviewUrl)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   expect(new URL(page.url()).searchParams.has('applicationHost')).toBe(false)
 })

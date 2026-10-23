@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
+import { resetSample, selectSample } from './PlaygroundControls.ts'
 import { runCommand } from './RunCommand.ts'
 
 test('output channel appends successive builds and clears only preview output', async ({ page }) => {
   await page.goto('/extension-samples/')
-  await page.getByRole('combobox', { name: 'Extension sample' }).selectOption({ label: 'Output Channel' })
+  await selectSample(page, 'Output Channel')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const output = page.locator('#preview-ide .OutputContent')
   await expect(output).toContainText('Ready.')
@@ -39,7 +40,7 @@ test('output channel reloads edited source and reset restores the original build
   await runCommand(page, 'Sample: Run Build')
   await expect(page.locator('#preview-ide .OutputContent')).toContainText('Edited build succeeded.')
   await expect(page.locator('#preview-ide .OutputContent')).toContainText('Build 1: starting')
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await runCommand(page, 'Sample: Run Build')

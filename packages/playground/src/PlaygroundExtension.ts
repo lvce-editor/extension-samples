@@ -111,14 +111,18 @@ const main = async (): Promise<void> => {
       const samples = await getSamples()
       if (samples.length === 0) return
       const route = await showQuickPick({
-        items: samples
-          .toSorted((a, b) => a.title.localeCompare(b.title))
-          .map(({ route, title }) => ({ description: route, label: title, value: route })),
+        items: [
+          ...samples
+            .toSorted((a, b) => a.title.localeCompare(b.title))
+            .map(({ route, title }) => ({ description: route, label: title, value: route })),
+          { description: 'Restore the original source files', label: 'Reset sample', value: '__reset_sample__' },
+        ],
         placeholder: 'Choose an extension sample',
         type: 'select',
       })
       // Escape returns undefined; keep the selected sample and URL unchanged.
-      if (typeof route === 'string') send({ route, type: 'select-sample' })
+      if (route === '__reset_sample__') send({ type: 'reset-sample' })
+      else if (typeof route === 'string') send({ route, type: 'select-sample' })
     },
     id: 'playground.selectSample',
   })

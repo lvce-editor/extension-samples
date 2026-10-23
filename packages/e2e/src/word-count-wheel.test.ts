@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 interface WheelRegistration {
   readonly passive: boolean
@@ -18,7 +19,7 @@ const expectPassiveWheelListeners = async (page: Page): Promise<void> => {
 }
 
 const expectBothEditorsToScroll = async (page: Page): Promise<void> => {
-  await page.setViewportSize({ height: 150, width: 1600 })
+  await page.setViewportSize({ height: 100, width: 1600 })
   for (const id of ['source-ide', 'preview-ide']) {
     const editor = page.locator(`#${id}`)
     const content = editor.locator('.EditorContent')
@@ -89,7 +90,7 @@ test('word count editors keep passive wheel listeners and scroll after rebuild a
   }
   await expectBothEditorsToScroll(page)
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expectPassiveWheelListeners(page)

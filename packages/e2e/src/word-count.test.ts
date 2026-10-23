@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 import { runCommand } from './RunCommand.ts'
 
 test('word count reads the active preview document and includes unsaved edits', async ({ page }) => {
@@ -58,7 +59,7 @@ test('word count can be run again after rebuilding and resetting the sample', as
   await expect(preview.getByText('There are 18 words.', { exact: true })).toBeVisible()
   await preview.locator('.NotificationCloseButton').last().click()
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await runCommand(page, 'Sample: Count Words')

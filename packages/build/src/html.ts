@@ -29,7 +29,7 @@ export const createHtml = (
         <div id="preview-divider" class="PreviewDivider" role="separator" aria-label="Resize source and preview" aria-orientation="vertical" aria-controls="source-ide preview-ide" aria-valuemin="20" aria-valuemax="80" aria-valuenow="50" tabindex="0"></div>
         <section class="IdePane" aria-label="Preview IDE"><div id="preview-ide" class="IdeRoot"></div></section>
       </div>
-      <output id="preview-status" class="VisuallyHidden" role="status">Loading…</output>
+      <div id="preview-status" class="VisuallyHidden" aria-live="polite">Loading…</div>
     </main>
     ${runtimeConfig ? `<script id="Config" type="application/json">${JSON.stringify(runtimeConfig).replaceAll('<', '\\u003c')}</script>` : ''}
     <script type="module" src="${prefix}/assets/site.js"></script>

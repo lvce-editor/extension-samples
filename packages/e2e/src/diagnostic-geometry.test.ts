@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 const diagnosticGeometryMatchesText = (root: Element): boolean => {
   const getTodoRanges = (): DOMRect[] => {
@@ -64,7 +65,7 @@ test('diagnostic underlines match the rendered TODO text', async ({ page }) => {
   await expectDiagnosticGeometry()
   await page.setViewportSize({ height: 800, width: 1200 })
   await expectDiagnosticGeometry()
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(editor.locator('.DiagnosticError')).toHaveCount(2)
   await expectDiagnosticGeometry()
   await editor.locator('textarea').focus()
