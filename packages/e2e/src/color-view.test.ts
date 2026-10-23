@@ -57,6 +57,7 @@ test('color view input keeps keyboard and pointer interaction out of the source 
   await expect(page.locator('#preview-ide .ColorView')).toHaveCSS('background-color', 'rgb(255, 99, 71)')
   await page.keyboard.press('ArrowLeft')
   await page.keyboard.press('Backspace')
+  // cspell:ignore tomao toma
   await expect(colorInput).toHaveValue('tomao')
   await page.keyboard.press('ArrowRight')
   await page.keyboard.press('Backspace')
