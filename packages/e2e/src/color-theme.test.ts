@@ -1,6 +1,8 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 
+const helloWorldOption = /Hello World/
+
 const getColorTheme = async (page: Page): Promise<string | undefined> =>
   page.evaluate(() => JSON.parse(globalThis.localStorage.getItem('preferences') || '{}')['workbench.colorTheme'])
 
@@ -24,7 +26,9 @@ test('playground uses the slime theme despite another saved theme preference', a
   await expect.poll(() => getColorTheme(page)).toBe('slime')
   await expect(page.locator('#source-ide .Editor')).toContainText('Saved draft')
 
-  await page.locator('#sample-picker').selectOption({ label: 'Hello World' })
+  await page.getByRole('button', { name: 'Choose a sample' }).click()
+  await page.getByRole('combobox', { name: 'Choose an extension sample' }).fill('Hello World')
+  await page.getByRole('option', { name: helloWorldOption }).click()
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true')
   await expect.poll(() => getColorTheme(page)).toBe('slime')
   await expect(page.locator('#source-ide .Editor')).toBeVisible()

@@ -88,21 +88,72 @@ export const mountPlayground = async (
   const sample = samples.find((sample) => sample.id === sampleId)
   const previewWorkspace = getPreviewWorkspace(sampleId)
   const previewFiles = getPreviewFiles(sampleId, sample)
-  const picker = document.querySelector<HTMLSelectElement>('#sample-picker')!
   const status = document.querySelector<HTMLElement>('#preview-status')!
-  const sortedSamples = samples.toSorted((a, b) => a.title.localeCompare(b.title))
-  for (const sample of sortedSamples) {
-    picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
-  }
-  picker.addEventListener('change', () => location.assign(`${prefix}/${picker.value}/`))
   const storageKey = `extension-samples:workspace:${sampleId}`
-  document.querySelector('#reset-button')!.addEventListener('click', () => {
-    try {
-      localStorage.removeItem(storageKey)
-    } finally {
-      location.reload()
-    }
-  })
+  const playgroundChannelName = `lvce-extension-samples-playground-${crypto.randomUUID()}`
+  const playgroundChannel = new BroadcastChannel(playgroundChannelName)
+  const playgroundExtensionUrl = new URL(`${prefix}/assets/playground-extension.js`, location.href)
+  playgroundExtensionUrl.searchParams.set('channel', playgroundChannelName)
+  const playgroundExtension = {
+    activation: ['*', 'onStatusBarItem', 'onCommand:playground.selectSample', 'onCommand:playground.resetSample'],
+    browser: playgroundExtensionUrl.href,
+    commands: [
+      { id: 'playground.selectSample', label: 'Playground: Select Sample' },
+      { id: 'playground.resetSample', label: 'Playground: Reset Sample' },
+    ],
+    contentSecurityPolicy: [],
+    id: 'playground.native-status-bar',
+    isolated: true,
+    isWeb: true,
+    name: 'Extension Samples Playground',
+    path: location.origin,
+    statusBarItems: [
+      { id: 'playground.source' },
+      { id: 'playground.preview' },
+      { id: 'playground.sample' },
+      { id: 'playground.reset' },
+      { id: 'playground.status' },
+    ],
+    uri: location.origin,
+  }
+  let previewStatus = 'Loading…'
+  const setStatus = (value: string): void => {
+    previewStatus = value
+    status.textContent = value
+    playgroundChannel.postMessage({ applicationId: 'preview', status: value, type: 'status' })
+  }
+  playgroundChannel.addEventListener(
+    'message',
+    ({ data }: MessageEvent<{ applicationId?: string; requestId?: string; route?: string; type?: string }>) => {
+      if (data.type === 'ready' && (data.applicationId === 'source' || data.applicationId === 'preview')) {
+        playgroundChannel.postMessage({
+          applicationId: data.applicationId,
+          sampleId,
+          sampleTitle: sample?.title || sampleId,
+          status: previewStatus,
+          type: 'state',
+        })
+        return
+      }
+      if (data.type === 'request-samples' && data.applicationId === 'source' && data.requestId) {
+        playgroundChannel.postMessage({ applicationId: 'source', requestId: data.requestId, samples, type: 'samples' })
+        return
+      }
+      if (data.applicationId !== 'source') return
+      if (data.type === 'select-sample' && typeof data.route === 'string') {
+        const selectedSample = samples.find((item) => item.route === data.route)
+        if (selectedSample) location.assign(`${prefix}/${selectedSample.route}/`)
+      }
+      if (data.type === 'reset-sample') {
+        try {
+          localStorage.removeItem(storageKey)
+        } finally {
+          location.reload()
+        }
+      }
+    },
+  )
+  window.addEventListener('pagehide', () => playgroundChannel.close(), { once: true })
   const initialFiles = await fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`)
   const ignoreHashes = await fetchJson<readonly string[]>(`${prefix}/samples/${sampleId}/eslint-ignore-hashes.json`)
   const tooling = await fetchJson<Files>(`${prefix}/tooling.json`)
@@ -182,13 +233,15 @@ export const mountPlayground = async (
       workspacePath: workspaceUri,
       workspaceUri,
     })
-    const commands = ['Layout.hideTitleBar', 'Layout.hideStatusBar']
+    const commands = ['Layout.hideTitleBar', 'Layout.showStatusBar']
     if (id !== previewId || (sampleId !== 'source-control-provider' && sampleId !== 'sidebar-counter' && sampleId !== 'color-view'))
       commands.push('Layout.hideActivityBar')
     commands.push('Layout.moveSideBarLeft', 'Layout.showSideBar')
     for (const command of commands) {
       await invoke('Application.execute', id, command)
     }
+    await invoke('Application.execute', id, 'Preferences.update', { 'statusBar.itemsVisible': true })
+    await invoke('Application.execute', id, 'StatusBar.handleChange')
     await invoke('Application.execute', id, 'Layout.openSideBarViewlet', 'Explorer')
     if (id === previewId && sampleId === 'source-control-provider') {
       root.addEventListener(
@@ -222,7 +275,7 @@ export const mountPlayground = async (
       event.preventDefault()
       event.stopImmediatePropagation()
       void invokeShortcut('Application.execute', activeApplicationId, 'Viewlet.openWidget', 'QuickPick', 'everything').catch((error) => {
-        status.textContent = String(error)
+        setStatus(String(error))
       })
     },
     { capture: true },
@@ -245,7 +298,7 @@ export const mountPlayground = async (
         event.preventDefault()
         event.stopImmediatePropagation()
         void invokeShortcut('Application.execute', id, 'Viewlet.executeViewletCommand', Number(editor.dataset.uid), 'Editor.save').catch((error) => {
-          status.textContent = String(error)
+          setStatus(String(error))
         })
       },
       { capture: true },
@@ -305,7 +358,7 @@ export const mountPlayground = async (
     if (previewExists) {
       await invoke('Application.execute', previewId, 'Extensions.reload', previewExtensionId, extension)
     } else {
-      await mount(previewId, previewWorkspace, previewFiles, [extension])
+      await mount(previewId, previewWorkspace, previewFiles, [extension, playgroundExtension])
       previewExists = true
       await invoke(
         'Application.execute',
@@ -343,7 +396,7 @@ export const mountPlayground = async (
       while (requested) {
         requested = false
         const started = performance.now()
-        status.textContent = 'Building…'
+        setStatus('Building…')
         const output = await getPreviewCode()
         if (requested) continue
         const manifest = JSON.parse(files['/extension.json'])
@@ -367,10 +420,10 @@ export const mountPlayground = async (
         }
         document.body.dataset.previewRevision = String(++revision)
         document.body.dataset.previewBuildMs = String(Math.round(performance.now() - started))
-        status.textContent = 'Preview ready'
+        setStatus('Preview ready')
       }
     } catch (error) {
-      status.textContent = String(error)
+      setStatus(String(error))
     } finally {
       running = false
       if (requested) void rebuild()
@@ -389,7 +442,7 @@ export const mountPlayground = async (
     path: location.origin,
     uri: location.origin,
   }
-  await mount(sourceId, 'sample-source:///sample', { ...tooling, ...files }, [...sourceExtensions, sourceProvider])
+  await mount(sourceId, 'sample-source:///sample', { ...tooling, ...files }, [...sourceExtensions, sourceProvider, playgroundExtension])
   await invoke('Application.execute', sourceId, 'Preferences.update', { 'eslint.ignoreHashes': ignoreHashes })
   await invoke('Application.execute', sourceId, 'Main.openUri', 'sample-source:///sample/src/main.ts')
   await rebuild()
@@ -401,7 +454,7 @@ export const mountPlayground = async (
       const { height, width } = root.getBoundingClientRect()
       if (width > 0 && height > 0)
         void invoke('Application.resize', id, width, height).catch((error) => {
-          if (id !== previewId || (previewExists && revision === observedRevision)) status.textContent = String(error)
+          if (id !== previewId || (previewExists && revision === observedRevision)) setStatus(String(error))
         })
     })
     observer.observe(root)
@@ -440,7 +493,7 @@ export const mountPlayground = async (
         void rebuild()
       }
     } catch (error) {
-      if (!readRequested) status.textContent = String(error)
+      if (!readRequested) setStatus(String(error))
     } finally {
       reading = false
       if (readRequested) void readWorkspace()

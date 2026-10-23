@@ -72,6 +72,8 @@ The playground shares the strict syntax and Unicorn rules, including checks agai
 
 Both IDEs share one renderer and the UI workers; neither IDE is an iframe. Each application owns its layout, component UIDs, workspace, and extension services. Worker ID ranges do not overlap. Preview rebuilds reload the extension in place, preserving both IDEs' tabs, selection, and undo history and retaining the shared UI workers.
 
+Both IDEs keep their native status bars visible and use them to identify Source and Preview. The source status bar contains a QuickPick sample selector and Reset action; the preview status bar reports build readiness and errors. Escape closes the sample picker without changing the current route.
+
 The source Explorer includes the complete sample, including `extension.json`, imported TypeScript files, and SVG decoration icons. TypeScript syntax highlighting and the released `builtin.eslint` web extension use normal LVCE editor paths. The build includes browser-compatible ESLint tooling in the source workspace; ESLint supplies diagnostics, while TypeScript retains its other language features. No package installation server is needed in the browser.
 
 The build generates SHA-256 hashes of each sample’s shipped files and configures `eslint.ignoreHashes` before opening the source editor. Browsing unchanged samples does not start ESLint’s evaluation worker. Editing source, including restoring an edited draft, resumes normal linting; undoing back to the shipped content clears diagnostics. Hashes are regenerated from the shipped files on every build, never from saved drafts.
@@ -107,7 +109,7 @@ The supplied helpers operate on the preview IDE:
 | `openSideBar(name)`       | Open a sidebar view, such as `Source Control`.                |
 | `openPanel(name)`         | Open a panel view, such as `Problems`.                        |
 
-`showStatusBar()` reveals the preview status bar for samples that contribute status bar items.
+`showStatusBar()` remains available to setup modules; the playground already keeps both status bars visible.
 
 Await each helper so actions run in order. Setup modules are standalone browser JavaScript; relative imports and extension API imports are not supported. They run in the playground page, separately from the extension.
 
