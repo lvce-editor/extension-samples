@@ -1,0 +1,4 @@
+{
+  "/README.md": "# Source Control Preview\n\nThese files are stored in a memfs volume.\n",
+  "/src/main.ts": "export const message = 'Hello from the source-control memfs workspace'\n"
+}

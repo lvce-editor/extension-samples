@@ -282,7 +282,15 @@ export const buildStatic = async (): Promise<void> => {
   }
   await writeFile(join(outputRoot, 'index.html'), createHtml(samples[0], false, assetDir, runtimeConfig))
   await writeFile(join(outputRoot, '404.html'), createHtml(samples[0], false, assetDir, runtimeConfig))
-  await writeJson(join(outputRoot, 'samples.json'), samples)
+  const outputSamples = await Promise.all(
+    samples.map(async (sample) => {
+      if (!sample.previewFilesPath || !sample.preview) return sample
+      const { previewFilesPath, ...outputSample } = sample
+      const previewFiles = JSON.parse(await readFile(join(root, 'packages', sample.packageName, previewFilesPath), 'utf8'))
+      return { ...outputSample, preview: { ...sample.preview, files: previewFiles } }
+    }),
+  )
+  await writeJson(join(outputRoot, 'samples.json'), outputSamples)
   await writeFile(join(outputRoot, '.nojekyll'), '')
 }
 

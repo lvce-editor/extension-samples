@@ -25,6 +25,21 @@ test('opens the real LVCE source-control view beside the sample source', async (
   await expect(sourceControlTab).toHaveAttribute('aria-selected', 'true')
   await expect(workbench.locator('.SourceControl')).toBeVisible()
   await expect(workbench.getByRole('tree', { name: 'Files Explorer' })).toBeHidden()
+  const runtimeResponse = await page.request.get('/extension-samples/runtime.json')
+  const { entry } = await runtimeResponse.json()
+  const openFile = async (uri: string): Promise<void> => {
+    await page.evaluate(
+      async ({ entry, uri }) => {
+        const renderer = await import(entry)
+        await renderer.executeCommand('Application.execute', 'preview', 'Main.openUri', uri)
+      },
+      { entry, uri },
+    )
+  }
+  await openFile('memfs:///preview/README.md')
+  await expect(workbench.locator('.Editor')).toContainText('These files are stored in a memfs volume.')
+  await openFile('memfs:///preview/src/main.ts')
+  await expect(workbench.locator('.Editor')).toContainText('Hello from the source-control memfs workspace')
 })
 
 test('discards changed files individually from the source-control view', async ({ page }) => {
