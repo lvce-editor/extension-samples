@@ -21,6 +21,12 @@ interface Sample {
   readonly title: string
 }
 
+const getCompilerFiles = (tooling: Files): Files => {
+  const memfsModule = tooling['/node_modules/memfs/index.js']
+  if (!memfsModule) throw new Error('The bundled memfs module is missing from tooling')
+  return { '/node_modules/memfs/index.js': memfsModule }
+}
+
 const fetchJson = async <T>(url: string): Promise<T> => {
   const response = await fetch(url)
   if (!response.ok) throw new Error(`Unable to load ${url}: ${response.status}`)
@@ -82,6 +88,7 @@ export const mountPlayground = async (
   const initialFiles = await fetchJson<Files>(`${prefix}/samples/${sampleId}/files.json`)
   const ignoreHashes = await fetchJson<readonly string[]>(`${prefix}/samples/${sampleId}/eslint-ignore-hashes.json`)
   const tooling = await fetchJson<Files>(`${prefix}/tooling.json`)
+  const compilerFiles = getCompilerFiles(tooling)
   let files = { ...initialFiles }
   try {
     const stored = JSON.parse(localStorage.getItem(storageKey) || 'null')
@@ -128,7 +135,7 @@ export const mountPlayground = async (
       const worker = getCompiler()
       const id = ++nextBuild
       pending.set(id, { reject, resolve })
-      worker.postMessage({ files: { ...files }, id })
+      worker.postMessage({ files: { ...compilerFiles, ...files }, id })
     })
 
   const getPreviewCode = async (): Promise<BuildOutput | undefined> => {

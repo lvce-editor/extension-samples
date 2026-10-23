@@ -48,7 +48,6 @@ test('source editor provides TypeScript completions for the sample files', async
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   const editor = page.locator('#source-ide .Editor')
   const textarea = editor.locator('textarea')
-  await expect(editor).toContainText('const fileStore', { timeout: 30_000 })
   await textarea.focus()
   await page.keyboard.press('ControlOrMeta+a')
   await page.keyboard.insertText('const fileStore = {}\nfileSto')

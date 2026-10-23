@@ -2,6 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 
+const unresolvedPackageImports = /from ["'](?:memfs|node:)/
+
 const execute = async (page: Page, command: string, ...args: readonly unknown[]): Promise<any> => {
   const response = await page.request.get('/extension-samples/runtime.json')
   const { entry } = await response.json()
@@ -33,7 +35,13 @@ for (const sample of ['hello-world', 'file-system-provider']) {
     await openGenerated(page)
     const source = page.locator('#source-ide .Editor')
     await expect(source).toContainText('@lvce-editor/api')
-    await expect(source).toContainText(sample === 'hello-world' ? 'Hello World!' : 'Hello from memfs')
+    if (sample === 'file-system-provider') {
+      const generatedSource = await execute(page, 'FileSystem.readFile', 'sample-source:///sample/dist/main.js')
+      expect(generatedSource).toContain('Hello from memfs')
+      expect(generatedSource).not.toMatch(unresolvedPackageImports)
+    } else {
+      await expect(source).toContainText('Hello World!')
+    }
     expect(requests.length).toBeGreaterThan(0)
     expect(page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))).toHaveLength(0)
     const editable = await execute(page, 'FileSystem.readDirWithFileTypes', 'memfs:///sample')
