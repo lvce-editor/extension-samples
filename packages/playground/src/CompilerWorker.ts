@@ -1,6 +1,7 @@
 import * as esbuild from 'esbuild-wasm'
 
 const allPaths = /.*/
+const relativePathPrefix = /^\.\//
 
 const initialized = esbuild.initialize({ wasmURL: new URL('esbuild.wasm', import.meta.url).href, worker: false })
 const loadApi = async (): Promise<string> => {
@@ -16,10 +17,10 @@ const getLoader = (path: string): esbuild.Loader => {
   return 'js'
 }
 
-const buildOutput = async (files: Record<string, string>, api: string, inlineApi: boolean): Promise<string> => {
+const buildOutput = async (files: Record<string, string>, api: string, inlineApi: boolean, entry = '/src/main.ts'): Promise<string> => {
   const result = await esbuild.build({
     bundle: true,
-    entryPoints: ['/src/main.ts'],
+    entryPoints: [entry],
     format: 'esm',
     platform: 'browser',
     plugins: [
@@ -55,7 +56,14 @@ onmessage = async (event: MessageEvent<{ files: Record<string, string>; id: numb
     await initialized
     const api = await apiSource
     const [code, generated] = await Promise.all([buildOutput(files, api, true), buildOutput(files, api, false)])
-    postMessage({ code, generated, id })
+    const manifest = JSON.parse(files['/extension.json']) as { languages?: readonly { tokenize?: string }[] }
+    const tokenizers: Record<string, string> = {}
+    const languages = manifest.languages || []
+    for (const language of languages) {
+      if (language.tokenize)
+        tokenizers[language.tokenize] = await buildOutput(files, api, true, `/${language.tokenize.replace(relativePathPrefix, '')}`)
+    }
+    postMessage({ code, generated, id, tokenizers })
   } catch (error) {
     postMessage({ error: String(error), id })
   }

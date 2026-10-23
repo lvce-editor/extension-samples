@@ -41,6 +41,7 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 - [Signature Help](./packages/sample-signature-help)
 - [Find Widget](./packages/sample-find-widget)
 - [Language Editing](./packages/sample-language-editing)
+- [Syntax Highlighting](./packages/sample-syntax-highlighting)
 
 ## Development
 

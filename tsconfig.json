@@ -98,6 +98,9 @@
       "path": "./packages/sample-language-editing"
     },
     {
+      "path": "./packages/sample-syntax-highlighting"
+    },
+    {
       "path": "./packages/sample-find-widget"
     },
     {

@@ -405,4 +405,17 @@ export const samples: readonly Sample[] = [
     route: 'language-editing',
     title: 'Language Editing',
   },
+  {
+    description: 'Contribute syntax highlighting for a small invented language.',
+    id: 'syntax-highlighting',
+    packageName: 'sample-syntax-highlighting',
+    preview: {
+      entry: '/example.sprout',
+      files: {
+        '/example.sprout': '// A tiny Sprout program\nlet greeting = "Hello, Sprout!"\nlet visits = 3\nprint(greeting)\nprint(true)\n',
+      },
+    },
+    route: 'syntax-highlighting',
+    title: 'Syntax Highlighting',
+  },
 ]
