@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 
+const lodashImport = /from\s+['"]lodash['"];/
 const unresolvedPackageImports = /from ["'](?:memfs|node:)/
 
 const execute = async (page: Page, command: string, ...args: readonly unknown[]): Promise<any> => {
@@ -101,6 +102,46 @@ test('generated output follows successful saves, survives failed builds, and res
   await expect(source).toContainText('Hello World!')
   await expect(source).not.toContainText('Next generated revision!')
   expect(page.workers().filter((worker) => worker.url().endsWith('/assets/compiler.js'))).toHaveLength(0)
+})
+
+test('npm dependency is bundled in the static and edited previews', async ({ page }) => {
+  await page.goto('/extension-samples/npm-dependency/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const preview = page.locator('#preview-ide')
+  await expect(preview.locator('.NotificationMessage')).toHaveText('2 + 3 = 5')
+
+  const staticBundle = await page.request.get('/extension-samples/samples/npm-dependency/dist/main.js')
+  const staticCode = await staticBundle.text()
+  expect(staticBundle.ok()).toBe(true)
+  expect(staticCode).toContain('LARGE_ARRAY_SIZE')
+  expect(staticCode).not.toMatch(lodashImport)
+
+  const response = await page.request.get('/extension-samples/samples/npm-dependency/files.json')
+  const files = await response.json()
+  const edited = files['/src/main.ts'].replace('add(2, 3)', 'add(2, 6)')
+  const source = page.locator('#source-ide .Editor')
+  await source.locator('textarea').focus()
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(edited)
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(preview.locator('.NotificationMessage').last()).toHaveText('2 + 3 = 8')
+  await openGenerated(page)
+  await expect(source).toContainText('LARGE_ARRAY_SIZE')
+  expect(await source.innerText()).not.toMatch(lodashImport)
+
+  await page.reload()
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await expect(page.locator('#preview-ide .NotificationMessage').last()).toHaveText('2 + 3 = 8')
+
+  const unsupported = edited.replace("import { add } from 'lodash'", "import { add } from 'unshipped-package'")
+  await execute(page, 'FileSystem.writeFile', 'memfs:///sample/src/main.ts', unsupported)
+  await expect(page.locator('#preview-status')).toContainText('Package is not shipped in the playground: unshipped-package')
+  await expect(page.locator('#preview-ide .NotificationMessage').last()).toHaveText('2 + 3 = 8')
+
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  await expect(page.locator('#preview-ide .NotificationMessage').last()).toHaveText('2 + 3 = 5')
 })
 
 test('source pane command palette shows the generated URL command with a label', async ({ page }) => {

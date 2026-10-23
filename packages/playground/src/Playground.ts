@@ -25,7 +25,14 @@ interface Sample {
 const getCompilerFiles = (tooling: Files): Files => {
   const memfsModule = tooling['/node_modules/memfs/index.js']
   if (!memfsModule) throw new Error('The bundled memfs module is missing from tooling')
-  return { '/node_modules/memfs/index.js': memfsModule }
+  const compilerFiles: Files = { '/node_modules/memfs/index.js': memfsModule }
+  const lodashModule = tooling['/node_modules/lodash/index.js']
+  const lodashBundle = tooling['/node_modules/lodash/lodash.js']
+  if (lodashModule && lodashBundle) {
+    compilerFiles['/node_modules/lodash/index.js'] = lodashModule
+    compilerFiles['/node_modules/lodash/lodash.js'] = lodashBundle
+  }
+  return compilerFiles
 }
 
 const fetchJson = async <T>(url: string): Promise<T> => {

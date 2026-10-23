@@ -1,0 +1,16 @@
+{
+  "id": "sample.npmDependency",
+  "name": "Npm Dependency Sample",
+  "description": "Use lodash from an npm dependency.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.addNumbers"],
+  "commands": [
+    {
+      "id": "sample.addNumbers",
+      "label": "Sample: Add Numbers"
+    }
+  ]
+}

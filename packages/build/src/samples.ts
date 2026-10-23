@@ -20,6 +20,19 @@ export const samples: readonly Sample[] = [
     title: 'Basic Vim',
   },
   {
+    description: 'Import lodash from an npm dependency and add two numbers.',
+    id: 'npm-dependency',
+    packageName: 'sample-npm-dependency',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md': '# Npm Dependency\n\nEdit src/main.ts and save to rebuild the lodash-powered preview.\n',
+      },
+    },
+    route: 'npm-dependency',
+    title: 'Npm Dependency',
+  },
+  {
     description: 'Replace matching files with a custom virtual DOM greeting view.',
     id: 'file-view',
     packageName: 'sample-file-view',
