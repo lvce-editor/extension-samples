@@ -1,0 +1,16 @@
+{
+  "id": "sample.selection-expansion",
+  "name": "Selection Expansion Sample",
+  "description": "Expand each selection to its full line.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onCommand:sample.expandSelection"],
+  "commands": [
+    {
+      "id": "sample.expandSelection",
+      "label": "Sample: Select Current Line"
+    }
+  ]
+}

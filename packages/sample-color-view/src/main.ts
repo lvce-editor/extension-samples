@@ -2,6 +2,7 @@ import { activate as activateExtensionApi, registerView, type VirtualDomViewInst
 
 const { Div, Input, Text } = VirtualDomElements
 const defaultColor = '#f0f0f0'
+const previewBackgroundColor = '#f0f0f0'
 const namedColors = new Set([
   'black',
   'blue',
@@ -72,6 +73,24 @@ const main = async (): Promise<void> => {
     kind: 'virtualDom',
     preferredLocation: 'sideBar',
     title: 'Color',
+  })
+  registerView({
+    create(): VirtualDomViewInstance {
+      return {
+        getCss(): string {
+          return `.ColorMainAreaView { box-sizing: border-box; min-height: 100%; padding: 24px; background-color: ${previewBackgroundColor}; color: #222; }`
+        },
+        render(): ReturnType<VirtualDomViewInstance['render']> {
+          return [
+            { childCount: 1, className: 'ColorMainAreaView', type: Div },
+            { childCount: 0, text: 'A color view in the main editor area.', type: Text },
+          ]
+        },
+      }
+    },
+    id: 'sample.color-view-preview',
+    kind: 'virtualDom',
+    title: 'Color Preview',
   })
 }
 

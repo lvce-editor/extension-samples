@@ -41,6 +41,9 @@
       "path": "./packages/sample-hello-world"
     },
     {
+      "path": "./packages/sample-npm-dependency"
+    },
+    {
       "path": "./packages/sample-text-manipulation"
     },
     {
@@ -57,6 +60,9 @@
     },
     {
       "path": "./packages/sample-status-bar-item"
+    },
+    {
+      "path": "./packages/sample-status-bar-counter"
     },
     {
       "path": "./packages/sample-output-channel"
@@ -95,7 +101,22 @@
       "path": "./packages/sample-signature-help"
     },
     {
-      "path": "./packages/sample-language-editing"
+      "path": "./packages/sample-brace-completion"
+    },
+    {
+      "path": "./packages/sample-closing-tags"
+    },
+    {
+      "path": "./packages/sample-comments"
+    },
+    {
+      "path": "./packages/sample-selection-expansion"
+    },
+    {
+      "path": "./packages/sample-tab-completion"
+    },
+    {
+      "path": "./packages/sample-syntax-highlighting"
     },
     {
       "path": "./packages/sample-find-widget"

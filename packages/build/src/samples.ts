@@ -20,6 +20,19 @@ export const samples: readonly Sample[] = [
     title: 'Basic Vim',
   },
   {
+    description: 'Import lodash from an npm dependency and add two numbers.',
+    id: 'npm-dependency',
+    packageName: 'sample-npm-dependency',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md': '# Npm Dependency\n\nEdit src/main.ts and save to rebuild the lodash-powered preview.\n',
+      },
+    },
+    route: 'npm-dependency',
+    title: 'Npm Dependency',
+  },
+  {
     description: 'Replace matching files with a custom virtual DOM greeting view.',
     id: 'file-view',
     packageName: 'sample-file-view',
@@ -243,14 +256,16 @@ export const samples: readonly Sample[] = [
     title: 'Error Dialog',
   },
   {
-    description: 'Type a CSS color to change the background of a preview view.',
+    description: 'Open a color preview in the main editor area for .color files.',
     id: 'color-view',
     packageName: 'sample-color-view',
     preview: {
-      entry: '/README.md',
+      entry: '/example.color',
       files: {
         '/README.md':
-          '# Color View\n\nOpen the **Color** sidebar and type a named or hexadecimal CSS color. Valid colors update the view background as you type. Empty or invalid values leave the last valid background in place. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
+          '# Color View\n\nOpen `example.color` to show the color preview in the main editor area. The **Color** sidebar view remains available for interactive named and hexadecimal color input. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
+        '/example.color': 'A color preview is shown in the main editor area.\n',
+        '/notes.txt': 'This file stays in the text editor.\n',
       },
     },
     route: 'color-view',
@@ -283,6 +298,20 @@ export const samples: readonly Sample[] = [
     },
     route: 'status-bar-item',
     title: 'Status Bar Item',
+  },
+  {
+    description: 'Increment a counter from a clickable status bar item.',
+    id: 'status-bar-counter',
+    packageName: 'sample-status-bar-counter',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Status Bar Counter\n\nClick the **Count: 0** item in the preview status bar to increase its count. The command palette also offers **Sample: Increment Status Bar Counter**.\n',
+      },
+    },
+    route: 'status-bar-counter',
+    title: 'Status Bar Counter',
   },
   {
     description: 'Write, append, and clear simulated build logs in the Output panel.',
@@ -398,11 +427,56 @@ export const samples: readonly Sample[] = [
     title: 'Find Widget',
   },
   {
-    description: 'Provide paired braces, closing tags, comments, selections, and log snippets.',
-    id: 'language-editing',
-    packageName: 'sample-language-editing',
-    preview: { entry: '/example.txt', files: { '/example.txt': 'word\n<demo><\nlog\n' } },
-    route: 'language-editing',
-    title: 'Language Editing',
+    description: 'Complete parentheses, brackets, and curly braces.',
+    id: 'brace-completion',
+    packageName: 'sample-brace-completion',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'word\n' } },
+    route: 'brace-completion',
+    title: 'Brace Completion',
+  },
+  {
+    description: 'Complete an HTML-style closing tag from its opening tag.',
+    id: 'closing-tags',
+    packageName: 'sample-closing-tags',
+    preview: { entry: '/example.txt', files: { '/example.txt': '<demo><\n' } },
+    route: 'closing-tags',
+    title: 'Closing Tags',
+  },
+  {
+    description: 'Toggle block comments around selected text.',
+    id: 'comments',
+    packageName: 'sample-comments',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'comment me\n' } },
+    route: 'comments',
+    title: 'Comments',
+  },
+  {
+    description: 'Expand the current selection to the full line.',
+    id: 'selection-expansion',
+    packageName: 'sample-selection-expansion',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'select this line\n' } },
+    route: 'selection-expansion',
+    title: 'Selection Expansion',
+  },
+  {
+    description: 'Expand the log prefix into a console.log snippet.',
+    id: 'tab-completion',
+    packageName: 'sample-tab-completion',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'log\n' } },
+    route: 'tab-completion',
+    title: 'Tab Completion',
+  },
+  {
+    description: 'Contribute syntax highlighting for a small invented language.',
+    id: 'syntax-highlighting',
+    packageName: 'sample-syntax-highlighting',
+    preview: {
+      entry: '/example.sprout',
+      files: {
+        '/example.sprout': '// A tiny Sprout program\nlet greeting = "Hello, Sprout!"\nlet visits = 3\nprint(greeting)\nprint(true)\n',
+      },
+    },
+    route: 'syntax-highlighting',
+    title: 'Syntax Highlighting',
   },
 ]
