@@ -40,7 +40,11 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 - [Editor Decorations](./packages/sample-editor-decorations)
 - [Signature Help](./packages/sample-signature-help)
 - [Find Widget](./packages/sample-find-widget)
-- [Language Editing](./packages/sample-language-editing)
+- [Brace Completion](./packages/sample-brace-completion)
+- [Closing Tags](./packages/sample-closing-tags)
+- [Comments](./packages/sample-comments)
+- [Selection Expansion](./packages/sample-selection-expansion)
+- [Tab Completion](./packages/sample-tab-completion)
 - [Syntax Highlighting](./packages/sample-syntax-highlighting)
 
 ## Development

@@ -1,0 +1,16 @@
+{
+  "id": "sample.closing-tags",
+  "name": "Closing Tags Sample",
+  "description": "Complete a closing tag from the most recent open tag.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onClosingTag:plaintext", "onCommand:sample.closeTag"],
+  "commands": [
+    {
+      "id": "sample.closeTag",
+      "label": "Sample: Complete Closing Tag"
+    }
+  ]
+}

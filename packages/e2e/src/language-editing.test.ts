@@ -1,45 +1,70 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
 
-test('language editing providers transform the preview and preserve undo', async ({ page }) => {
-  await page.goto('/extension-samples/language-editing/')
+const replaceText = async (page: Page, editor: Locator, text: string): Promise<void> => {
+  const textarea = editor.locator('textarea')
+  await textarea.focus()
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(text)
+}
+
+test('brace completion sample inserts matching braces and preserves undo', async ({ page }) => {
+  await page.goto('/extension-samples/brace-completion/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   const editor = page.locator('#preview-ide .Editor')
-  const textarea = editor.locator('textarea')
-  await editor.locator('.EditorRow').first().click()
-  const replaceText = async (text: string): Promise<void> => {
-    await textarea.focus()
-    await page.keyboard.press('ControlOrMeta+a')
-    await page.keyboard.insertText(text)
-  }
-  await replaceText('')
+  await replaceText(page, editor, 'word')
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('End')
   await runSelectedCommand(page, 'Sample: Complete Brace')
-  await expect(editor.locator('.EditorRow').first()).toHaveText('()')
-  await textarea.focus()
+  await expect(editor.locator('.EditorRow').first()).toHaveText('word()')
+  await editor.locator('textarea').focus()
   await page.keyboard.press('ControlOrMeta+z')
   await expect(editor.locator('.EditorRow').first()).toHaveText('word')
-  await replaceText('<demo><')
+})
+
+test('closing tags sample completes a closing tag', async ({ page }) => {
+  await page.goto('/extension-samples/closing-tags/')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  const editor = page.locator('#preview-ide .Editor')
+  await replaceText(page, editor, '<demo><')
   await runSelectedCommand(page, 'Sample: Complete Closing Tag')
   await expect(editor.locator('.EditorRow').first()).toHaveText('<demo></demo>')
-  await replaceText('log')
-  await runSelectedCommand(page, 'Sample: Expand Log Snippet')
-  await expect(editor.locator('.EditorRow').first()).toHaveText('console.log()')
-  await textarea.focus()
-  await page.keyboard.insertText('42')
-  await expect(editor.locator('.EditorRow').first()).toHaveText('console.log(42)')
-  await replaceText('word')
-  await expect(editor.locator('.EditorRow').first()).toHaveText('word')
-  await expect(editor.locator('.EditorSelection')).toHaveCount(0)
-  await runSelectedCommand(page, 'Sample: Select Current Line')
-  await expect(editor.locator('.EditorSelection')).toHaveCount(1)
-  await textarea.focus()
-  await page.keyboard.insertText('replacement')
-  await expect(editor.locator('.EditorRow').first()).toHaveText('replacement')
-  await textarea.focus()
+})
+
+test('comments sample toggles block comments', async ({ page }) => {
+  await page.goto('/extension-samples/comments/')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  const editor = page.locator('#preview-ide .Editor')
+  await replaceText(page, editor, 'comment me')
   await page.keyboard.press('ControlOrMeta+a')
   await runSelectedCommand(page, 'Sample: Toggle Sample Comment')
   await expect(editor.locator('.EditorRow').first()).toContainText('/*')
   await expect(editor.locator('.EditorRow').first()).toContainText('*/')
   await runSelectedCommand(page, 'Sample: Toggle Sample Comment')
+  await expect(editor.locator('.EditorRow').first()).toHaveText('comment me')
+})
+
+test('selection expansion sample selects and replaces the current line', async ({ page }) => {
+  await page.goto('/extension-samples/selection-expansion/')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  const editor = page.locator('#preview-ide .Editor')
+  const textarea = editor.locator('textarea')
+  await editor.locator('.EditorRow').first().click()
+  await runSelectedCommand(page, 'Sample: Select Current Line')
+  await expect(editor.locator('.EditorSelection')).toHaveCount(1)
+  await textarea.focus()
+  await page.keyboard.insertText('replacement')
   await expect(editor.locator('.EditorRow').first()).toHaveText('replacement')
+})
+
+test('tab completion sample expands the log snippet and places the cursor', async ({ page }) => {
+  await page.goto('/extension-samples/tab-completion/')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  const editor = page.locator('#preview-ide .Editor')
+  await replaceText(page, editor, 'log')
+  await runSelectedCommand(page, 'Sample: Expand Log Snippet')
+  await expect(editor.locator('.EditorRow').first()).toHaveText('console.log()')
+  await editor.locator('textarea').focus()
+  await page.keyboard.insertText('42')
+  await expect(editor.locator('.EditorRow').first()).toHaveText('console.log(42)')
 })

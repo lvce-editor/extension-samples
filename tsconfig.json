@@ -95,7 +95,19 @@
       "path": "./packages/sample-signature-help"
     },
     {
-      "path": "./packages/sample-language-editing"
+      "path": "./packages/sample-brace-completion"
+    },
+    {
+      "path": "./packages/sample-closing-tags"
+    },
+    {
+      "path": "./packages/sample-comments"
+    },
+    {
+      "path": "./packages/sample-selection-expansion"
+    },
+    {
+      "path": "./packages/sample-tab-completion"
     },
     {
       "path": "./packages/sample-syntax-highlighting"

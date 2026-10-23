@@ -1,4 +1,16 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+const openPreviewFile = async (page: Page, path: string): Promise<void> => {
+  const response = await page.request.get('/extension-samples/runtime.json')
+  const { entry } = await response.json()
+  await page.evaluate(
+    async ({ entry, path }) => {
+      const renderer = await import(entry)
+      await renderer.executeCommand('Application.execute', 'preview', 'Main.openUri', `memfs:///preview/${path}`)
+    },
+    { entry, path },
+  )
+}
 
 test('file extension selects a custom view and unrelated files stay in the editor', async ({ page }) => {
   await page.goto('/extension-samples/file-view/')
@@ -158,4 +170,35 @@ test('greeting source rebuilds and reset restores the sample', async ({ page }) 
   await expect(page.locator('#preview-ide .FileViewGreeting')).toHaveText('Updated greeting!')
   await page.getByRole('button', { name: 'Reset sample' }).click()
   await expect(page.locator('#preview-ide .FileViewGreeting')).toHaveText('Hello from a custom file view!')
+})
+
+test('color file opens a color preview in the main area and unrelated files stay in the editor', async ({ page }) => {
+  await page.goto('/extension-samples/color-view/')
+  const preview = page.locator('#preview-ide')
+  const view = preview.locator('.EditorGroup .ColorMainAreaView')
+  await expect(view).toBeVisible({ timeout: 30_000 })
+  await expect(view).toHaveCSS('background-color', 'rgb(240, 240, 240)')
+  await expect(view).toHaveText('A color view in the main editor area.')
+
+  await openPreviewFile(page, 'notes.txt')
+  await expect(preview.locator('.Editor')).toContainText('This file stays in the text editor.')
+  await expect(preview.locator('.EditorGroup .ColorMainAreaView')).toHaveCount(0)
+})
+
+test('color preview source rebuilds and reset restores its original color', async ({ page }) => {
+  await page.goto('/extension-samples/color-view/')
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
+  const response = await page.request.get('/extension-samples/samples/color-view/files.json')
+  const files = await response.json()
+  const source = page.locator('#source-ide')
+  await source.locator('.Editor textarea').focus()
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace("previewBackgroundColor = '#f0f0f0'", "previewBackgroundColor = '#eeeeee'"))
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await expect(page.locator('#preview-ide .EditorGroup .ColorMainAreaView')).toHaveCSS('background-color', 'rgb(238, 238, 238)')
+
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+  await expect(page.locator('#preview-ide .EditorGroup .ColorMainAreaView')).toHaveCSS('background-color', 'rgb(240, 240, 240)')
 })

@@ -9,7 +9,6 @@ test('extension opens the find widget and searches the preview document', async 
   const findInput = page.locator('#preview-ide .FindWidget .MultilineInputBox')
   const matchCount = page.locator('#preview-ide .FindWidgetMatchCount')
 
-  await runSelectedCommand(page, 'Sample: Find Phrase')
   await expect(findInput).toBeVisible()
   await expect(page.locator('#source-ide .FindWidget')).toHaveCount(0)
   await expect(findInput).toHaveValue('matching phrase')
@@ -17,6 +16,8 @@ test('extension opens the find widget and searches the preview document', async 
   await expect(editor.locator('.EditorRow')).toHaveText(['Find the matching phrase in this preview.', 'Another line stays unchanged.', ''])
 
   await runSelectedCommand(page, 'Sample: Find Phrase')
+  await expect(findInput).toBeVisible()
+  await expect(page.locator('#source-ide .FindWidget')).toHaveCount(0)
   await expect(findInput).toHaveValue('matching phrase')
   await expect(matchCount).toHaveText('1 of 1')
   await expect(editor.locator('.EditorRow')).toHaveText(['Find the matching phrase in this preview.', 'Another line stays unchanged.', ''])
@@ -36,4 +37,16 @@ test('extension opens the find widget and searches the preview document', async 
   await expect(findInput).toHaveValue('preview')
   await expect(matchCount).toHaveText('1 of 1')
   await expect(editor.locator('.EditorRow')).toHaveText(['Find the matching phrase in this preview.', 'Another line stays unchanged.', ''])
+
+  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await expect(findInput).toBeVisible()
+  await expect(findInput).toHaveValue('matching phrase')
+  await expect(matchCount).toHaveText('1 of 1')
+
+  await page.reload()
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await expect(findInput).toBeVisible()
+  await expect(findInput).toHaveValue('matching phrase')
+  await expect(matchCount).toHaveText('1 of 1')
 })
