@@ -1,0 +1,16 @@
+{
+  "id": "sample.comments",
+  "name": "Comments Sample",
+  "description": "Toggle block comments around the selected text.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:plaintext", "onCommand:sample.commentSelection"],
+  "commands": [
+    {
+      "id": "sample.commentSelection",
+      "label": "Sample: Toggle Sample Comment"
+    }
+  ]
+}
