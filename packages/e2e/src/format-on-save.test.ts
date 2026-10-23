@@ -45,7 +45,7 @@ for (const restoredDraft of [false, true]) {
       )
       .toBe("const message = { text: 'formatted on save' }")
     await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
-    await expect(page.getByRole('status')).toHaveText('Preview ready')
+    await expect(page.locator('#preview-status')).toHaveText('Preview ready')
     await page.reload()
     await expect(editor.locator('.EditorRow').first()).toHaveText("const message = { text: 'formatted on save' }", { timeout: 30_000 })
   })

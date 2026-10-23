@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { resetSample } from './PlaygroundControls.ts'
 import { runCommand } from './RunCommand.ts'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
 
@@ -23,7 +24,7 @@ test('status bar counter increments on click and resets with the sample', async 
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(item).toHaveText('Count: 10')
   await expect(item).toHaveCount(1)
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(item).toHaveText('Count: 0', { timeout: 30_000 })
   await expect(item).toHaveCount(1)
 })
@@ -32,7 +33,8 @@ test('status bar item updates after selection and preserves its value on cancell
   await page.goto('/extension-samples/status-bar-item/')
   const item = page.locator('#preview-ide .StatusBarItem').filter({ hasText: 'Environment:' })
   await expect(item).toHaveText('Environment: Development', { timeout: 30_000 })
-  await expect(page.locator('#source-ide .StatusBar')).toBeHidden()
+  await expect(page.locator('#source-ide .StatusBar')).toBeVisible()
+  await expect(page.locator('#source-ide .StatusBarItem').filter({ hasText: 'Sample:' })).toBeVisible()
   await item.click()
   await page.locator('#preview-ide .QuickPick').getByRole('option').filter({ hasText: 'Staging' }).click()
   await expect(item).toHaveText('Environment: Staging')
@@ -54,7 +56,7 @@ test('status bar item updates after selection and preserves its value on cancell
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(item).toHaveText('Environment: Production')
   await expect(item).toHaveCount(1)
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(item).toHaveText('Environment: Development', { timeout: 30_000 })
   await expect(item).toHaveCount(1)
 })
@@ -174,7 +176,7 @@ test('rename opens automatically, changes complete identifiers, and can be cance
   await page.keyboard.press('Escape')
   await expect(input).toBeHidden()
   await expect(editor.locator('.EditorRow')).toHaveText(['let color = blue', 'let colorful = green', 'print(color)', 'print(color)', ''])
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(input).toBeVisible()
   await expect(input).toHaveValue('color')
 })

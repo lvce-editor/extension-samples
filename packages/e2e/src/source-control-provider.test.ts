@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 test('opens the real LVCE source-control view beside the sample source', async ({ page }) => {
   await page.goto('/extension-samples/source-control-provider/')
@@ -13,7 +14,8 @@ test('opens the real LVCE source-control view beside the sample source', async (
   await expect(workbench.locator('.DecorationIcon')).toHaveCount(2)
   await expect(workbench.locator('.DecorationIcon').first()).toHaveJSProperty('naturalWidth', 16)
   await expect(workbench.locator('.ActivityBar')).toBeVisible()
-  await expect(workbench.locator('.TitleBar:visible, .StatusBar:visible')).toHaveCount(0)
+  await expect(workbench.locator('.TitleBar:visible')).toHaveCount(0)
+  await expect(workbench.locator('.StatusBar:visible')).toHaveCount(1)
   await expect(page.locator('#source-ide .ActivityBar:visible')).toHaveCount(0)
   const explorerTab = workbench.getByRole('tab', { name: 'Explorer' })
   const sourceControlTab = workbench.getByRole('tab', { name: 'Source Control' })
@@ -77,7 +79,7 @@ test('keeps the source-control preview activity bar visible after resize, reload
   await expect(preview.locator('.SourceControl')).toBeVisible()
   await expect(preview.locator('.ActivityBar')).toBeVisible()
 
-  await page.locator('#reset-button').click()
+  await resetSample(page)
   await expect(preview.locator('.SourceControl')).toBeVisible()
   await expect(preview.locator('.ActivityBar')).toBeVisible()
 })

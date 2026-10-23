@@ -245,6 +245,16 @@ export const buildStatic = async (): Promise<void> => {
     target: 'es2022',
     external: ['node:*', 'electron'],
   })
+  await build({
+    alias: { ...browserAliases, '@lvce-editor/api': join(assets, 'api.js') },
+    bundle: true,
+    entryPoints: [join(root, 'packages/playground/src/PlaygroundExtension.ts')],
+    format: 'esm',
+    inject: browserInject,
+    outfile: join(assets, 'playground-extension.js'),
+    platform: 'browser',
+    target: 'es2022',
+  })
   await cp(require.resolve('esbuild-wasm/esbuild.wasm'), join(assets, 'esbuild.wasm'))
   await cp(join(root, 'packages/playground/src/app.css'), join(assets, 'app.css'))
   for (const sample of samples) {

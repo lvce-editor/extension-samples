@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { resetSample } from './PlaygroundControls.ts'
 import { runCommand } from './RunCommand.ts'
 
 const lodashImport = /from\s+['"]lodash['"];/
@@ -103,7 +104,7 @@ test('generated output follows successful saves, survives failed builds, and res
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await openGenerated(page)
   await expect.poll(() => sourceText(page)).toContain('Next generated revision!')
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await openGenerated(page)
   await expect.poll(() => sourceText(page)).toContain('Hello World!')
@@ -146,7 +147,7 @@ test('npm dependency is bundled in the static and edited previews', async ({ pag
   await expect(page.locator('#preview-status')).toContainText('Package is not shipped in the playground: unshipped-package')
   await expect(page.locator('#preview-ide .NotificationMessage').last()).toHaveText('2 + 3 = 8')
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await expect(page.locator('#preview-ide .NotificationMessage').last()).toHaveText('2 + 3 = 5')
 })

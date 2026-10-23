@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { resetSample } from './PlaygroundControls.ts'
 
 const openPreviewFile = async (page: Page, path: string): Promise<void> => {
   const response = await page.request.get('/extension-samples/runtime.json')
@@ -150,7 +151,7 @@ test('file view counter source rebuilds and reset restores the sample', async ({
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '3')
   await expect(page.locator('#preview-ide .FileViewCounter')).toHaveCSS('gap', '24px')
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(page.locator('#preview-ide .FileViewCounter').getByRole('status')).toHaveText('Count: 0')
   await expect(page.locator('#preview-ide .FileViewCounter')).toHaveCSS('gap', '12px')
@@ -168,7 +169,7 @@ test('greeting source rebuilds and reset restores the sample', async ({ page }) 
   await page.keyboard.press('Control+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(page.locator('#preview-ide .FileViewGreeting')).toHaveText('Updated greeting!')
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('#preview-ide .FileViewGreeting')).toHaveText('Hello from a custom file view!')
 })
 
@@ -198,7 +199,7 @@ test('color preview source rebuilds and reset restores its original color', asyn
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
   await expect(page.locator('#preview-ide .EditorGroup .ColorMainAreaView')).toHaveCSS('background-color', 'rgb(238, 238, 238)')
 
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
   await expect(page.locator('#preview-ide .EditorGroup .ColorMainAreaView')).toHaveCSS('background-color', 'rgb(240, 240, 240)')
 })

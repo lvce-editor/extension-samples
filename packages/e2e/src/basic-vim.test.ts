@@ -1,6 +1,7 @@
 // cspell:words keymap lpha zzzalpha hzzzalpha himport iworks worksalpha cawword dawqqq dawdaw ldaw
 import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
+import { resetSample } from './PlaygroundControls.ts'
 import { runCommand } from './RunCommand.ts'
 
 const open = async (page: Page): Promise<void> => {
@@ -276,7 +277,7 @@ test('rebuilding and resetting releases the old keymap and cursor override', asy
   await expect(page.locator('#preview-ide .EditorCursor')).toHaveCSS('width', '2px')
   await page.keyboard.type('qqq')
   await expectOriginalText(page)
-  await page.getByRole('button', { name: 'Reset sample' }).click()
+  await resetSample(page)
   await expect(page.locator('#preview-status')).toHaveText('Preview ready')
   await focusEditor(page)
   await expect(page.locator('#preview-ide .EditorCursor')).toHaveCSS('opacity', '0.5')

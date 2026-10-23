@@ -51,7 +51,7 @@ test('text insertion survives a sample rebuild and inserts at an empty selection
   await page.keyboard.insertText(files['/src/main.ts'].replace('Hello, World!', 'Hello again!'))
   await page.keyboard.press('ControlOrMeta+s')
   await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
-  await expect(page.getByRole('status')).toHaveText('Preview ready')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
 
   await preview.locator('.EditorRow').first().click()
   await preview.locator('textarea').focus()
