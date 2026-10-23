@@ -2,6 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 
+const lodashImport = /from\s+['"]lodash['"];/
+
 const execute = async (page: Page, command: string, ...args: readonly unknown[]): Promise<any> => {
   const response = await page.request.get('/extension-samples/runtime.json')
   const { entry } = await response.json()
@@ -105,7 +107,7 @@ test('npm dependency is bundled in the static and edited previews', async ({ pag
   const staticCode = await staticBundle.text()
   expect(staticBundle.ok()).toBe(true)
   expect(staticCode).toContain('LARGE_ARRAY_SIZE')
-  expect(staticCode).not.toMatch(/from\s+['"]lodash['"];/)
+  expect(staticCode).not.toMatch(lodashImport)
 
   const response = await page.request.get('/extension-samples/samples/npm-dependency/files.json')
   const files = await response.json()
@@ -119,7 +121,7 @@ test('npm dependency is bundled in the static and edited previews', async ({ pag
   await expect(preview.locator('.NotificationMessage').last()).toHaveText('2 + 3 = 8')
   await openGenerated(page)
   await expect(source).toContainText('LARGE_ARRAY_SIZE')
-  expect(await source.innerText()).not.toMatch(/from\s+['"]lodash['"];/)
+  expect(await source.innerText()).not.toMatch(lodashImport)
 
   await page.reload()
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
