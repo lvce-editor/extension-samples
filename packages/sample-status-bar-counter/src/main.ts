@@ -6,10 +6,10 @@ const main = async (): Promise<void> => {
   const statusBar = registerStatusBarItemProvider({
     getStatusBarItem() {
       return {
-        ariaLabel: `Counter: ${count}`,
+        ariaLabel: `Counter: ${String(count)}`,
         name: 'sample.incrementStatusBarCounter',
         onClick: 'sample.incrementStatusBarCounter',
-        text: `Count: ${count}`,
+        text: `Count: ${String(count)}`,
         title: 'Click to increment the counter',
       }
     },
