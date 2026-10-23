@@ -6,6 +6,7 @@ export interface Sample {
     readonly entry: string
     readonly files: Record<string, string>
   }
+  readonly previewFilesPath?: string
   readonly route: string
   readonly title: string
 }
@@ -72,6 +73,8 @@ export const samples: readonly Sample[] = [
     description: 'Expose mock changed files, SVG decorations, and example commit actions.',
     id: 'source-control-provider',
     packageName: 'sample-source-control-provider',
+    preview: { entry: '/README.md', files: {} },
+    previewFilesPath: 'src/initial-files.json',
     route: 'source-control-provider',
     title: 'Source Control Provider',
   },

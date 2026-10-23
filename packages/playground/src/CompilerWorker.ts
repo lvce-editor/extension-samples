@@ -18,10 +18,11 @@ const getLoader = (path: string): esbuild.Loader => {
 }
 
 const getShippedPackagePath = (name: string, files: Record<string, string>): string | undefined => {
-  if (name !== 'lodash' || !('/node_modules/lodash/index.js' in files)) return undefined
+  const packagePath = `/node_modules/${name}/index.js`
+  if (!['lodash', 'memfs'].includes(name) || !(packagePath in files)) return undefined
   try {
     const packageJson = JSON.parse(files['/package.json'])
-    return packageJson.dependencies?.lodash ? '/node_modules/lodash/index.js' : undefined
+    return packageJson.dependencies?.[name] ? packagePath : undefined
   } catch {
     // An invalid editable package.json should not make an undeclared dependency available.
     return undefined
@@ -40,7 +41,12 @@ const buildOutput = async (files: Record<string, string>, api: string, inlineApi
         setup(build): void {
           build.onResolve({ filter: allPaths }, (args) => {
             if (args.path === '@lvce-editor/api') return inlineApi ? { namespace: 'api', path: 'api' } : { external: true, path: args.path }
-            if (args.path === 'memfs') return { namespace: 'workspace', path: '/node_modules/memfs/index.js' }
+            if (args.path === 'memfs') {
+              const packagePath = getShippedPackagePath(args.path, files)
+              return packagePath
+                ? { namespace: 'workspace', path: packagePath }
+                : { errors: [{ text: 'Package is not shipped in the playground: memfs' }] }
+            }
             if (args.importer && !args.path.startsWith('.')) {
               const packagePath = getShippedPackagePath(args.path, files)
               if (packagePath) return { namespace: 'workspace', path: packagePath }

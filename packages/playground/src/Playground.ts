@@ -48,6 +48,20 @@ const readIcons = (paths: readonly string[], files: Files): readonly string[] =>
     return content
   })
 
+const getPreviewWorkspace = (sampleId: string): string => {
+  if (sampleId === 'file-system-provider') return 'sample-memfs:///'
+  return 'memfs:///preview'
+}
+
+const getPreviewFiles = (sampleId: string, sample: Sample | undefined): Files => {
+  if (sample?.preview) return sample.preview.files
+  if (sampleId === 'file-system-provider') return {}
+  return {
+    '/README.md': '# Preview workspace\n',
+    '/src/main.ts': 'export const message = "Preview file"\n',
+  }
+}
+
 export const mountPlayground = async (
   invoke: Invoke,
   prefix: string,
@@ -72,15 +86,8 @@ export const mountPlayground = async (
   const sampleId = document.body.dataset.sampleId || 'file-system-provider'
   const samples = await fetchJson<Sample[]>(`${prefix}/samples.json`)
   const sample = samples.find((sample) => sample.id === sampleId)
-  const previewWorkspace = sampleId === 'file-system-provider' ? 'sample-memfs:///' : 'memfs:///preview'
-  const previewFiles: Files =
-    sample?.preview?.files ??
-    (sampleId === 'file-system-provider'
-      ? {}
-      : {
-          '/README.md': '# Preview workspace\n',
-          '/src/main.ts': 'export const message = "Preview file"\n',
-        })
+  const previewWorkspace = getPreviewWorkspace(sampleId)
+  const previewFiles = getPreviewFiles(sampleId, sample)
   const picker = document.querySelector<HTMLSelectElement>('#sample-picker')!
   const status = document.querySelector<HTMLElement>('#preview-status')!
   for (const sample of samples) picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
