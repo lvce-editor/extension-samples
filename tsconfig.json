@@ -59,6 +59,9 @@
       "path": "./packages/sample-status-bar-item"
     },
     {
+      "path": "./packages/sample-status-bar-counter"
+    },
+    {
       "path": "./packages/sample-output-channel"
     },
     {

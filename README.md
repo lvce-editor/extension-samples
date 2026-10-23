@@ -31,6 +31,7 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 - [Formatting Provider](./packages/sample-formatting-provider)
 - [Quick Input](./packages/sample-quick-input)
 - [Status Bar Item](./packages/sample-status-bar-item)
+- [Status Bar Counter](./packages/sample-status-bar-counter)
 - [Output Channel](./packages/sample-output-channel)
 - [Rename Provider](./packages/sample-rename-provider)
 - [Code Actions](./packages/sample-code-actions)
