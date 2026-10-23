@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test'
 
+const regexSpecialCharacters = /[.*+?^${}()|[\]\\]/g
+
 export const resetSample = async (page: Page): Promise<void> => {
   const reset = page.locator('#source-ide .StatusBarItem').filter({ hasText: 'Reset' })
   if (await reset.count()) {
@@ -14,6 +16,6 @@ export const resetSample = async (page: Page): Promise<void> => {
 export const selectSample = async (page: Page, title: string): Promise<void> => {
   await page.getByRole('button', { name: 'Choose a sample' }).click()
   await page.getByRole('combobox', { name: 'Choose an extension sample' }).fill(title)
-  const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const escapedTitle = title.replaceAll(regexSpecialCharacters, '\\$&')
   await page.getByRole('option', { name: new RegExp(`^${escapedTitle}(?:\\s|$)`) }).click()
 }
