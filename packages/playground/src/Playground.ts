@@ -90,7 +90,10 @@ export const mountPlayground = async (
   const previewFiles = getPreviewFiles(sampleId, sample)
   const picker = document.querySelector<HTMLSelectElement>('#sample-picker')!
   const status = document.querySelector<HTMLElement>('#preview-status')!
-  for (const sample of samples) picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
+  const sortedSamples = samples.toSorted((a, b) => a.title.localeCompare(b.title))
+  for (const sample of sortedSamples) {
+    picker.add(new Option(sample.title, sample.route, false, sample.id === sampleId))
+  }
   picker.addEventListener('change', () => location.assign(`${prefix}/${picker.value}/`))
   const storageKey = `extension-samples:workspace:${sampleId}`
   document.querySelector('#reset-button')!.addEventListener('click', () => {
