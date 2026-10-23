@@ -113,6 +113,9 @@
       "path": "./packages/sample-tab-completion"
     },
     {
+      "path": "./packages/sample-syntax-highlighting"
+    },
+    {
       "path": "./packages/sample-find-widget"
     },
     {

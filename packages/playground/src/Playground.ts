@@ -10,6 +10,7 @@ type Files = Record<string, string>
 interface BuildOutput {
   readonly code: string
   readonly generated: string
+  readonly tokenizers: Readonly<Record<string, string>>
 }
 interface Sample {
   readonly id: string
@@ -121,7 +122,9 @@ export const mountPlayground = async (
       for (const request of pending.values()) request.reject(compilerError)
       pending.clear()
     }
-    compiler.onmessage = ({ data }: MessageEvent<{ id: number; code: string; generated: string; error?: string }>): void => {
+    compiler.onmessage = ({
+      data,
+    }: MessageEvent<{ id: number; code: string; generated: string; tokenizers: Record<string, string>; error?: string }>): void => {
       const request = pending.get(data.id)
       pending.delete(data.id)
       if (data.error) request?.reject(new Error(data.error))
@@ -142,7 +145,7 @@ export const mountPlayground = async (
     const unchanged =
       Object.keys(files).length === Object.keys(initialFiles).length &&
       Object.entries(initialFiles).every(([path, content]) => files[path] === content)
-    return unchanged ? undefined : compile()
+    return unchanged && !JSON.parse(files['/extension.json']).languages ? undefined : compile()
   }
 
   const mount = async (id: string, workspaceUri: string, workspaceFiles: Files, extensions: readonly unknown[]): Promise<void> => {
@@ -259,21 +262,29 @@ export const mountPlayground = async (
     code: string | undefined,
     manifest: { readonly id: string; readonly [key: string]: unknown },
     icons: readonly string[],
+    tokenizers: Readonly<Record<string, string>>,
   ): Promise<void> => {
     const needsSetup = !previewExists
     const nextIconUrls = icons.map((content: string) => URL.createObjectURL(new Blob([content], { type: 'image/svg+xml' })))
     const nextPreviewUrl = createPreviewUrl(code)
+    const tokenizerUrls = Object.fromEntries(
+      Object.entries(tokenizers).map(([path, content]) => [path, URL.createObjectURL(new Blob([content], { type: 'text/javascript' }))]),
+    )
+    const languages = manifest.languages as readonly { tokenize?: string }[] | undefined
     const extension = {
       ...manifest,
       browser: nextPreviewUrl,
       contentSecurityPolicy: [],
       isWeb: true,
       path: location.origin,
+      ...(languages && {
+        languages: languages.map((language) => ({ ...language, tokenize: language.tokenize ? tokenizerUrls[language.tokenize] : undefined })),
+      }),
       'source-control-icons': nextIconUrls,
       uri: location.origin,
     }
     previewUrls.add(nextPreviewUrl)
-    for (const url of nextIconUrls) previewUrls.add(url)
+    for (const url of [...nextIconUrls, ...Object.values(tokenizerUrls)]) previewUrls.add(url)
     if (previewExists) {
       await invoke('Application.execute', previewId, 'Extensions.reload', previewExtensionId, extension)
     } else {
@@ -290,7 +301,7 @@ export const mountPlayground = async (
     if (Array.isArray(manifest.activation) && manifest.activation.includes('onEditorTextDecoration')) {
       await invoke('Application.execute', previewId, 'Editor.refreshTextDecorations')
     }
-    const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls])
+    const retainedUrls = new Set([nextPreviewUrl, ...nextIconUrls, ...Object.values(tokenizerUrls)])
     for (const url of previewUrls) {
       if (retainedUrls.has(url)) {
         continue
@@ -320,7 +331,7 @@ export const mountPlayground = async (
         if (requested) continue
         const manifest = JSON.parse(files['/extension.json'])
         const icons = readIcons(manifest['source-control-icons'] || [], files)
-        await updatePreview(output?.code, manifest, icons)
+        await updatePreview(output?.code, manifest, icons, output?.tokenizers || {})
         const nextGeneratedUrl = output
           ? await storeGeneratedBundle(output.generated)
           : new URL(`${prefix}/samples/${sampleId}/dist/main.js`, location.href).href

@@ -46,6 +46,7 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 - [Comments](./packages/sample-comments)
 - [Selection Expansion](./packages/sample-selection-expansion)
 - [Tab Completion](./packages/sample-tab-completion)
+- [Syntax Highlighting](./packages/sample-syntax-highlighting)
 
 ## Development
 
