@@ -36,10 +36,13 @@ test('status bar item updates after selection and preserves its value on cancell
   await item.click()
   await page.locator('#preview-ide .QuickPick').getByRole('option').filter({ hasText: 'Staging' }).click()
   await expect(item).toHaveText('Environment: Staging')
+  // Closing the picker restores editor focus after removing its DOM.
+  await expect(page.locator('#preview-ide .Editor textarea')).toBeFocused()
   await item.click()
   await expect(page.locator('#preview-ide .QuickPick')).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.locator('#preview-ide .QuickPick')).toBeHidden()
+  await expect(page.locator('#preview-ide .Editor textarea')).toBeFocused()
   await expect(item).toHaveText('Environment: Staging')
 
   const response = await page.request.get('/extension-samples/samples/status-bar-item/files.json')

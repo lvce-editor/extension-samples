@@ -31,7 +31,6 @@ const main = async (): Promise<void> => {
   await activateExtensionApi()
   registerView({
     create(): VirtualDomViewInstance {
-      let inputValue = defaultColor
       let backgroundColor = defaultColor
       return {
         getCss(): string {
@@ -43,7 +42,6 @@ const main = async (): Promise<void> => {
         },
         handleEvent(event): void {
           if (event.type !== 'input' || event.name !== 'color' || typeof event.value !== 'string') return
-          inputValue = event.value
           const color = event.value.trim()
           if (color && isCssColor(color)) backgroundColor = color
         },
@@ -56,9 +54,12 @@ const main = async (): Promise<void> => {
               className: 'ColorViewInput',
               inputType: 'text',
               name: 'color',
+              onFocus: 'handleFocus',
               onInput: 'handleInput',
+              onKeyDown: 'nativeInputKeyDown',
               type: Input,
-              value: inputValue,
+              // Keep native edits intact while asynchronous input events update the background.
+              value: defaultColor,
             },
             { childCount: 1, className: 'ColorViewPreview', role: 'status', type: Div },
             { childCount: 0, text: `Background: ${backgroundColor}`, type: Text },
@@ -66,6 +67,8 @@ const main = async (): Promise<void> => {
         },
       }
     },
+    // Leave input editing to the browser instead of the shared editor shortcut dispatcher.
+    eventListeners: [{ name: 'nativeInputKeyDown', params: [], stopPropagation: true }],
     id: 'sample.color-view',
     kind: 'virtualDom',
     preferredLocation: 'sideBar',
