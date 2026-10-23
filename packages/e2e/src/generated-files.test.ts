@@ -19,6 +19,8 @@ const openGenerated = async (page: Page): Promise<void> => {
   const source = page.locator('#source-ide')
   await source.getByRole('treeitem', { exact: true, name: 'dist' }).click()
   await source.getByRole('treeitem', { exact: true, name: 'main.js' }).click()
+  // Text can render before the new editor's asynchronous focus request arrives.
+  await expect(source.locator('.Editor textarea')).toBeFocused()
 }
 
 for (const sample of ['hello-world', 'file-system-provider']) {
