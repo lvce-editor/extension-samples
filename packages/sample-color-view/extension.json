@@ -6,7 +6,7 @@
   "browser": "dist/main.js",
   "isolated": true,
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
-  "activation": ["onView:sample.color-view"],
+  "activation": ["onView:sample.color-view", "onView:sample.color-view-preview"],
   "views": [
     {
       "id": "sample.color-view",
@@ -14,6 +14,14 @@
       "icon": "symbol-number",
       "kind": "virtualDom",
       "preferredLocation": "sideBar"
+    },
+    {
+      "id": "sample.color-view-preview",
+      "title": "Color Preview",
+      "kind": "virtualDom",
+      "type": "preview",
+      "selector": [".color"],
+      "showSideBarHeader": false
     }
   ]
 }

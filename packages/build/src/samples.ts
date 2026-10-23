@@ -243,14 +243,16 @@ export const samples: readonly Sample[] = [
     title: 'Error Dialog',
   },
   {
-    description: 'Type a CSS color to change the background of a preview view.',
+    description: 'Open a color preview in the main editor area for .color files.',
     id: 'color-view',
     packageName: 'sample-color-view',
     preview: {
-      entry: '/README.md',
+      entry: '/example.color',
       files: {
         '/README.md':
-          '# Color View\n\nOpen the **Color** sidebar and type a named or hexadecimal CSS color. Valid colors update the view background as you type. Empty or invalid values leave the last valid background in place. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
+          '# Color View\n\nOpen `example.color` to show the color preview in the main editor area. The **Color** sidebar view remains available for interactive named and hexadecimal color input. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
+        '/example.color': 'A color preview is shown in the main editor area.\n',
+        '/notes.txt': 'This file stays in the text editor.\n',
       },
     },
     route: 'color-view',
