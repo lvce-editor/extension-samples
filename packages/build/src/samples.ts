@@ -249,7 +249,8 @@ export const samples: readonly Sample[] = [
     preview: {
       entry: '/example.color',
       files: {
-        '/README.md': '# Color View\n\nOpen `example.color` to show the color preview in the main editor area. The **Color** sidebar view remains available for interactive named and hexadecimal color input. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
+        '/README.md':
+          '# Color View\n\nOpen `example.color` to show the color preview in the main editor area. The **Color** sidebar view remains available for interactive named and hexadecimal color input. Edit the source on the left and save with Ctrl+S to rebuild the preview.\n',
         '/example.color': 'A color preview is shown in the main editor area.\n',
         '/notes.txt': 'This file stays in the text editor.\n',
       },
