@@ -55,6 +55,7 @@ const main = async (): Promise<void> => {
               className: 'ColorViewInput',
               inputType: 'text',
               name: 'color',
+              onFocus: 'handleFocus',
               onInput: 'handleInput',
               type: Input,
               value: inputValue,
