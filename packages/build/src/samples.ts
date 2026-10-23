@@ -95,6 +95,14 @@ export const samples: readonly Sample[] = [
     title: 'Completion Provider',
   },
   {
+    description: 'Resolve a color completion to a custom inserted value.',
+    id: 'completion-resolve-provider',
+    packageName: 'sample-completion-resolve-provider',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'color=blu\nKeep this line unchanged.\n' } },
+    route: 'completion-resolve-provider',
+    title: 'Completion Resolve Provider',
+  },
+  {
     description: 'Show documentation for recognized color names.',
     id: 'hover-provider',
     packageName: 'sample-hover-provider',

@@ -23,6 +23,9 @@
       "path": "./packages/sample-completion-provider"
     },
     {
+      "path": "./packages/sample-completion-resolve-provider"
+    },
+    {
       "path": "./packages/sample-hover-provider"
     },
     {

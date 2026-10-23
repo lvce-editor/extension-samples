@@ -1,0 +1,15 @@
+{
+  "id": "sample.completion-resolve-provider",
+  "name": "Completion Resolve Provider Sample",
+  "description": "Resolve a completion into a custom inserted value.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "completionProviders": [
+    {
+      "id": "sample-completion-resolve",
+      "languageId": "plaintext"
+    }
+  ]
+}

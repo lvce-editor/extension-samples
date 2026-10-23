@@ -43,6 +43,25 @@ test('completion filters a typed prefix and inserts the selected color', async (
   await expect(page.locator('.EditorCompletion')).toBeHidden()
 })
 
+test('completion resolve supplies a custom value on acceptance and Escape cancels', async ({ page }) => {
+  await page.goto('/extension-samples/completion-resolve-provider/')
+  const editor = page.locator('#preview-ide .Editor')
+  const items = page.locator('.EditorCompletionItem')
+  await expect(editor).toContainText('color=blu', { timeout: 30_000 })
+  await expect(items).toHaveText(['blue'])
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.EditorCompletion')).toBeHidden()
+  await expect(editor.locator('.EditorRow')).toHaveText(['color=blu', 'Keep this line unchanged.', ''])
+
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('ControlOrMeta+Space')
+  await expect(items).toHaveText(['blue'])
+  await page.keyboard.press('Enter')
+  await expect(editor.locator('.EditorRow')).toHaveText(['color=#0000ff', 'Keep this line unchanged.', ''])
+  await expect(page.locator('.EditorCompletion')).toBeHidden()
+})
+
 test('source editor provides TypeScript completions for the sample files', async ({ page }) => {
   await page.goto('/extension-samples/file-system-provider/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
