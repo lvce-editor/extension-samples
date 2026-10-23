@@ -16,15 +16,15 @@ const main = async (): Promise<void> => {
     id: 'sample-counter',
   })
   registerCommand({
-    execute() {},
     id: 'sample.initializeStatusBarCounter',
+    execute() {},
   })
   registerCommand({
+    id: 'sample.incrementStatusBarCounter',
     async execute() {
       count++
       await statusBar.refresh()
     },
-    id: 'sample.incrementStatusBarCounter',
   })
 }
 

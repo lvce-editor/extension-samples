@@ -14,10 +14,10 @@ const main = async (): Promise<void> => {
     },
   })
   registerCommand({
+    id: 'sample.completeLog',
     async execute() {
       await executeCommand('Editor.tabCompletion')
     },
-    id: 'sample.completeLog',
   })
 }
 

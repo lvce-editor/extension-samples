@@ -10,10 +10,10 @@ const main = async (): Promise<void> => {
     },
   })
   registerCommand({
+    id: 'sample.commentSelection',
     async execute() {
       await executeCommand('Editor.toggleBlockComment')
     },
-    id: 'sample.commentSelection',
   })
 }
 

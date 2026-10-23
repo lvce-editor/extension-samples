@@ -68,11 +68,11 @@ const main = async (): Promise<void> => {
     keymap = undefined
   }
 
-  registerCommand({ execute: handleKey, id: 'basicVim.handleKey' })
-  registerCommand({ execute: () => undefined, id: 'basicVim.consumeKey' })
-  registerCommand({ execute: deleteWord, id: 'basicVim.deleteWord' })
-  registerCommand({ execute: start, id: 'basicVim.start' })
-  registerCommand({ execute: stop, id: 'basicVim.stop' })
+  registerCommand({ id: 'basicVim.handleKey', execute: handleKey })
+  registerCommand({ id: 'basicVim.consumeKey', execute: () => undefined })
+  registerCommand({ id: 'basicVim.deleteWord', execute: deleteWord })
+  registerCommand({ id: 'basicVim.start', execute: start })
+  registerCommand({ id: 'basicVim.stop', execute: stop })
 }
 
 main()

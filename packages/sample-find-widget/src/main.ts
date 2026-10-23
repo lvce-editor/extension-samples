@@ -3,6 +3,7 @@ import { activate, executeCommand, getWorkspaceUri, openUri, registerCommand } f
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
+    id: 'sample.findPhrase',
     async execute() {
       const root = await getWorkspaceUri()
       await openUri(`${root}/example.txt`)
@@ -12,7 +13,6 @@ const main = async (): Promise<void> => {
       const scriptInput = 2
       await executeCommand('Viewlet.executeViewletCommand', editorUid, 'FindWidget.handleInput', 'matching phrase', scriptInput)
     },
-    id: 'sample.findPhrase',
   })
 }
 

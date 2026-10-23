@@ -56,6 +56,7 @@ const buildTooling = async (): Promise<Record<string, string>> => {
     ['eslint', 'eslint/universal'],
     ['typescript-eslint', 'typescript-eslint'],
     ['eslint-plugin-unicorn', 'eslint-plugin-unicorn'],
+    ['eslint-plugin-perfectionist', 'eslint-plugin-perfectionist'],
   ]) {
     const result = await build({
       entryPoints: [require.resolve(entry)],

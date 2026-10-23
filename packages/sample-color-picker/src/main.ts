@@ -3,6 +3,7 @@ import { activate, getActiveEditor, openColorPicker, registerCommand } from '@lv
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
+    id: 'sample.openColorPicker',
     async execute() {
       const editor = await getActiveEditor()
       if (!editor) {
@@ -10,7 +11,6 @@ const main = async (): Promise<void> => {
       }
       await openColorPicker(editor.id, '#ff8800')
     },
-    id: 'sample.openColorPicker',
   })
 }
 

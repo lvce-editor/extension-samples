@@ -25,10 +25,10 @@ const main = async (): Promise<void> => {
   let generatedUrl = new URL('../samples/' + new URL(import.meta.url).searchParams.get('sample') + '/dist/main.js', import.meta.url).href
   await activate()
   registerCommand({
+    id: 'sampleSource.setGeneratedUrl',
     execute(url: string) {
       generatedUrl = url
     },
-    id: 'sampleSource.setGeneratedUrl',
   })
   registerFileSystemProvider({
     id: 'sample-source',

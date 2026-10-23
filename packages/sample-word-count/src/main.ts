@@ -4,6 +4,7 @@ import { countWords } from './count-words.ts'
 const main = async (): Promise<void> => {
   await activate()
   registerCommand({
+    id: 'sample.countWords',
     async execute() {
       const document = await executeCommand('GetActiveEditor.getTextDocument')
       if (!document || typeof document !== 'object' || !('text' in document) || typeof document.text !== 'string') {
@@ -14,7 +15,6 @@ const main = async (): Promise<void> => {
       const word = count === 1 ? 'word' : 'words'
       await showNotification('info', `There ${count === 1 ? 'is' : 'are'} ${String(count)} ${word}.`)
     },
-    id: 'sample.countWords',
   })
 }
 

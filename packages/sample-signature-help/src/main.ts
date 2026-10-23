@@ -5,10 +5,10 @@ const main = async (): Promise<void> => {
   await activate()
   registerSignatureHelpProvider({ id: 'sample-mix-signature', languageId: 'plaintext', provideSignatureHelp })
   registerCommand({
+    id: 'sample.showSignatureHelp',
     async execute() {
       await executeCommand('Editor.showSignatureHelp')
     },
-    id: 'sample.showSignatureHelp',
   })
 }
 

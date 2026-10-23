@@ -17,10 +17,10 @@ const main = async (): Promise<void> => {
     },
   })
   registerCommand({
+    id: 'sample.closeTag',
     async execute() {
       await executeCommand('Editor.typeWithAutoClosing', '/')
     },
-    id: 'sample.closeTag',
   })
 }
 

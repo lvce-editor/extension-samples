@@ -30,8 +30,9 @@ const collapseSelections = async (): Promise<void> => {
 
 const main = async (): Promise<void> => {
   await activate()
-  registerCommand({ execute: collapseSelections, id: 'sample.collapseSelections' })
+  registerCommand({ id: 'sample.collapseSelections', execute: collapseSelections })
   registerCommand({
+    id: 'sample.openExampleTabs',
     async execute() {
       const root = await getWorkspaceUri()
       await writeFile(`${root}/first-tab.txt`, 'First example tab')
@@ -39,21 +40,20 @@ const main = async (): Promise<void> => {
       await openUri(`${root}/first-tab.txt`)
       await openUri(`${root}/second-tab.txt`)
     },
-    id: 'sample.openExampleTabs',
   })
-  registerCommand({ execute: focusPreviousTab, id: 'sample.focusPreviousExampleTab' })
-  registerCommand({ execute: focusNextTab, id: 'sample.focusNextExampleTab' })
+  registerCommand({ id: 'sample.focusPreviousExampleTab', execute: focusPreviousTab })
+  registerCommand({ id: 'sample.focusNextExampleTab', execute: focusNextTab })
   registerCommand({
+    id: 'sample.closeExampleTabs',
     async execute() {
       const root = await getWorkspaceUri()
       await closeUri(`${root}/second-tab.txt`)
       await closeUri(`${root}/first-tab.txt`)
     },
-    id: 'sample.closeExampleTabs',
   })
   registerCommand({
-    execute: insertText,
     id: 'sample.insertText',
+    execute: insertText,
   })
 }
 
