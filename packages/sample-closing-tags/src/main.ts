@@ -18,7 +18,6 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.closeTag',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await executeCommand('Editor.typeWithAutoClosing', '/')
     },

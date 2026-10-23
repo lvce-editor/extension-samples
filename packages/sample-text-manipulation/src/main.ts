@@ -30,11 +30,9 @@ const collapseSelections = async (): Promise<void> => {
 
 const main = async (): Promise<void> => {
   await activate()
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'sample.collapseSelections', execute: collapseSelections })
   registerCommand({
     id: 'sample.openExampleTabs',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       const root = await getWorkspaceUri()
       await writeFile(`${root}/first-tab.txt`, 'First example tab')
@@ -43,13 +41,10 @@ const main = async (): Promise<void> => {
       await openUri(`${root}/second-tab.txt`)
     },
   })
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'sample.focusPreviousExampleTab', execute: focusPreviousTab })
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'sample.focusNextExampleTab', execute: focusNextTab })
   registerCommand({
     id: 'sample.closeExampleTabs',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       const root = await getWorkspaceUri()
       await closeUri(`${root}/second-tab.txt`)
@@ -58,7 +53,6 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.insertText',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     execute: insertText,
   })
 }

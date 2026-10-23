@@ -68,15 +68,10 @@ const main = async (): Promise<void> => {
     keymap = undefined
   }
 
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'basicVim.handleKey', execute: handleKey })
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'basicVim.consumeKey', execute: () => undefined })
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'basicVim.deleteWord', execute: deleteWord })
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'basicVim.start', execute: start })
-  // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
   registerCommand({ id: 'basicVim.stop', execute: stop })
 }
 

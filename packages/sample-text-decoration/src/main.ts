@@ -120,7 +120,6 @@ class TextDecorationSample {
   private registerExample(id: string, example: Example): void {
     registerCommand({
       id,
-      // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
       execute: this.selectExample.bind(this, example),
     })
   }
@@ -149,7 +148,6 @@ class TextDecorationSample {
     })
     registerCommand({
       id: 'sample.underlineSelection',
-      // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
       execute: this.underlineSelection.bind(this),
     })
     this.registerExample('sample.highlightTodos', 'todo')
@@ -157,12 +155,10 @@ class TextDecorationSample {
     this.registerExample('sample.findRepeatedWords', 'repeated')
     registerCommand({
       id: 'sample.clearUnderlines',
-      // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
       execute: this.clearUnderlines.bind(this),
     })
     registerCommand({
       id: 'sample.disposeUnderlines',
-      // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
       execute: this.disposeUnderlines.bind(this),
     })
   }

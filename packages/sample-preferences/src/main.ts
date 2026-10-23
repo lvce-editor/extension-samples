@@ -19,7 +19,6 @@ const main = async (): Promise<void> => {
   const ready = originalFontSize.then((value) => output.appendLine(`Current ${preferenceKey}: ${String(value)}`))
   registerCommand({
     id: 'sample.setFontSize',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       const fontSize = await showQuickPick({
@@ -39,7 +38,6 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.resetFontSize',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       await setPreference(preferenceKey, await originalFontSize)
@@ -50,7 +48,6 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.inspectConfiguration',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       const [definitions, themes] = await Promise.all([getConfigurationDefinitions(), getColorThemeNames()])

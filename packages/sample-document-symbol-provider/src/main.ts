@@ -7,7 +7,6 @@ const main = async (): Promise<void> => {
   const ready = setPreference('breadcrumbs.enabled', true)
   registerCommand({
     id: 'sample.initializeDocumentSymbols',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
     },

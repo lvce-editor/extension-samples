@@ -64,7 +64,6 @@ const main = async (): Promise<void> => {
   registerSourceControlProvider(provider)
   registerCommand({
     id: 'sampleSourceControl.discard',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     execute: discardFile,
   })
 }

@@ -5,7 +5,6 @@ const main = async (): Promise<void> => {
   await activate()
   registerCommand({
     id: 'sample.countWords',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       const document = await executeCommand('GetActiveEditor.getTextDocument')
       if (!document || typeof document !== 'object' || !('text' in document) || typeof document.text !== 'string') {

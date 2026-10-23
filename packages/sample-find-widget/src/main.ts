@@ -4,7 +4,6 @@ const main = async (): Promise<void> => {
   await activate()
   registerCommand({
     id: 'sample.findPhrase',
-    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       const root = await getWorkspaceUri()
       await openUri(`${root}/example.txt`)
