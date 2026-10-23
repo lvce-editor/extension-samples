@@ -9,8 +9,10 @@
     "@lvce-editor/extension-management-worker": "4.94.0",
     "@lvce-editor/renderer-process": "30.79.0",
     "@lvce-editor/shared-process": "0.125.5",
+    "@types/lodash": "^4.17.20",
     "esbuild": "^0.28.2",
     "esbuild-wasm": "^0.28.2",
+    "lodash": "^4.17.21",
     "tar": "^7.5.22"
   }
 }
