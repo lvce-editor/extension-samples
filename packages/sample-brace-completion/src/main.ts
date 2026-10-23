@@ -17,6 +17,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.completeBrace',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await executeCommand('Editor.braceCompletion', '(')
     },

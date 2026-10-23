@@ -22,6 +22,7 @@ const main = async (): Promise<void> => {
   const watchedUri = async (): Promise<string> => `${await getWorkspaceUri()}/watched.txt`
   registerCommand({
     id: 'sample.runBuild',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       build++
@@ -34,6 +35,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.clearBuildOutput',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       await output.clear()
@@ -42,6 +44,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.cacheBuildArtifact',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       const key = 'https://extension-samples.invalid/build-artifact'
@@ -60,6 +63,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.watchFileChanges',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       const uri = await watchedUri()
@@ -73,6 +77,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.writeWatchedFile',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       fileRevision++
@@ -83,6 +88,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.stopWatchingFileChanges',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       changeHandler?.dispose()
@@ -93,6 +99,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.reportBuildError',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       await ready
       const error = await preparePrettyError(new Error('Example build failure'))

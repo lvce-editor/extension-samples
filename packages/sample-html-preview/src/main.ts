@@ -67,6 +67,7 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: sampleCommandId,
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute(): Promise<void> {
       await executeCommand('Layout.openSideBarViewlet', sampleViewId)
     },

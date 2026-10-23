@@ -17,10 +17,12 @@ const main = async (): Promise<void> => {
   })
   registerCommand({
     id: 'sample.initializeStatusBar',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     execute() {},
   })
   registerCommand({
     id: 'sample.selectEnvironment',
+    // eslint-disable-next-line perfectionist/sort-objects -- sample API command IDs precede their handlers
     async execute() {
       const value = await showQuickPick({
         items: ['Development', 'Staging', 'Production'].map((label) => ({ description: `Use ${label.toLowerCase()} settings`, label, value: label })),
