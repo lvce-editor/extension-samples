@@ -128,7 +128,7 @@ export const mountPlayground = async (
       const worker = getCompiler()
       const id = ++nextBuild
       pending.set(id, { reject, resolve })
-      worker.postMessage({ files: { ...files }, id })
+      worker.postMessage({ files: { ...tooling, ...files }, id })
     })
 
   const getPreviewCode = async (): Promise<BuildOutput | undefined> => {

@@ -29,7 +29,17 @@ const buildOutput = async (files: Record<string, string>, api: string, inlineApi
           build.onResolve({ filter: allPaths }, (args) => {
             if (args.path === '@lvce-editor/api') return inlineApi ? { namespace: 'api', path: 'api' } : { external: true, path: args.path }
             if (args.importer && !args.path.startsWith('.')) {
-              return { errors: [{ text: `Only relative imports and @lvce-editor/api are supported: ${args.path}` }] }
+              if (args.path === 'lodash') {
+                try {
+                  const packageJson = JSON.parse(files['/package.json'])
+                  if (packageJson.dependencies?.lodash && '/node_modules/lodash/index.js' in files) {
+                    return { namespace: 'workspace', path: '/node_modules/lodash/index.js' }
+                  }
+                } catch {
+                  // An invalid editable package.json should not make an undeclared dependency available.
+                }
+              }
+              return { errors: [{ text: `Package is not shipped in the playground: ${args.path}` }] }
             }
             const path = new URL(args.path, `https://workspace${args.importer || '/'}`).pathname
             const match = [path, `${path}.ts`, `${path}.js`, `${path}/index.ts`].find((candidate) => candidate in files)

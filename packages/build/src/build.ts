@@ -65,6 +65,32 @@ const buildTooling = async (): Promise<Record<string, string>> => {
     await visit('dist')
     files[`/node_modules/${name}/package.json`] = await readFile(join(packageRoot, 'package.json'), 'utf8')
   }
+  const lodash = await build({
+    bundle: true,
+    entryPoints: [require.resolve('lodash')],
+    format: 'esm',
+    platform: 'browser',
+    target: 'es2022',
+    write: false,
+  })
+  files['/node_modules/lodash/lodash.js'] = lodash.outputFiles[0].text
+  files['/node_modules/lodash/index.js'] = `import lodash from './lodash.js'\nexport const add = lodash.add\nexport default lodash\n`
+  files['/node_modules/lodash/package.json'] = JSON.stringify({
+    main: 'index.js',
+    name: 'lodash',
+    types: '../@types/lodash/index.d.ts',
+  })
+  const lodashTypesRoot = dirname(require.resolve('@types/lodash/package.json'))
+  const copyLodashTypes = async (relative: string): Promise<void> => {
+    for (const entry of await readdir(join(lodashTypesRoot, relative), { withFileTypes: true })) {
+      const path = relative ? `${relative}/${entry.name}` : entry.name
+      if (entry.isDirectory()) await copyLodashTypes(path)
+      else if (entry.name.endsWith('.d.ts') || path === 'package.json') {
+        files[`/node_modules/@types/lodash/${path}`] = await readFile(join(lodashTypesRoot, path), 'utf8')
+      }
+    }
+  }
+  await copyLodashTypes('')
   const esbuildRoot = dirname(require.resolve('esbuild/package.json'))
   for (const path of ['package.json', 'README.md', 'LICENSE.md', 'install.js', 'lib/main.js', 'lib/main.d.ts']) {
     files[`/node_modules/esbuild/${path}`] = await readFile(join(esbuildRoot, path), 'utf8')

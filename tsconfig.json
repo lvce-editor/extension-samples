@@ -41,6 +41,9 @@
       "path": "./packages/sample-hello-world"
     },
     {
+      "path": "./packages/sample-npm-dependency"
+    },
+    {
       "path": "./packages/sample-text-manipulation"
     },
     {

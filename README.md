@@ -14,6 +14,7 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 - [Sidebar counter](./packages/sample-sidebar-counter)
 - [Color view](./packages/sample-color-view)
 - [Hello World](./packages/sample-hello-world)
+- [Npm Dependency](./packages/sample-npm-dependency)
 - [Text Decoration](./packages/sample-text-decoration)
 - [Text Manipulation](./packages/sample-text-manipulation)
 - [Word Count](./packages/sample-word-count)
@@ -75,9 +76,9 @@ The build generates SHA-256 hashes of each sample’s shipped files and configur
 
 The source Explorer also exposes read-only `dist/main.js` through a filesystem provider. It delegates editable files to the application’s memory filesystem and fetches generated JavaScript only when read. Successful builds refresh the package bundle (with `@lvce-editor/api` kept external), including open generated editors; failed builds keep the last successful output. Generated content is excluded from source snapshots and browser storage. Reset restores the shipped bundle without starting the compiler.
 
-The compiler resolves relative workspace imports and `@lvce-editor/api`. Saving code, manifests, or SVG icons rebuilds the preview. Compile and missing-icon errors leave the last working preview visible. The file-system preview reads its workspace from the sample's registered provider; the source-control preview shows its real source-control view and decoration icons.
+The compiler resolves relative workspace imports, `@lvce-editor/api`, and the shipped lodash dependency used by the Npm Dependency sample. Saving code, manifests, or SVG icons rebuilds the preview. Other npm packages and Node-only APIs are not available in the browser compiler. Compile and missing-icon errors leave the last working preview visible. The file-system preview reads its workspace from the sample's registered provider; the source-control preview shows its real source-control view and decoration icons.
 
-Saved workspace snapshots persist in browser storage when available; **Reset sample** restores the example. The generated site is a static GitHub Pages artifact. Arbitrary npm imports, Node-only APIs, and binary asset editing are not supported by the browser compiler.
+Saved workspace snapshots persist in browser storage when available; **Reset sample** restores the example. The generated site is a static GitHub Pages artifact. Beyond the shipped lodash dependency, npm packages, Node-only APIs, and binary asset editing are not supported by the browser compiler.
 
 Application isolation separates editor state and extension services; it is not a security sandbox for hostile code. Use the playground to experiment with code you trust.
 
