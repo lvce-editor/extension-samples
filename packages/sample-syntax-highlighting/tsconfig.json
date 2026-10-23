@@ -15,7 +15,9 @@
     "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "strict": true,
-    "target": "esnext"
+    "target": "esnext",
+    "allowJs": true,
+    "types": ["node"]
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }
