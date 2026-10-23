@@ -1,4 +1,4 @@
-import { expect, test } from './FocusDiagnostics.ts'
+import { expect, test } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 import { runCommand } from './RunCommand.ts'
 import { runSelectedCommand } from './RunSelectedCommand.ts'
