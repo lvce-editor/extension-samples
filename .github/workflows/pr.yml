@@ -55,6 +55,7 @@ jobs:
       - run: npm run e2e:headless
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
+          E2E_FOCUS_DIAGNOSTICS: '1'
       - uses: actions/upload-artifact@v7
         if: always()
         with:
