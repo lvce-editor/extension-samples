@@ -55,6 +55,7 @@ const main = async (): Promise<void> => {
               name: 'color',
               onFocus: 'handleFocus',
               onInput: 'handleInput',
+              onKeyDown: 'nativeInputKeyDown',
               type: Input,
               // Keep native edits intact while asynchronous input events update the background.
               value: defaultColor,
@@ -65,6 +66,8 @@ const main = async (): Promise<void> => {
         },
       }
     },
+    // Leave input editing to the browser instead of the shared editor shortcut dispatcher.
+    eventListeners: [{ name: 'nativeInputKeyDown', params: [], stopPropagation: true }],
     id: 'sample.color-view',
     kind: 'virtualDom',
     preferredLocation: 'sideBar',

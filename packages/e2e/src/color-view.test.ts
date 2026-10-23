@@ -80,6 +80,12 @@ test('color view input keeps keyboard and pointer interaction out of the source 
   await expect(colorInput).toBeFocused()
   await expect(page.locator('#preview-ide .ColorView')).toHaveCSS('background-color', 'rgb(0, 255, 136)')
   await expect.poll(() => sourceSnapshot(page)).toEqual(editedSource)
+
+  await page.keyboard.press('F1')
+  await expect(page.locator('#preview-ide .QuickPick')).toBeVisible()
+  await expect(page.locator('#source-ide .QuickPick')).toBeHidden()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.QuickPick')).toBeHidden()
 })
 
 test('editing the color view rebuilds the preview and reset restores the sample', async ({ page }) => {
