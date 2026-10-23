@@ -1,4 +1,5 @@
 import unicorn from 'eslint-plugin-unicorn'
+import perfectionist from 'eslint-plugin-perfectionist'
 import tseslint from 'typescript-eslint'
 
 export const commandRegistrationSort = [
@@ -14,6 +15,7 @@ export const sampleConfig = [
   ...tseslint.configs.strictTypeChecked,
   unicorn.configs.recommended,
   {
+    plugins: { perfectionist },
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       // The sample entry points intentionally start main without awaiting it.
