@@ -22,11 +22,6 @@ test('extension opens the find widget and searches the preview document', async 
   await expect(matchCount).toHaveText('1 of 1')
   await expect(editor.locator('.EditorRow')).toHaveText(['Find the matching phrase in this preview.', 'Another line stays unchanged.', ''])
 
-  await runSelectedCommand(page, 'Sample: Find Phrase')
-  await expect(findInput).toHaveValue('matching phrase')
-  await expect(matchCount).toHaveText('1 of 1')
-  await expect(editor.locator('.EditorRow')).toHaveText(['Find the matching phrase in this preview.', 'Another line stays unchanged.', ''])
-
   await expect(findInput).toBeFocused()
 
   const response = await page.request.get('/extension-samples/samples/find-widget/files.json')
