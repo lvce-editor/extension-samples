@@ -62,6 +62,9 @@
       "path": "./packages/sample-status-bar-item"
     },
     {
+      "path": "./packages/sample-status-bar-counter"
+    },
+    {
       "path": "./packages/sample-output-channel"
     },
     {
@@ -111,6 +114,9 @@
     },
     {
       "path": "./packages/sample-tab-completion"
+    },
+    {
+      "path": "./packages/sample-syntax-highlighting"
     },
     {
       "path": "./packages/sample-find-widget"

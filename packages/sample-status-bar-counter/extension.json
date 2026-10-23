@@ -1,0 +1,15 @@
+{
+  "id": "sample.status-bar-counter",
+  "name": "Status Bar Counter Sample",
+  "description": "Increment a counter from a clickable status bar item.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["*", "onStatusBarItem", "onCommand:sample.incrementStatusBarCounter", "onCommand:sample.initializeStatusBarCounter"],
+  "statusBarItems": [{ "id": "sample-counter" }],
+  "commands": [
+    { "id": "sample.incrementStatusBarCounter", "label": "Sample: Increment Status Bar Counter" },
+    { "id": "sample.initializeStatusBarCounter", "internal": true }
+  ]
+}
