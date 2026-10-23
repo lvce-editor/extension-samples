@@ -1,7 +1,7 @@
 import { expect, type Page } from '@playwright/test'
 
 export const focusEditor = async (page: Page, rootId = 'preview'): Promise<void> => {
-  const input = page.locator(`#${rootId}-ide .Editor textarea`)
+  const input = page.locator(`#${rootId}-ide .Editor textarea`).first()
   await input.focus()
   // DOM focus precedes the worker publishing the editor's active keybindings.
   // Await the same focus command before sending shortcuts to the embedded editor.

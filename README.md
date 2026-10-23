@@ -17,6 +17,7 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 - [Npm Dependency](./packages/sample-npm-dependency)
 - [Text Decoration](./packages/sample-text-decoration)
 - [Text Manipulation](./packages/sample-text-manipulation)
+- [Three Editors](./packages/sample-three-editors)
 - [Word Count](./packages/sample-word-count)
 - [Dialog](./packages/sample-dialog)
 - [Information dialog](./packages/sample-info-dialog)

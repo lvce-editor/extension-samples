@@ -21,6 +21,20 @@ export const samples: readonly Sample[] = [
     title: 'Basic Vim',
   },
   {
+    description: 'Open HTML, CSS, and JavaScript files in three columns with one API call.',
+    id: 'three-editors',
+    packageName: 'sample-three-editors',
+    preview: {
+      entry: '/README.md',
+      files: {
+        '/README.md':
+          '# Three Editors\n\nFocus the preview editor and run **Sample: Open Three Editors** to open the HTML, CSS, and JavaScript examples in three columns.\n',
+      },
+    },
+    route: 'three-editors',
+    title: 'Three Editors',
+  },
+  {
     description: 'Import lodash from an npm dependency and add two numbers.',
     id: 'npm-dependency',
     packageName: 'sample-npm-dependency',

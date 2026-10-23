@@ -1,0 +1,11 @@
+{
+  "id": "sample.three-editors",
+  "name": "Three Editors Sample",
+  "description": "Open HTML, CSS, and JavaScript files in three columns with one API call.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onCommand:sample.openThreeEditors"],
+  "commands": [{ "id": "sample.openThreeEditors", "label": "Sample: Open Three Editors" }]
+}
