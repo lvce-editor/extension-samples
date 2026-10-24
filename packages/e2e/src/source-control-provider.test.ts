@@ -47,7 +47,9 @@ test('opens the real LVCE source-control view beside the sample source', async (
 test('initializes and reloads the source-control preview without worker rejections', async ({ page }) => {
   const pageErrors: Error[] = []
   const unhandledRejections: string[] = []
-  page.on('pageerror', (error) => pageErrors.push(error))
+  page.on('pageerror', (error) => {
+    pageErrors.push(error)
+  })
   page.on('console', (message) => {
     if (message.type() === 'error' && message.text().includes('Unhandled Rejection')) {
       unhandledRejections.push(message.text())
