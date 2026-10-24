@@ -44,6 +44,34 @@ test('opens the real LVCE source-control view beside the sample source', async (
   await expect(workbench.locator('.Editor')).toContainText('Hello from the source-control memfs workspace')
 })
 
+test('initializes and reloads the source-control preview without worker rejections', async ({ page }) => {
+  const pageErrors: Error[] = []
+  const unhandledRejections: string[] = []
+  page.on('pageerror', (error) => {
+    pageErrors.push(error)
+  })
+  page.on('console', (message) => {
+    if (message.type() === 'error' && message.text().includes('Unhandled Rejection')) {
+      unhandledRejections.push(message.text())
+    }
+  })
+
+  await page.goto('/extension-samples/source-control-provider/')
+  const preview = page.locator('#preview-ide')
+  await expect(preview.locator('.SourceControl')).toContainText('Changes', { timeout: 30_000 })
+  await expect(preview.locator('.SourceControl')).toContainText('README.md')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+
+  await page.reload()
+  await expect(preview.locator('.SourceControl')).toContainText('Changes', { timeout: 30_000 })
+  await expect(preview.locator('.SourceControl')).toContainText('main.ts')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+  await expect(preview.getByRole('tab', { name: 'Explorer' })).toBeVisible()
+
+  expect(pageErrors).toEqual([])
+  expect(unhandledRejections).toEqual([])
+})
+
 test('discards changed files individually from the source-control view', async ({ page }) => {
   await page.goto('/extension-samples/source-control-provider/')
   const workbench = page.locator('#preview-ide')
