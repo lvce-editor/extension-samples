@@ -2,6 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { resetSample, selectSample } from './PlaygroundControls.ts'
 
 const sizeSymbol = /^size$/
+const markdownHoverSamplePath = /\/extension-samples\/hover-provider-with-markdown\/$/
 
 const formatDocument = async (page: Page, editor: Locator): Promise<void> => {
   await editor.locator('.EditorRow').first().click({ button: 'right' })
@@ -177,7 +178,7 @@ test('sample selector opens the Markdown hover sample', async ({ page }) => {
   await page.goto('/extension-samples/hover-provider/')
   await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
   await selectSample(page, 'Hover Provider with Markdown')
-  await expect(page).toHaveURL(/\/extension-samples\/hover-provider-with-markdown\/$/)
+  await expect(page).toHaveURL(markdownHoverSamplePath)
   await expect(page.locator('#source-ide .Editor')).toContainText('Markdown supports', { timeout: 30_000 })
   await expect(page.locator('#preview-status')).toHaveText('Preview ready')
 })
