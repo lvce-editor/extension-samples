@@ -50,6 +50,9 @@
       "path": "./packages/sample-text-manipulation"
     },
     {
+      "path": "./packages/sample-three-editors"
+    },
+    {
       "path": "./packages/sample-word-count"
     },
     {
