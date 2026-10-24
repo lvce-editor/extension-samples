@@ -27,6 +27,7 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 - [Completion Provider](./packages/sample-completion-provider)
 - [Completion Resolve Provider](./packages/sample-completion-resolve-provider)
 - [Hover Provider](./packages/sample-hover-provider)
+- [Hover Provider with Markdown](./packages/sample-hover-provider-with-markdown)
 - [Definition Provider](./packages/sample-definition-provider)
 - [Type Definition Provider](./packages/sample-type-definition-provider)
 - [Quick Pick](./packages/sample-quick-pick)

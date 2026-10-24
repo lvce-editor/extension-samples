@@ -29,6 +29,9 @@
       "path": "./packages/sample-hover-provider"
     },
     {
+      "path": "./packages/sample-hover-provider-with-markdown"
+    },
+    {
       "path": "./packages/sample-quick-pick"
     },
     {

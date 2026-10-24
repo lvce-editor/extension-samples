@@ -111,6 +111,14 @@ export const samples: readonly Sample[] = [
     title: 'Hover Provider',
   },
   {
+    description: 'Render formatted Markdown documentation for recognized words.',
+    id: 'hover-provider-with-markdown',
+    packageName: 'sample-hover-provider-with-markdown',
+    preview: { entry: '/example.txt', files: { '/example.txt': 'blue unknown\n' } },
+    route: 'hover-provider-with-markdown',
+    title: 'Hover Provider with Markdown',
+  },
+  {
     description: 'Jump from a variable reference to its declaration.',
     id: 'definition-provider',
     packageName: 'sample-definition-provider',
