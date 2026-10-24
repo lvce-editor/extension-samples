@@ -17,7 +17,7 @@ export default defineConfig({
     },
     {
       name: 'firefox',
-      testMatch: /diagnostic-geometry\.test\.ts/,
+      testMatch: /(diagnostic-geometry|selection)\.test\.ts/,
       use: {
         browserName: 'firefox',
       },
