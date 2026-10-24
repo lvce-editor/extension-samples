@@ -5,8 +5,12 @@ const regexSpecialCharacters = /[.*+?^${}()|[\]\\]/g
 export const resetSample = async (page: Page): Promise<void> => {
   const reset = page.locator('#source-ide .StatusBarItem').filter({ hasText: 'Reset' })
   if (await reset.count()) {
-    await reset.click()
-    return
+    try {
+      await reset.click({ timeout: 1_000 })
+      return
+    } catch {
+      // The status item can disappear during responsive layout changes.
+    }
   }
   await page.getByRole('button', { name: 'Choose a sample' }).click()
   await page.getByRole('combobox', { name: 'Choose an extension sample' }).fill('Reset sample')
