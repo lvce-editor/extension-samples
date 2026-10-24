@@ -1,7 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { resetSample } from './PlaygroundControls.ts'
+import { resetSample, selectSample } from './PlaygroundControls.ts'
 
 const sizeSymbol = /^size$/
+const markdownHoverSamplePath = /\/extension-samples\/hover-provider-with-markdown\/$/
 
 const formatDocument = async (page: Page, editor: Locator): Promise<void> => {
   await editor.locator('.EditorRow').first().click({ button: 'right' })
@@ -133,6 +134,53 @@ test('hover shows documentation only for a recognized word', async ({ page }) =>
   await page.keyboard.press('ArrowLeft')
   await page.keyboard.press('ControlOrMeta+h')
   await expect(page.locator('.EditorHover')).toBeHidden()
+})
+
+test('markdown hover renders formatting, skips unknown words, and rebuilds after reset', async ({ page }) => {
+  await page.goto('/extension-samples/hover-provider-with-markdown/')
+  const editor = page.locator('#preview-ide .Editor')
+  const hover = page.locator('#preview-ide .EditorHover')
+  await expect(editor).toContainText('blue unknown', { timeout: 30_000 })
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
+  await expect(hover.locator('.HoverDocumentation strong')).toHaveText('bold')
+  await expect(hover.locator('.HoverDocumentation code')).toHaveText('inline code')
+  await expect(hover.locator('.HoverDocumentation ul li')).toHaveText(['First item', 'Second item'])
+
+  await page.keyboard.press('Escape')
+  await page.keyboard.press('End')
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('ControlOrMeta+h')
+  await expect(hover).toBeHidden()
+
+  const response = await page.request.get('/extension-samples/samples/hover-provider-with-markdown/files.json')
+  const files = await response.json()
+  const source = page.locator('#source-ide .Editor')
+  await source.locator('textarea').focus()
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.insertText(files['/src/main.ts'].replace('Markdown supports', 'Updated Markdown supports'))
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '2')
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('ControlOrMeta+Home')
+  await page.keyboard.press('ControlOrMeta+h')
+  await expect(hover.locator('.HoverDocumentation')).toContainText('Updated Markdown supports')
+
+  await resetSample(page)
+  await expect(page.locator('body')).toHaveAttribute('data-preview-revision', '1')
+  await editor.locator('textarea').focus()
+  await page.keyboard.press('ControlOrMeta+Home')
+  await page.keyboard.press('ControlOrMeta+h')
+  await expect(hover.locator('.HoverDocumentation')).toContainText('Markdown supports')
+  await expect(hover.locator('.HoverDocumentation')).not.toContainText('Updated Markdown supports')
+})
+
+test('sample selector opens the Markdown hover sample', async ({ page }) => {
+  await page.goto('/extension-samples/hover-provider/')
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready', { timeout: 30_000 })
+  await selectSample(page, 'Hover Provider with Markdown')
+  await expect(page).toHaveURL(markdownHoverSamplePath)
+  await expect(page.locator('#source-ide .Editor')).toContainText('Markdown supports', { timeout: 30_000 })
+  await expect(page.locator('#preview-status')).toHaveText('Preview ready')
 })
 
 test('formatting normalizes settings and can be undone', async ({ page }) => {
