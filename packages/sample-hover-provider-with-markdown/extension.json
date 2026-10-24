@@ -1,0 +1,15 @@
+{
+  "id": "sample.hover-provider-with-markdown",
+  "name": "Hover Provider with Markdown Sample",
+  "description": "Show formatted Markdown documentation for recognized words.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "hoverProviders": [
+    {
+      "id": "sample-hover-with-markdown",
+      "languageId": "plaintext"
+    }
+  ]
+}
