@@ -6,7 +6,7 @@ export const resetSample = async (page: Page): Promise<void> => {
   const reset = page.locator('#source-ide .StatusBarItem').filter({ hasText: 'Reset' })
   if (await reset.count()) {
     try {
-      await reset.click({ timeout: 1_000 })
+      await reset.click({ timeout: 1000 })
       return
     } catch {
       // The status item can disappear during responsive layout changes.
