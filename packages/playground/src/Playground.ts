@@ -243,6 +243,7 @@ export const mountPlayground = async (
     await invoke('Application.execute', id, 'Preferences.update', { 'statusBar.itemsVisible': true })
     await invoke('Application.execute', id, 'StatusBar.handleChange')
     await invoke('Application.execute', id, 'Layout.openSideBarViewlet', 'Explorer')
+    if (document.body.dataset.embedded === 'true') await invoke('Application.execute', id, 'Layout.hideSideBar')
     if (id === previewId && sampleId === 'source-control-provider') {
       root.addEventListener(
         'mousedown',
@@ -444,7 +445,7 @@ export const mountPlayground = async (
   }
   await mount(sourceId, 'sample-source:///sample', { ...tooling, ...files }, [...sourceExtensions, sourceProvider, playgroundExtension])
   await invoke('Application.execute', sourceId, 'Preferences.update', { 'eslint.ignoreHashes': ignoreHashes })
-  await invoke('Application.execute', sourceId, 'Main.openUri', 'sample-source:///sample/src/main.ts')
+  await invoke('Application.execute', sourceId, 'Main.openUri', `sample-source:///sample/${document.body.dataset.sourceEntry || 'src/main.ts'}`)
   await rebuild()
   for (const id of [sourceId, previewId]) {
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!

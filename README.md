@@ -54,6 +54,10 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 
 ## Development
 
+To build a browser sample for a local desktop run, use `npm run build:desktop -- hello-world` (or `syntax-highlighting`), then `lvce --transient --link ./packages/sample-hello-world ./packages/sample-hello-world`. This bundles the API into the extension worker; the static playground's generated output keeps the API external for inspection.
+
+For a native desktop LSP example, see [Language Server](./packages/sample-language-server). It runs a real server process and is not part of the static browser playground.
+
 ```sh
 npm ci
 npm run dev
@@ -62,6 +66,10 @@ npm run dev
 Then open `http://localhost:3000/extension-samples/file-system-provider/`.
 
 Use `npm run build:static` to create the GitHub Pages artifact in `.tmp/static` and `npm run e2e:headless` to test the live-editing flow.
+
+Static consumers such as the documentation site can set `SAMPLES_BASE_PATH=/documentation/playground` and `SAMPLES_IDS=hello-world,syntax-highlighting` when building. The base path has no trailing slash; the IDs select which samples to ship. The default build still publishes the complete standalone playground.
+
+Consumers can prerender the running playground into a `[data-playground-snapshot]` wrapper and keep an empty playground skeleton in `[data-playground-live]` with `visibility:hidden`. Set `data-playground-state="static"` on the body to defer runtime imports until pointer or keyboard interaction. The bootstrap retains the snapshot during startup and replays the initial input into the live application. Preserve the runtime's adopted stylesheets when capturing DOM. Set `data-embedded="true"` for a compact initial layout, and optionally select `data-source-entry="src/tokenizeSprout.js"`.
 
 Run `npm run knip` to check unused files, exports, and dependencies across every package, including build tooling, e2e tests, the playground, and each extension sample. Both PR and main-branch CI run this check. The command also runs a production export check so sample entry-point exports are checked without Knip's build-script exemptions.
 

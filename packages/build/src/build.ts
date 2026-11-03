@@ -166,12 +166,19 @@ const installExtension = async (name: string, version: string, commitHash: strin
 }
 
 export const buildStatic = async (): Promise<void> => {
+  const base = process.env.SAMPLES_BASE_PATH || '/extension-samples'
+  if (!/^\/[\w/-]+$/.test(base) || base.endsWith('/')) throw new Error('SAMPLES_BASE_PATH must be an absolute path without a trailing slash')
+  const selectedIds = process.env.SAMPLES_IDS?.split(',')
+  const selectedSamples = selectedIds ? samples.filter((sample) => selectedIds.includes(sample.id)) : samples
+  if (!selectedSamples.length || selectedIds?.some((id) => !selectedSamples.some((sample) => sample.id === id))) {
+    throw new Error('SAMPLES_IDS must contain known sample IDs')
+  }
   await rm(outputRoot, { recursive: true, force: true })
   await mkdir(outputRoot, { recursive: true })
   const sharedProcess = await import(
     pathToFileURL(join(dirname(require.resolve('@lvce-editor/shared-process')), 'src/parts/ExportStatic/ExportStatic.js')).href
   )
-  const pathPrefix = '/extension-samples/runtime'
+  const pathPrefix = `${base}/runtime`
   let commitHash: string
   if (process.env.LVCE_STATIC_PATH) {
     // A local LVCE static build must use PATH_PREFIX=/extension-samples/runtime.
@@ -257,7 +264,7 @@ export const buildStatic = async (): Promise<void> => {
   })
   await cp(require.resolve('esbuild-wasm/esbuild.wasm'), join(assets, 'esbuild.wasm'))
   await cp(join(root, 'packages/playground/src/app.css'), join(assets, 'app.css'))
-  for (const sample of samples) {
+  for (const sample of selectedSamples) {
     const packageRoot = join(root, 'packages', sample.packageName)
     const files = await readWorkspace(packageRoot)
     await writeJson(join(outputRoot, 'samples', sample.id, 'files.json'), files)
@@ -291,10 +298,10 @@ export const buildStatic = async (): Promise<void> => {
     await mkdir(route, { recursive: true })
     await writeFile(join(route, 'index.html'), createHtml(sample, true, assetDir, runtimeConfig))
   }
-  await writeFile(join(outputRoot, 'index.html'), createHtml(samples[0], false, assetDir, runtimeConfig))
-  await writeFile(join(outputRoot, '404.html'), createHtml(samples[0], false, assetDir, runtimeConfig))
+  await writeFile(join(outputRoot, 'index.html'), createHtml(selectedSamples[0], false, assetDir, runtimeConfig))
+  await writeFile(join(outputRoot, '404.html'), createHtml(selectedSamples[0], false, assetDir, runtimeConfig))
   const outputSamples = await Promise.all(
-    samples.map(async (sample) => {
+    selectedSamples.map(async (sample) => {
       if (!sample.previewFilesPath || !sample.preview) return sample
       const { previewFilesPath, ...outputSample } = sample
       const previewFiles = JSON.parse(await readFile(join(root, 'packages', sample.packageName, previewFilesPath), 'utf8'))

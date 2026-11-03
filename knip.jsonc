@@ -29,5 +29,9 @@
       "entry": ["src/tokenizeSprout.js"],
       "includeEntryExports": true,
     },
+    "packages/sample-language-server": {
+      "entry": ["src/main.ts", "src/server.ts"],
+      "includeEntryExports": true,
+    },
   },
 }
