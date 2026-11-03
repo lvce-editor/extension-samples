@@ -11,7 +11,7 @@ const message = (value: unknown): string => {
   return `Content-Length: ${String(Buffer.byteLength(body))}\r\n\r\n${body}`
 }
 
-test('native server answers initialize and hover, frames Unicode output in bytes, and shuts down', async () => {
+test('native server answers initialize and completion, frames Unicode output in bytes, and shuts down', async () => {
   const child = spawn(process.execPath, [Path.resolve(import.meta.dirname, '../src/server.ts')], { stdio: 'pipe' })
   const chunks: Buffer[] = []
   const errors: Buffer[] = []
@@ -27,9 +27,9 @@ test('native server answers initialize and hover, frames Unicode output in bytes
       message({ id: 1, jsonrpc: '2.0', method: 'initialize', params: {} }),
       message({ jsonrpc: '2.0', method: 'initialized', params: {} }),
       message({
-        id: 2,
+        id: 'completion-\u{E9}',
         jsonrpc: '2.0',
-        method: 'textDocument/hover',
+        method: 'textDocument/completion',
         params: { position: { character: 0, line: 0 }, textDocument: { uri: 'file:///example.sproutlsp' } },
       }),
       message({ id: 3, jsonrpc: '2.0', method: 'shutdown' }),
@@ -54,9 +54,13 @@ test('native server answers initialize and hover, frames Unicode output in bytes
       {
         id: 1,
         jsonrpc: '2.0',
-        result: { capabilities: { hoverProvider: true, textDocumentSync: 1 }, serverInfo: { name: 'Sprout sample', version: '1.0.0' } },
+        result: { capabilities: { completionProvider: {}, textDocumentSync: 1 }, serverInfo: { name: 'Sprout sample', version: '1.0.0' } },
       },
-      { id: 2, jsonrpc: '2.0', result: { contents: { kind: 'plaintext', value: 'Hello from the Sprout language server. 🌱' } } },
+      {
+        id: 'completion-\u{E9}',
+        jsonrpc: '2.0',
+        result: [{ detail: 'A completion from the Sprout language server', insertText: 'helloFromServer', kind: 6, label: 'helloFromServer' }],
+      },
       // eslint-disable-next-line unicorn/no-null -- JSON-RPC requires a null shutdown result.
       { id: 3, jsonrpc: '2.0', result: null },
     ])

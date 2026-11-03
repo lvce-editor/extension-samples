@@ -25,7 +25,10 @@ const main = (): void => {
     if (request.id === undefined) return
     switch (request.method) {
       case 'initialize': {
-        respond(request.id, { capabilities: { hoverProvider: true, textDocumentSync: 1 }, serverInfo: { name: 'Sprout sample', version: '1.0.0' } })
+        respond(request.id, {
+          capabilities: { completionProvider: {}, textDocumentSync: 1 },
+          serverInfo: { name: 'Sprout sample', version: '1.0.0' },
+        })
         break
       }
       case 'shutdown': {
@@ -34,8 +37,10 @@ const main = (): void => {
         respond(request.id, null)
         break
       }
-      case 'textDocument/hover': {
-        respond(request.id, { contents: { kind: 'plaintext', value: 'Hello from the Sprout language server. 🌱' } })
+      case 'textDocument/completion': {
+        respond(request.id, [
+          { detail: 'A completion from the Sprout language server', insertText: 'helloFromServer', kind: 6, label: 'helloFromServer' },
+        ])
         break
       }
       default: {
