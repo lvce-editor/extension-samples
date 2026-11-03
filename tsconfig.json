@@ -132,6 +132,9 @@
     },
     {
       "path": "./packages/basic-vim"
+    },
+    {
+      "path": "./packages/sample-language-server"
     }
   ]
 }

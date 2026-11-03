@@ -1,0 +1,12 @@
+{
+  "id": "sample.language-server",
+  "name": "Language Server Sample",
+  "description": "Run a small native language server over standard input and output.",
+  "version": "0.0.0",
+  "browser": "dist/main.js",
+  "isolated": true,
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "activation": ["onLanguage:sprout-lsp", "onHover:sprout-lsp"],
+  "languages": [{ "id": "sprout-lsp", "extensions": [".sproutlsp"] }],
+  "languageServers": [{ "id": "sample.sprout-server", "languageId": "sprout-lsp" }]
+}
