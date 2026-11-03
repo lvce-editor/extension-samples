@@ -54,6 +54,8 @@ Extensions live in `packages/sample-<id>` or `packages/basic-vim`. The static pl
 
 ## Development
 
+To build a browser sample for a local desktop run, use `npm run build:desktop -- hello-world` (or `syntax-highlighting`), then `lvce --transient --link ./packages/sample-hello-world ./packages/sample-hello-world`. This bundles the API into the extension worker; the static playground's generated output keeps the API external for inspection.
+
 For a native desktop LSP example, see [Language Server](./packages/sample-language-server). It runs a real server process and is not part of the static browser playground.
 
 ```sh

@@ -4,7 +4,7 @@ import Path from 'node:path'
 await build({
   bundle: true,
   entryPoints: [Path.resolve(import.meta.dirname, 'src/main.ts')],
-  external: ['@lvce-editor/api'],
+  external: ['node:*', 'electron'],
   format: 'esm',
   outfile: Path.resolve(import.meta.dirname, 'dist/main.js'),
   platform: 'browser',
