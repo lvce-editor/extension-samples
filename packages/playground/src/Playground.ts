@@ -445,6 +445,7 @@ export const mountPlayground = async (
   }
   await mount(sourceId, 'sample-source:///sample', { ...tooling, ...files }, [...sourceExtensions, sourceProvider, playgroundExtension])
   await invoke('Application.execute', sourceId, 'Preferences.update', { 'eslint.ignoreHashes': ignoreHashes })
+  await invoke('Application.execute', sourceId, 'Main.openUri', 'sample-source:///sample/extension.json')
   await invoke('Application.execute', sourceId, 'Main.openUri', `sample-source:///sample/${document.body.dataset.sourceEntry || 'src/main.ts'}`)
   await rebuild()
   for (const id of [sourceId, previewId]) {
