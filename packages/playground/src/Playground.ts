@@ -68,6 +68,18 @@ export const mountPlayground = async (
   sourceExtensions: readonly unknown[],
   invokeShortcut: Invoke,
 ): Promise<void> => {
+  if (document.body.dataset.embedded === 'true') {
+    for (const type of ['dragstart', 'dragover', 'drop']) {
+      document.addEventListener(
+        type,
+        (event) => {
+          event.preventDefault()
+          event.stopImmediatePropagation()
+        },
+        { capture: true },
+      )
+    }
+  }
   setupPreviewDivider()
   try {
     await invoke('ColorTheme.setColorTheme', 'slime')
