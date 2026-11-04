@@ -70,7 +70,7 @@ export const mountPlayground = async (
 ): Promise<void> => {
   if (document.body.dataset.embedded === 'true') {
     for (const type of ['dragstart', 'dragover', 'drop']) {
-      document.addEventListener(
+      window.addEventListener(
         type,
         (event) => {
           event.preventDefault()
