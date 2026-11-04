@@ -48,15 +48,16 @@ export const tokenizeLine = (line, lineState) => {
       continue
     }
     const value = match[0]
-    const type = value.startsWith('//')
-      ? TokenType.Comment
-      : value.startsWith('"') || value.startsWith("'")
-        ? TokenType.String
-        : numberPattern.test(value)
-          ? TokenType.Number
-          : keywordPattern.test(value)
-            ? TokenType.Keyword
-            : TokenType.Punctuation
+    let type = TokenType.Punctuation
+    if (value.startsWith('//')) {
+      type = TokenType.Comment
+    } else if (value.startsWith('"') || value.startsWith("'")) {
+      type = TokenType.String
+    } else if (numberPattern.test(value)) {
+      type = TokenType.Number
+    } else if (keywordPattern.test(value)) {
+      type = TokenType.Keyword
+    }
     tokens.push(type, value.length)
     offset += value.length
     if (type === TokenType.Comment) break
