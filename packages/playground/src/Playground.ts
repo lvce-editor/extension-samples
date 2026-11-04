@@ -68,18 +68,6 @@ export const mountPlayground = async (
   sourceExtensions: readonly unknown[],
   invokeShortcut: Invoke,
 ): Promise<void> => {
-  if (document.body.dataset.embedded === 'true') {
-    for (const type of ['dragstart', 'dragover', 'drop']) {
-      globalThis.addEventListener(
-        type,
-        (event) => {
-          event.preventDefault()
-          event.stopImmediatePropagation()
-        },
-        { capture: true },
-      )
-    }
-  }
   setupPreviewDivider()
   try {
     await invoke('ColorTheme.setColorTheme', 'slime')
@@ -230,6 +218,26 @@ export const mountPlayground = async (
 
   const mount = async (id: string, workspaceUri: string, workspaceFiles: Files, extensions: readonly unknown[]): Promise<void> => {
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
+    if (document.body.dataset.embedded === 'true') {
+      const disableTabDragging = (): void => {
+        for (const tab of root.querySelectorAll<HTMLElement>('.MainTab')) {
+          if (tab.draggable) tab.draggable = false
+        }
+      }
+      const preventTabDrop = (event: DragEvent): void => {
+        const { target } = event
+        if (!(target instanceof Element) || !target.closest('.MainTab')) return
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        if (event.type === 'dragover' && event.dataTransfer) event.dataTransfer.dropEffect = 'none'
+      }
+      for (const type of ['dragstart', 'dragover', 'drop'] as const) {
+        root.addEventListener(type, preventTabDrop, { capture: true })
+      }
+      const observer = new MutationObserver(disableTabDragging)
+      observer.observe(root, { attributeFilter: ['draggable'], attributes: true, childList: true, subtree: true })
+      disableTabDragging()
+    }
     const { height, width } = root.getBoundingClientRect()
     await invoke('Application.create', {
       extensions,
