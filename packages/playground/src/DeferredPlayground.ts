@@ -88,14 +88,50 @@ export const deferPlayground = (start: () => Promise<PlaygroundRuntime>): void =
     activation ||= (async (): Promise<void> => {
       try {
         document.body.dataset.playgroundState = 'loading'
+        const scrollPositions: { scrollX: number; scrollY: number; window: Window }[] = []
+        const getParentWindow = (parentWindow: Window): Window | undefined => {
+          try {
+            if (parentWindow === parentWindow.parent) return undefined
+            return parentWindow.parent
+          } catch {
+            return undefined
+          }
+        }
+        let parentWindow: Window | undefined = globalThis.parent
+        while (parentWindow) {
+          try {
+            const { scrollX, scrollY } = parentWindow
+            scrollPositions.push({ scrollX, scrollY, window: parentWindow })
+          } catch {
+            break
+          }
+          parentWindow = getParentWindow(parentWindow)
+        }
+        const restoreScrollPositions = (): void => {
+          for (const { scrollX, scrollY, window: parentWindow } of scrollPositions) {
+            if (parentWindow.scrollX !== scrollX || parentWindow.scrollY !== scrollY) parentWindow.scrollTo(scrollX, scrollY)
+          }
+        }
+        const focusEvents = new AbortController()
+        document.addEventListener('focusin', () => globalThis.requestAnimationFrame(restoreScrollPositions), { signal: focusEvents.signal })
+        document.addEventListener('keydown', () => focusEvents.abort(), { once: true, signal: focusEvents.signal })
+        try {
+          globalThis.parent.document.addEventListener('wheel', () => focusEvents.abort(), {
+            once: true,
+            passive: true,
+            signal: focusEvents.signal,
+          })
+          globalThis.parent.document.addEventListener('pointerdown', () => focusEvents.abort(), { once: true, signal: focusEvents.signal })
+        } catch {
+          focusEvents.abort()
+        }
         const runtime = await start()
-        const ownsFocus = snapshot.contains(document.activeElement)
         snapshot.remove()
         live.style.visibility = ''
         replaying = true
         listeners.abort()
-        if (ownsFocus) document.querySelector<HTMLElement>(`#${application}-ide .EditorInput textarea`)?.focus()
         await replayInputs(queued, runtime)
+        restoreScrollPositions()
         document.body.dataset.playgroundState = 'live'
       } catch (error) {
         document.body.dataset.playgroundState = 'error'
