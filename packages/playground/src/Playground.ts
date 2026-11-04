@@ -220,7 +220,9 @@ export const mountPlayground = async (
     const root = document.querySelector<HTMLElement>(`#${id}-ide`)!
     if (document.body.dataset.embedded === 'true') {
       const disableTabDragging = (): void => {
-        for (const tab of root.querySelectorAll<HTMLElement>('.MainTab')) tab.draggable = false
+        for (const tab of root.querySelectorAll<HTMLElement>('.MainTab')) {
+          if (tab.draggable) tab.draggable = false
+        }
       }
       const preventTabDrop = (event: DragEvent): void => {
         const { target } = event
