@@ -205,6 +205,14 @@ export const buildStatic = async (): Promise<void> => {
     join(root, 'dist', commitHash, 'packages', 'extension-management-worker', 'dist'),
     { recursive: true },
   )
+  // Preserve the owning application's providers when opening source actions.
+  await cp(
+    dirname(require.resolve('@lvce-editor/source-action-worker')),
+    join(root, 'dist', commitHash, 'packages', 'source-action-worker', 'dist'),
+    {
+      recursive: true,
+    },
+  )
   await installExtension('eslint', '1.20.0', commitHash, pathPrefix)
   // Put Prettier first so its edits win over optional TypeScript formatting.
   await installExtension('prettier', '2.23.1', commitHash, pathPrefix)

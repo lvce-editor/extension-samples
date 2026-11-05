@@ -9,6 +9,7 @@
     "@lvce-editor/extension-management-worker": "4.98.0",
     "@lvce-editor/renderer-process": "30.81.6",
     "@lvce-editor/shared-process": "0.127.11",
+    "@lvce-editor/source-action-worker": "1.23.1",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "@types/lodash": "^4.17.20",
