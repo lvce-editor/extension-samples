@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
 
 const regexSpecialCharacters = /[.*+?^${}()|[\]\\]/g
 
@@ -18,6 +18,8 @@ export const resetSample = async (page: Page): Promise<void> => {
 }
 
 export const selectSample = async (page: Page, title: string): Promise<void> => {
+  // The source toolbar appears before both embedded applications finish mounting.
+  await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
   await page.getByRole('button', { name: 'Choose a sample' }).click()
   await page.getByRole('combobox', { name: 'Choose an extension sample' }).fill(title)
   const escapedTitle = title.replaceAll(regexSpecialCharacters, '\\$&')

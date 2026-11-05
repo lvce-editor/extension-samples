@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 
+// Two TypeScript 7 source requests take about 19 seconds each, plus preview and layout checks.
+test.describe.configure({ timeout: 90_000 })
+
 test('positions empty source actions next to the cursor in the embedded editor', async ({ page }) => {
   await page.goto('/extension-samples/hello-world/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
@@ -13,7 +16,7 @@ test('positions empty source actions next to the cursor in the embedded editor',
     await page.keyboard.press('ControlOrMeta+.')
 
     const actions = root.getByRole('listbox')
-    if (rootId === 'source') await expect(actions).toContainText('Organize Imports')
+    if (rootId === 'source') await expect(actions).toContainText('Organize Imports', { timeout: 30_000 })
     else await expect(root.locator('.EditorMessageText')).toHaveText('No code actions available')
     const popupBox = await root.locator('.EditorMessage, .EditorSourceActions').boundingBox()
     const cursorBox = await editor.locator('.EditorCursor').boundingBox()

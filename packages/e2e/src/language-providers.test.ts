@@ -77,7 +77,8 @@ test('source editor provides TypeScript completions for the sample files', async
   const completion = page.getByRole('option', { exact: true, name: 'fileStore' })
   await expect(completion).toBeVisible({ timeout: 30_000 })
   await page.keyboard.press('Enter')
-  await expect(editor.locator('.EditorRow').last()).toHaveText('fileStore')
+  // TypeScript 7 resolves this completion before applying it (16.5 seconds in the measured run).
+  await expect(editor.locator('.EditorRow').last()).toHaveText('fileStore', { timeout: 30_000 })
 })
 
 test('sample tokenizer highlights Sprout files and survives preview edits and reset', async ({ page }) => {
