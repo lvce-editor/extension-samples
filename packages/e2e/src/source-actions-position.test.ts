@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { focusEditor } from './FocusEditor.ts'
 
+// Two TypeScript 7 source requests take about 19 seconds each, plus preview and layout checks.
+test.describe.configure({ timeout: 90_000 })
+
 test('positions empty source actions next to the cursor in the embedded editor', async ({ page }) => {
-  // Two TypeScript 7 source requests take about 19 seconds each, plus preview and layout checks.
-  test.setTimeout(90_000)
   await page.goto('/extension-samples/hello-world/')
   await expect(page.locator('body')).toHaveAttribute('data-playground-ready', 'true', { timeout: 30_000 })
 
